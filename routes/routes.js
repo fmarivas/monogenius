@@ -19,7 +19,6 @@ const Files = require('../controllers/function/uploadFILES');
 
 router.get('/', async (req,res) =>{
 	try{
-		console.log(cloudinary.url('d4869f8a4ec3adce80fa8e61beec964e'))
 		res.render('landingpage')		
 	}catch(err){
 		console.error(err)
