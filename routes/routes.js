@@ -14,11 +14,34 @@ const fileReader = require('../controllers/function/fileFunction')
 const userRequest = require('../controllers/function/canMakeRequest')
 const isAuth = require('../controllers/function/middleware/auth')
 
-router.get('/', (req,res) =>{
-	res.render('landingpage')
+const cloudinary = require('../controllers/cloudinaryClient')
+const Files = require('../controllers/function/uploadFILES');
+
+router.get('/', async (req,res) =>{
+	try{
+		console.log(cloudinary.url('d4869f8a4ec3adce80fa8e61beec964e'))
+		res.render('landingpage')		
+	}catch(err){
+		console.error(err)
+	}
 })
 
 const generalRoutes = {
+	'upload-files': async (req,res)=>{
+		try {
+			const baseImagePath = path.join(__dirname, '..', 'public', 'assets', 'img');
+			
+			const uploadSuccess = await Files.uploadAllImages(baseImagePath);
+			if (uploadSuccess) {
+				res.send('Upload de imagens concluído com sucesso');
+			} else {
+				res.status(500).send('Erro ao fazer upload das imagens');
+			}
+		} catch (err) {
+			console.error('Erro ao processar upload de imagens:', err);
+			res.status(500).send('Erro interno do servidor');
+		}
+	},
   'about': 'about',
   'terms': 'terms',
   'privacy': 'privacy',
@@ -98,6 +121,7 @@ router.get('/:id', (req, res, next) => {
   const id = req.params.id;
   const route = generalRoutes[id];
 
+console.log(id)
   if (typeof route === 'function') {
     route(req, res);
   } else if (route) {
