@@ -14,7 +14,7 @@ class Files {
                 } else if (['.jpg', '.jpeg', '.png', '.gif', 'webp', 'ico'].includes(path.extname(file.name).toLowerCase())) {
                     // Se for uma imagem, faz o upload
                     const relativePath = path.relative(baseFolder, filePath);
-                    const publicId = `assets_${relativePath.replace(/\\/g, '/')}`.replace(/\.[^/.]+$/, "");
+                    const publicId = `${relativePath.replace(/\\/g, '/')}`.replace(/\.[^/.]+$/, "");
                     const result = await cloudinary.uploader.upload(filePath, {
                         public_id: publicId,
                         folder: 'assets'
