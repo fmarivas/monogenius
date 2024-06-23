@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+	<link rel="apple-touch-icon" sizes="180x180" href="/assets/img/favicon/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon/favicon-16x16.png">
+	<link rel="manifest" href="/assets/img/favicon/site.webmanifest">      
+	<script src="https://cdn.tailwindcss.com"></script>
+	<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="/assets/js/template.js"></script>
+	<script src="//code.tidio.co/mwu2j13oujaafzownf2hemd6v6mfeyfl.js" async></script>
+	<!-- Google tag (gtag.js) -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-PTD2W9YS10"></script>
+	<script>
+	  window.dataLayer = window.dataLayer || [];
+	  function gtag(){dataLayer.push(arguments);}
+	  gtag('js', new Date());
+
+	  gtag('config', 'G-PTD2W9YS10');
+	</script>   
+ 
+	<title>Monogenius - Templates</title>
+</head>
+<body class="bg-gray-100 font-sans">
+    <header class="bg-white shadow sticky to/cp-0 z-10">
+		<!-- Modal Message-->
+		<div id="modalMessage" class="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 invisible">
+			<div class="bg-white rounded-lg shadow-lg p-4 max-w-sm mx-auto my-4">
+				<div class="flex items-start justify-between mb-2">
+					<div class="flex items-center">
+						<svg id="modal-icon" class="w-6 h-6 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+						</svg>
+						<h3 id="modal-title" class="text-lg font-medium text-gray-900"></h3>
+					</div>
+					<!-- <button id="close-modal" type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg p-1.5 ml-auto inline-flex items-center"> -->
+						<!-- <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"> -->
+							<!-- <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path> -->
+						<!-- </svg> -->
+					<!-- </button>					 -->
+				</div>
+				<p id="modal-message" class="text-gray-700"></p>
+			</div>
+		</div>		
+			
+        <nav class="container mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center">
+                <a href="/c/dashboard" class="text-xl font-bold text-gray-800">Monogenius</a>
+            </div>
+            <div class="flex items-center">
+                <a href="/c/plagiarism" class="text-gray-600 hover:text-gray-800 mx-4">Verificador de Plágio</a>
+                <a href="/c/template" class="text-gray-600 hover:text-gray-800 mx-4">Templates</a>
+                <a href="/c/profile" class="text-gray-600 hover:text-gray-800 mx-4">Perfil</a>
+            </div>
+        </nav>
+    </header>
+	<!-- Modal -->
+	<div id="modal" class="hidden overflow-auto fixed inset-0 z-50 mt-6 flex items-center justify-center">
+		<div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+		<div class="transform scale-50">
+			<div id="downloadArea" >
+				<div contenteditable="true" class="bg-white flex flex-col pt-[2.47cm] pb-[2.78cm] pl-[2.79cm] pr-[2.12cm] w-[210mm] h-[297mm] z-10 rounded-lg">
+					<div id="logoContainer" class="flex justify-center mb-4"></div>
+					<span id="instituicaoContainer" class="block text-center font-bold text-xl text-[10pt] leading-6 font-['Times New Roman']"></span>
+					
+					<div class="h-[108pt]"></div>
+					
+					<span id="temaContainer" class="block mt-auto text-center text-lg leading-6 text-[12pt] font-['Times New Roman']"></span>
+					<div class="h-[108pt]"></div>
+					<div class="flex flex-col justify-center mb-auto mt-5">
+						<span id="autorContainer" class="block text-center text-lg leading-[22.5pt] text-[12pt] font-['Times New Roman'] mb-[9pt]"></span>
+						<span id="supervisorContainer" class="block text-center text-lg leading-[22.5pt] text-[12pt] font-['Times New Roman']"></span>
+					</div>
+					<div class="flex justify-center mt-auto">
+						<span id="localContainer" class="block text-center text-lg leading-[22.5pt] text-[12pt] font-['Times New Roman'] mb-4"></span>
+						<span id="dataContainer" class="block text-center text-lg leading-[22.5pt] text-[12pt] font-['Times New Roman']"></span>
+					</div>
+				</div>
+			</div>
+			
+			
+			
+			<div class="mt-6">
+				<div class="flex items-center justify-center mb-4">
+					<svg class="h-6 w-6 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+					</svg>
+					<p class="text-gray-500">Você pode fazer o download ou refazer a personalização.</p>
+				</div>
+				<div class="flex justify-center">
+					<button id="downloadModal" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded mr-4">
+						<i class="fas fa-download mr-2"></i>
+						Download
+					</button>
+					<button id="redoModal" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded mr-4">
+						<i class="fas fa-redo mr-2"></i>
+						Refazer
+					</button>
+					<button id="closeModal" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">
+						<i class="fas fa-times mr-2"></i>
+						Fechar
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+
+
+
+     <main class="container mx-auto px-6 py-8">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6">Personalizar Capa</h1>
+        <div class="bg-white shadow-md rounded-lg p-6">
+            <form action='/template/download' id="dataForm" method="POST" enctype="multipart/form-data">
+                <div class="mb-4">
+                    <label class="block text-gray-700 font-bold mb-2" for="logo">Logo da Instituição</label>
+                    <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="logo" name="logo" type="file" accept=".png,.jpg,.jpeg" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 font-bold mb-2" for="instituicao">Nome da Instituição</label>
+                    <input class="inputTemplate shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="instituicao" name="instituicao" type="text" placeholder="Digite o nome da instituição"  required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 font-bold mb-2" for="tema">Tema do Trabalho</label>
+                    <input class="inputTemplate shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="tema" name="tema" type="text" placeholder="Digite o tema do trabalho"  required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 font-bold mb-2" for="autor">Autor</label>
+                    <input class="inputTemplate shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="autor" name="autor" type="text" placeholder="Digite o nome do autor"  required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 font-bold mb-2" for="supervisor">Supervisor</label>
+                    <input class="inputTemplate shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="supervisor" name="supervisor" type="text" placeholder="Digite o nome do supervisor"  required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 font-bold mb-2" for="local">Local</label>
+                    <input class="inputTemplate shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="local" name="local" type="text" placeholder="Digite o local"  required>
+                </div>
+                <div class="flex mb-4">
+                    <div class="mr-4">
+                        <label class="block text-gray-700 font-bold mb-2" for="mes">Mês</label>
+                        <input class="inputTemplate shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="mes" name="mes" type="text" placeholder="Digite o mês"  required>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-bold mb-2" for="ano">Ano</label>
+                        <input class="inputTemplate shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="ano" name="ano" type="text" placeholder='Digite o ano'  required>
+                    </div>
+                </div>
+                <div class="flex justify-center">
+                    <button id="create" type="button" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                        Gerar Capa
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+    <footer class="bg-gray-800 text-white py-6">
+        <div class="container mx-auto px-6 flex justify-between items-center">
+            <p>&copy; 2024 Monogenius</p>
+            <div>
+                <a href="/terms" class="hover:text-gray-400 mx-2">Termos de Serviço</a>
+                <a href="/privacy" class="hover:text-gray-400 mx-2">Política de Privacidade</a>
+                <a href="/about" class="hover:text-gray-400 mx-2">Sobre Nós</a>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

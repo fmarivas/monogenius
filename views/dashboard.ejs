@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Monogenius - Dashboard</title>
+	<link rel="apple-touch-icon" sizes="180x180" href="/assets/img/favicon/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon/favicon-16x16.png">
+	<link rel="manifest" href="/assets/img/favicon/site.webmanifest">  	
+</head>
+<body class="bg-gray-100 font-sans flex flex-col min-h-screen">
+    <header class="bg-white shadow">
+        <nav class="container mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center">
+                <a href="/c/dashboard" class="text-xl font-bold text-gray-800">Monogenius</a>
+            </div>
+            <div class="flex items-center">
+                <a href="/c/plagiarism" class="text-gray-600 hover:text-gray-800 mx-4">Verificador de Plágio</a>
+                <a href="/c/template" class="text-gray-600 hover:text-gray-800 mx-4">Templates</a>
+                <a href="/c/profile" class="text-gray-600 hover:text-gray-800 mx-4">Perfil</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-6 py-8 flex-grow flex items-center justify-center">
+		<div class="bg-white shadow-md rounded-lg p-8 max-w-xl mx-auto">
+			<h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Criar Nova Monografia</h2>
+			<a href="/c/create" class="bg-indigo-600 hover:bg-indigo-700 text-white text-center font-bold py-4 px-8 rounded-lg transition-colors duration-300 flex items-center justify-center mx-auto">
+				<span class="mr-2">+</span>
+				<span>Criar</span>
+			</a>
+			<p class="mt-4 text-gray-600 text-center">Clique no botão acima para iniciar o processo de criação de sua nova monografia.</p>
+		</div>
+    </main>
+
+    <footer class="bg-gray-800 text-white py-6 mt-auto">
+        <div class="container mx-auto px-6 flex justify-between items-center">
+            <p>&copy; 2024 Monogenius</p>
+            <div>
+                <a href="/terms" class="hover:text-gray-400 mx-2">Termos de Serviço</a>
+                <a href="/privacy" class="hover:text-gray-400 mx-2">Política de Privacidade</a>
+                <a href="/about" class="hover:text-gray-400 mx-2">Sobre Nós</a>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

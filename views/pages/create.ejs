@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/assets/js/create.js"></script>
+	<link rel="apple-touch-icon" sizes="180x180" href="/assets/img/favicon/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon/favicon-16x16.png">
+	<link rel="manifest" href="/assets/img/favicon/site.webmanifest">  	
+	<script src="//code.tidio.co/mwu2j13oujaafzownf2hemd6v6mfeyfl.js" async></script>
+	<link rel='stylesheet' type='text/css' href='src/simple-editor.css'>
+	<script type='text/javascript' src='//code.jquery.com/jquery-2.2.2.min.js'></script>
+	<script type='text/javascript' src='src/simple-editor.js'></script>	
+	<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <title>Monogenius - Criar Monografia</title>
+	<!-- Google tag (gtag.js) -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-PTD2W9YS10"></script>
+	<script>
+	  window.dataLayer = window.dataLayer || [];
+	  function gtag(){dataLayer.push(arguments);}
+	  gtag('js', new Date());
+
+	  gtag('config', 'G-PTD2W9YS10');
+	</script>   
+	
+	<style>
+		#modal {
+			visibility: visible;
+			opacity: 1;
+			transition: opacity 0.3s ease;
+		}
+
+		#modal.invisible {
+			visibility: hidden;
+			opacity: 0;
+		}
+
+		#modal-icon.text-green-500 {
+			color: #22c55e;
+		}
+
+		#modal-icon.text-red-500 {
+			color: #ef4444;
+		}	
+	</style>
+	
+</head>
+<body class="bg-gray-100 font-sans">
+    <!-- Modal -->
+    <div id="modal" class="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 invisible">
+        <div class="bg-white rounded-lg shadow-lg p-4 max-w-sm mx-auto my-4">
+            <div class="flex items-start justify-between mb-2">
+                <div class="flex items-center">
+                    <svg id="modal-icon" class="w-6 h-6 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <h3 id="modal-title" class="text-lg font-medium text-gray-900"></h3>
+                </div>
+                <button id="close-modal" type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg p-1.5 ml-auto inline-flex items-center">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                    </svg>
+                </button>
+            </div>
+            <p id="modal-message" class="text-gray-700"></p>
+        </div>
+    </div>
+	
+    <header class="bg-white shadow sticky top-0 z-10">
+        <nav class="container mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center">
+                <a href="/c/dashboard" class="text-xl font-bold text-gray-800">Monogenius</a>
+            </div>
+            <div class="flex items-center">
+                <a href="/c/plagiarism" class="text-gray-600 hover:text-gray-800 mx-4">Verificador de Plágio</a>
+                <a href="/c/template" class="text-gray-600 hover:text-gray-800 mx-4">Templates</a>
+                <a href="/c/profile" class="text-gray-600 hover:text-gray-800 mx-4">Perfil</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-6 py-8 flex flex-col md:flex-row overflow-auto">
+		<div id="overlay" class="fixed inset-0 flex items-center justify-center z-50 hidden">
+			<div class="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-green-600"></div>
+		</div>
+	
+        <div class="w-full md:w-3/4">
+            <h1 class="text-3xl font-bold text-gray-800 mb-6">Criar Monografia</h1>
+            <div class="bg-white shadow-md rounded-lg p-6 mb-6">
+                <div class="flex justify-between items-center mb-4">
+                    <div class="flex items-center">
+                        <button class="bg-gray-200 text-gray-600 hover:bg-gray-300 rounded-l-md px-3 py-2" id="bold-btn">
+                            <i class="fas fa-bold"></i>
+                        </button>
+                        <button class="bg-gray-200 text-gray-600 hover:bg-gray-300 px-3 py-2" id="italic-btn">
+                            <i class="fas fa-italic"></i>
+                        </button>
+                        <button class="bg-gray-200 text-gray-600 hover:bg-gray-300 px-3 py-2" id="underline-btn">
+                            <i class="fas fa-underline"></i>
+                        </button>
+                    </div>
+					<!-- <div> -->
+                        <!-- <button class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-3 py-2 rounded-lg" id="underline-btn"> -->
+                            <!-- <i class="fas fa-download"></i> -->
+                        <!-- </button>					 -->
+					<!-- </div> -->
+                </div>
+                <div class="editable w-full h-64 lg:h-screen p-4 border border-gray-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-indigo-600 overflow-auto" contenteditable="true" data-placeholder="Aqui vai aparecer o CAPITULO I da sua monografia..."></div>
+            </div>
+        </div>
+        <div class="w-full md:w-1/4 md:pl-6 mt-6 md:mt-0">
+			<form id="formCreator" method="POST">
+				<button class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg w-full mb-6 transition-colors duration-300">
+					Criar Monografia
+				</button>
+				<div class="bg-white shadow-md rounded-lg p-6">
+					<h3 class="text-lg font-bold text-gray-800 mb-4">Informações Iniciais</h3>
+					<div class="mb-4">
+						<label class="block text-gray-700 font-bold mb-2" for="tema">
+							Tema
+						</label>
+						<input value='Segregação de Funções como Ferramenta Indispensavel para a Eficacia do Controlo Interno Contabilistico-Financeiro: Estudo de Caso PMEs ' class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="tema" name="tema" type="text" placeholder="Digite o tema da monografia">
+					</div>
+					<div class="mb-4">
+						<label class="block text-gray-700 font-bold mb-2" for="ideia-inicial">
+							Ideia Inicial
+						</label>
+						<textarea class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="ideia-inicial" name="ideiaInicial" rows="15" placeholder="Descreva a ideia inicial para a monografia">
+Segregação de funções é a prática de separar as tarefas e responsabilidades entre diferentes indivíduos ou grupo de pessoas para evitar conflitos de interesse e garantir a transparência e controlo das actividades organizacionais. Este trabalho pretende responder o seguinte objectivo geral: Analisar o impacto da segregação de funções na transparência e controle das actividades organizacionais e os objectivos específicos que são: i) Examinar a implementação da segregação de funções é nas PME’S; ii) Aferir os principais benefícios da segregação de funções no controlo das actividades organizacionais; e iii) Investigar as melhores práticas e estratégias para implementar a segregação de funções para maximizar o controlo interno. Para responder esses objectivo será usada a pesquisa documental, entrevista estruturada, entrevista semi-estruturada, e questionário estruturado. Com essa pesquisa espera que seja examinado a implementação de segregação de funções na PME’s, aferir os principias benefícios da segregação de funções no controle interno, e investigado as melhores práticas e estratégias para implementar a segregação de funções e maximizar o controle interno.						
+						</textarea>
+					</div>
+					<div>
+						<label class="block text-gray-700 font-bold mb-2" for="manuais">
+							Manuais de Apoio (Opcional)
+						</label>
+						<input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="manuais" name="manuais" type="file">
+						<p class="text-gray-600 mt-2">Você pode fazer upload de manuais de apoio para ajudar na geração de referências bibliográficas.</p>
+					</div>
+				</div>
+			</form>
+        </div>
+    </main>
+
+    <footer class="bg-gray-800 text-white py-6">
+        <div class="container mx-auto px-6 flex justify-between items-center">
+            <p>&copy; 2024 Monogenius</p>
+            <div>
+                <a href="/terms" class="hover:text-gray-400 mx-2">Termos de Serviço</a>
+                <a href="/privacy" class="hover:text-gray-400 mx-2">Política de Privacidade</a>
+                <a href="/about" class="hover:text-gray-400 mx-2">Sobre Nós</a>
+            </div>
+        </div>
+    </footer>
+	
+    <script>
+
+    </script>
+</body>
+</html>

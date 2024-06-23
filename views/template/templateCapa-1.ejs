@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+ 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+    <title>A4 Paper Size with Shade - Centered Content</title>
+	<script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @page {
+            size: A4;
+            margin: 0;
+        }
+	  .content {
+		font-family: 'Times New Roman', Times, serif;
+	  }	
+    </style>
+</head>
+ 
+<body class="w-[210mm] h-[297mm] m-0 p-0 flex justify-center items-center">
+	<div id="functionality" class="flex justify-between h-20 fixed inset-0 bg-black bg-opacity-75 z-0">
+		<button id="closePdfBtn" class="fixed top-4 right-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded z-10">
+			Fechar
+		</button>
+		<button id="savePdfBtn" class="fixed top-4 left-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded z-10">
+			Salvar como PDF
+		</button>
+	</div>
+    <div contenteditable="true" class="content flex flex-col h-full w-full pt-[2.47cm] pb-[2.78cm] pl-[3cm] pr-[3cm]">
+		<div id="logoContainer" class="flex justify-center items-center w-full max-w-[100px] mx-auto h-[100px]">
+			<% if (logo) { %>
+				<img class="max-w-full max-h-full object-contain" src="data:image/<%=logo.mimetype%>;base64,<%=logo.toString('base64')%>" alt="Logo">
+			<% } %>
+		</div>	
+		<span id="instituicaoContainer" class="text-center font-bold text-xl text-[12pt] font-['Times New Roman']"><%= instituicao %></span>
+		<div class="h-[108pt]"></div>
+		
+		<span id="temaContainer" class="block mt-auto text-center text-lg leading-6 text-[12pt] font-['Times New Roman']"><%= tema %></span>
+		<div class="h-[108pt]"></div>
+		<div class="flex flex-col justify-center mb-auto mt-5">
+			<span id="autorContainer" class="block text-center text-lg leading-[22.5pt] text-[12pt] font-['Times New Roman'] mb-[9pt]">
+				<span class="font-bold">Autor:</span> <%= autor %>
+			</span>
+			<span id="supervisorContainer" class="block text-center text-lg leading-[22.5pt] text-[12pt] font-['Times New Roman']">
+				<span class="font-bold">Supervisor:</span> <%= supervisor %>
+			</span>
+		</div>
+		<div class="flex justify-center mt-auto">
+			<span id="dataContainer" class="block text-center text-lg leading-[22.5pt] text-[12pt] font-['Times New Roman']"><%= dateLocal %></span>
+		</div>		
+	</div>
+	
+	
+	<script>
+		const savePdfBtn = document.getElementById('savePdfBtn');
+		const closeBtn = document.getElementById('closePdfBtn');
+		const functionality = document.getElementById('functionality');
+
+		savePdfBtn.addEventListener('click', () => {
+			functionality.classList.add('hidden')
+			
+			window.scrollTo({
+				top: 0,
+				behavior: 'smooth'
+			});
+			
+			setTimeout(saveAsPDF, 1500);
+			window.addEventListener('afterprint', backToNormal);
+		});
+		
+		closeBtn.addEventListener('click', closeWindow)
+		
+		
+		function backToNormal(){
+			functionality.classList.remove('hidden')
+		}
+		
+		function saveAsPDF() {
+			window.print();
+		}
+
+		function closeWindow() {
+			window.location.href = '/c/template'
+		}
+	</script>
+</body>
+ 
+</html>

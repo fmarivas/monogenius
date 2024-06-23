@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+	<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="/assets/js/plagiarism.js"></script>
+	<script src="//code.tidio.co/mwu2j13oujaafzownf2hemd6v6mfeyfl.js" async></script>
+	<link rel="stylesheet" href='/assets/css/plagiarism.css'>
+	<link rel="apple-touch-icon" sizes="180x180" href="/assets/img/favicon/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon/favicon-16x16.png">
+	<link rel="manifest" href="/assets/img/favicon/site.webmanifest">  	
+	<!-- Google tag (gtag.js) -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-PTD2W9YS10"></script>
+	<script>
+	  window.dataLayer = window.dataLayer || [];
+	  function gtag(){dataLayer.push(arguments);}
+	  gtag('js', new Date());
+
+	  gtag('config', 'G-PTD2W9YS10');
+	</script>   
+	<title>Monogenius - Verificador de Plágio</title>
+</head>
+<body class="bg-gray-100 font-sans">
+	<div id="overlay" class="fixed inset-0 flex items-center justify-center z-50 hidden">
+		<div class="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-green-600"></div>
+	</div>
+
+    <header class="bg-white shadow sticky top-0 z-10">
+        <nav class="container mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center">
+                <a href="/c/dashboard" class="text-xl font-bold text-gray-800">Monogenius</a>
+            </div>
+            <div class="flex items-center">
+                <a href="/c/plagiarism" class="text-gray-600 hover:text-gray-800 mx-4">Verificador de Plágio</a>
+                <a href="/c/template" class="text-gray-600 hover:text-gray-800 mx-4">Templates</a>
+                <a href="/c/profile" class="text-gray-600 hover:text-gray-800 mx-4">Perfil</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-6 py-8">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6">Verificador de Plágio</h1>
+        <div class="bg-white shadow-md rounded-lg p-6">
+            <form method="POST">
+                <div class="mb-4">
+                    <label class="block text-gray-700 font-bold mb-2" for="text-input">
+                        Texto a ser verificado
+                    </label>
+                    <textarea class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="text-input" rows="5" placeholder="Cole ou digite o texto aqui"></textarea>
+					<div class="font-semibold text-right text-gray-600 text-sm">
+						<span id="word-count">Limit: 0 / 500 palavras</span> -
+						<span id="char-count">Total Caracteres: 0</span>
+					</div>					
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 font-bold mb-2" for="file-input">
+                        Ou selecione um arquivo
+                    </label>
+                    <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="file-input" name="file-input" type="file" accept=".doc,.docx,.pdf,.txt">
+                </div>
+                <div class="flex justify-center">
+                    <button type="button" id='result-btn' class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                        Verificar Plágio
+                    </button>
+                </div>
+            </form>
+        </div>
+		<div id="resultado" class="bg-white shadow-md rounded-lg p-6 mt-6 hidden">
+			<h2 class="text-xl font-bold text-gray-800 mb-4">Resultado</h2>
+			<div class="grid grid-cols-2 gap-4 mb-4">
+				<div class="bg-blue-100 p-4 rounded-lg">
+					<h3 class="text-lg font-semibold text-blue-800">Plágio na Web</h3>
+					<p id="percentPlagiarism" class="text-3xl font-bold text-blue-600"></p>
+					<p class="text-sm text-blue-700">Plágio</p>
+				</div>
+				<div class="bg-green-100 p-4 rounded-lg">
+					<h3 class="text-lg font-semibold text-green-800">Fontes</h3>
+					<p id="sourceCount" class="text-3xl font-bold text-green-600"></p>
+					<p class="text-sm text-green-700">Fontes encontradas</p>
+				</div>
+			</div>
+			<div class="mb-4">
+				<h3 class="text-lg font-semibold text-gray-800 mb-2">Correspondências na Web</h3>
+				<div id="matches" class="text-gray-700"></div>
+			</div>
+			<div>
+				<h3 class="text-lg font-semibold text-gray-800 mb-2">Fontes</h3>
+				<ul id="sources" class="list-disc list-inside text-gray-700"></ul>
+			</div>
+			<div class="mt-4">
+				<h3 class="text-lg font-semibold text-gray-800 mb-2">Citações</h3>
+				<ul id="citations" class="list-disc list-inside text-gray-700"></ul>
+			</div>
+		</div>
+    </main>
+
+    <footer class="bg-gray-800 text-white py-6">
+        <div class="container mx-auto px-6 flex justify-between items-center">
+            <p>&copy; 2024 Monogenius</p>
+            <div>
+                <a href="/terms" class="hover:text-gray-400 mx-2">Termos de Serviço</a>
+                <a href="/privacy" class="hover:text-gray-400 mx-2">Política de Privacidade</a>
+                <a href="/about" class="hover:text-gray-400 mx-2">Sobre Nós</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+
+
+    </script>
+</body>
+</html>
