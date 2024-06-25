@@ -120,7 +120,6 @@ router.get('/:id', (req, res, next) => {
   const id = req.params.id;
   const route = generalRoutes[id];
 
-console.log(id)
   if (typeof route === 'function') {
     route(req, res);
   } else if (route) {
