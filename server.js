@@ -54,11 +54,6 @@ app.use(passport.session());
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-app.use((req, res, next) => {
-  console.log('Requested URL:', req.url);
-  next();
-});
-
 app.use('/static', express.static(path.join(__dirname, 'public')));
 app.use('/', routes);
 app.use('/auth', authRoutes);

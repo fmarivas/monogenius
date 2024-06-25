@@ -63,7 +63,7 @@ async function uploadFile(files) {
 			
 		}catch(err){
 			console.error(err)
-			alert('Ocorreu um erro ao ler o arquivo.');
+			alert("Ocorreu um erro ao ler o arquivo.");
 		}
     }
 }
