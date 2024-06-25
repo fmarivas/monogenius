@@ -58,23 +58,8 @@ app.use((req, res, next) => {
   console.log('Requested URL:', req.url);
   next();
 });
-const fs = require('fs');
-const faviconPaths = [
-  '/assets/img/favicon/apple-touch-icon.png',
-  '/assets/img/favicon/favicon-32x32.png',
-  '/assets/img/favicon/favicon-16x16.png'
-];
 
-faviconPaths.forEach(path => {
-  const fullPath = __dirname + '/public' + path;
-  fs.access(fullPath, fs.constants.F_OK, (err) => {
-    console.log(`${path} ${err ? 'does not exist' : 'exists'}`);
-  });
-});
-
-console.log('Public directory:', path.join(__dirname, 'public'));
-
-app.use(express.static(path.join(__dirname, 'public')));
+app.use('/static', express.static(path.join(__dirname, 'public')));
 app.use('/', routes);
 app.use('/auth', authRoutes);
 
