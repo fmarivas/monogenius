@@ -25,6 +25,25 @@ document.addEventListener('DOMContentLoaded', () => {
         formatText('underline')
     });
 	
+function showModal(success, message) {
+    const modal = document.getElementById('modal');
+    const modalTitle = document.getElementById('modal-title');
+    const modalMessage = document.getElementById('modal-message');
+    const modalIcon = document.getElementById('modal-icon');
+
+    if (success) {
+        modalTitle.textContent = 'Sucesso';
+        modalIcon.classList.remove('text-red-500');
+        modalIcon.classList.add('text-green-500');
+    } else {
+        modalTitle.textContent = 'Erro';
+        modalIcon.classList.remove('text-green-500');
+        modalIcon.classList.add('text-red-500');
+    }
+
+    modalMessage.textContent = message;
+    modal.classList.remove('invisible');
+}
 	
 //validaca dos campos de referencia
 function formatMonographyHTML(mono) {
@@ -45,7 +64,16 @@ function formatMonographyHTML(mono) {
     formattedHTML += `<h2>Delimitação da Pesquisa</h2><p>${mono.delimitacao_pesquisa}</p>`;
     formattedHTML += `<br>`;
     formattedHTML += `<h2>Estrutura do Trabalho</h2><p>${mono.estrutura_trabalho}</p>`;
-
+	
+    // Preencher a lista de referências
+    const referenciasList = document.getElementById('referencias-lista');
+    referenciasList.innerHTML = ''; // Limpar a lista existente
+    mono.referencias_bibliograficas.forEach(ref => {
+        const li = document.createElement('li');
+        li.textContent = ref;
+        referenciasList.appendChild(li);
+    });
+	
     return formattedHTML;
 }
 
@@ -53,6 +81,7 @@ const form = document.getElementById('formCreator');
 const temaInput = document.getElementById('tema');
 const ideiaInicialInput = document.getElementById('ideia-inicial');
 const manuaisInput = document.getElementById('manuais');
+const referenciasContainer = document.getElementById('referencias-container');
 
 form.addEventListener('submit', async (event) => {
   event.preventDefault();
@@ -83,6 +112,7 @@ form.addEventListener('submit', async (event) => {
   }
   
   overlay.classList.remove('hidden')
+  referenciasContainer.classList.add('hidden')
   try {
     // Enviar os dados para o servidor usando Axios
 	const responseToken = await axios.get('/get-public-token')
@@ -97,6 +127,9 @@ form.addEventListener('submit', async (event) => {
     });
 
     if(response.data.success){
+		referenciasContainer.classList.remove('hidden')
+		
+		
 		const formattedMono = formatMonographyHTML(response.data.mono);
 		textField.innerHTML = formattedMono;
 		overlay.classList.add('hidden')

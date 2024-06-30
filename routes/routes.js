@@ -218,7 +218,7 @@ router.post('/api/create', upload.single('manuais'), async (req, res) => {
 			  res.json({ success: false, message: 'Falha ao criar Monografia. Tente mais tarde!' });
 		  }
 	  }else{
-		  res.json({success: false, message: 'Excedeu o limite diario!'})	
+		  res.json({success: false, message: canMakeRequest.message})	
 	  }
   }catch(err){
 	  console.error(err)
@@ -277,7 +277,7 @@ router.post('/api/plagiarism', async (req,res)=> {
 				res.json({success: false, message: plagiarismChecker.message});
 			}
 		}else{
-			res.json({success: false, message: 'Excedeu o limite diario!'})	
+			res.json({success: false, message: canMakeRequest.message})	
 		}
 		
 	}catch(err){

@@ -16,15 +16,15 @@ class Monography {
 				properties: {
 				  contextualizacao: {
 					type: "string",
-					description: "Contextualização do tema (mínimo de 500 palavras)"
+					description: "Contextualização do tema (minimo 5000 carateres)"
 				  },
 				  problematizacao: {
 					type: "string",
-					description: "Problematização do tema (mínimo de 500 palavras)"
+					description: "Problematização do tema (minimo 5000 carateres)"
 				  },
 				  justificativa: {
 					type: "string",
-					description: "Justificativa do trabalho (mínimo de 500 palavras)"
+					description: "Justificativa do trabalho (minimo 5000 carateres)"
 				  },
 				  objetivo_geral: {
 					type: "string",
@@ -37,7 +37,7 @@ class Monography {
 				  },
 				  delimitacao_pesquisa: {
 					type: "string",
-					description: "Delimitação da pesquisa (mínimo de 500 palavras)"
+					description: "Delimitação da pesquisa (minimo 5000 carateres)"
 				  },
 				  estrutura_trabalho: {
 					type: "string",
@@ -46,7 +46,7 @@ class Monography {
 				  referencias_bibliograficas: {
 					type: "array",
 					items: { type: "string" },
-					description: "Lista de referências bibliográficas utilizadas"
+					description: "Lista de 10 referências bibliográficas que sustentariam o tema"
 				  }
 				},
 				required: ["contextualizacao", "problematizacao", "justificativa", "objetivo_geral", "objetivos_especificos", "delimitacao_pesquisa", "estrutura_trabalho", "referencias_bibliograficas"]
@@ -61,9 +61,9 @@ class Monography {
 
 		try {
 		  const completion = await openai.chat.completions.create({
-			model: "gpt-3.5-turbo",
+			model: "gpt-4o",
 			messages: [
-			  { role: "system", content: "Você é um assistente virtual especializado em orientar estudantes e pesquisadores na estruturação e redação de trabalhos acadêmicos. Ajude a organizar e desenvolver cada seção de forma clara e objetiva, seguindo as normas e diretrizes específicas." },
+			  { role: "system", content: "Você é um assistente virtual especializado em orientar estudantes e pesquisadores na estruturação e redação de trabalhos acadêmicos. Ajude a organizar e desenvolver cada seção de forma clara e objetiva, seguindo a norma APA e diretrizes específicas." },
 			  { role: "user", content: message }
 			],
 			tools: tools,
