@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="/static/assets/js/create.js"></script>
+	<script src="/static/assets/js/common.js"></script>
 	<link rel="apple-touch-icon" sizes="180x180" href="/static/assets/img/favicon/apple-touch-icon.png">
 	<link rel="icon" type="image/png" sizes="32x32" href="/static/assets/img/favicon/favicon-32x32.png">
 	<link rel="icon" type="image/png" sizes="16x16" href="/static/assets/img/favicon/favicon-16x16.png">
@@ -68,7 +69,27 @@
             <p id="modal-message" class="text-gray-700"></p>
         </div>
     </div>
-	
+
+	<div id="feedback-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
+		<div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+			<h3 class="text-lg font-bold text-gray-900 mb-4" id="modal-title">Seu feedback</h3>
+			<p class="mb-4">Por que você <span id="feedback-type" class="font-semibold"></span> deste conteúdo?</p>
+			<select id="feedback-reason" class="w-full p-2 mb-4 border rounded">
+				<option value="">Selecione uma razão</option>
+				<option value="qualidade">Qualidade do conteúdo</option>
+				<option value="relevancia">Relevância para o tema</option>
+				<option value="estrutura">Estrutura do texto</option>
+				<option value="clareza">Clareza das ideias</option>
+				<option value="outros">Outros</option>
+			</select>
+			<textarea id="feedback-other" class="w-full p-2 mb-4 border rounded hidden" placeholder="Por favor, explique..."></textarea>
+			<input type="hidden" id="functionality" value="create_monograph">
+			<div class="flex justify-end">
+				<button id="submit-feedback" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Enviar</button>
+				<button id="closeFeedback-modal" class="ml-2 px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400">Fechar</button>
+			</div>
+		</div>
+	</div>	
     <header class="bg-white shadow sticky top-0 z-10">
         <nav class="container mx-auto px-6 py-4 flex items-center justify-between">
             <div class="flex items-center">
@@ -78,10 +99,22 @@
                 <a href="/c/plagiarism" class="text-gray-600 hover:text-gray-800 mx-4">Verificador de Plágio</a>
                 <a href="/c/template" class="text-gray-600 hover:text-gray-800 mx-4">Templates</a>
                 <a href="/c/profile" class="text-gray-600 hover:text-gray-800 mx-4">Perfil</a>
+				<button id="suporte-btn" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-full ml-4">
+					Suporte
+				</button>				
             </div>
         </nav>
     </header>
-
+	
+	<div id="notification-bar" class="bg-indigo-100 text-indigo-700 px-4 py-3 hidden">
+		<div class="container mx-auto flex justify-center items-center">
+			<p>
+				O Monogenius acabou de atualizar. 
+				<a href="/c/updates" target="_blank" class="font-bold underline hover:text-indigo-900">Veja as atualizações</a>
+			</p>
+		</div>
+	</div>
+	
     <main class="container mx-auto px-6 py-8 flex flex-col md:flex-row overflow-auto">
 		<div id="overlay" class="fixed inset-0 flex items-center justify-center z-50 hidden">
 			<div class="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-green-600"></div>
@@ -109,6 +142,19 @@
 					<!-- </div> -->
                 </div>
                 <div class="editable w-full h-64 lg:h-screen p-4 border border-gray-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-indigo-600 overflow-auto" contenteditable="true" data-placeholder="Aqui vai aparecer o CAPITULO I da sua monografia..."></div>
+				<div class="flex justify-between items-center mt-4">
+					<button id="copy-btn" class="bg-gray-200 text-gray-600 hover:bg-gray-300 px-4 py-2 rounded">
+						<i class="fas fa-copy mr-2"></i>Copiar
+					</button>
+					<div>
+						<button id="like-btn" class="bg-green-500 text-white hover:bg-green-600 px-4 py-2 rounded-l">
+							<i class="fas fa-thumbs-up mr-2"></i>Gostei
+						</button>
+						<button id="dislike-btn" class="bg-red-500 text-white hover:bg-red-600 px-4 py-2 rounded-r">
+							<i class="fas fa-thumbs-down mr-2"></i>Não Gostei
+						</button>
+					</div>
+				</div>				
             </div>
         </div>
         <div class="w-full md:w-1/4 md:pl-6 mt-6 md:mt-0">

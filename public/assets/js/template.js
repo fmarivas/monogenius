@@ -41,13 +41,13 @@ document.addEventListener('DOMContentLoaded', () => {
 	}		
 
 	function abrirModal() {
-		const modal = document.getElementById('modal');
+		const modal = document.getElementById('modal-template');
 		modal.classList.remove('hidden');
 	}
 
 
 	function fecharModal() {
-		const modal = document.getElementById('modal');
+		const modal = document.getElementById('modal-template');
 		modal.classList.add('hidden');
 	}
 

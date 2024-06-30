@@ -21,6 +21,7 @@
     "ejs": "^3.1.10",
     "express": "^4.19.2",
     "express-mysql-session": "^3.0.2",
+    "express-rate-limit": "^7.3.1",
     "express-session": "^1.18.0",
     "filereader": "^0.10.3",
     "fs": "^0.0.1-security",

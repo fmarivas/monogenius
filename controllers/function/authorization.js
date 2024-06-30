@@ -5,7 +5,6 @@ class Authorization {
     static async handUserGoogleLogin(user) {
 		
         return new Promise((resolve, reject) => {
-			console.log(user)
             let { id, name, emails, photos, provider } = user;
             let user_code = id;
             let fname = name.givenName;

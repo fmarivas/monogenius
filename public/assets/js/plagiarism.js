@@ -11,6 +11,7 @@ function updateCount() {
 
 document.getElementById('text-input').addEventListener('input', updateCount);
 
+
 //verificar o tamanh do documento que foi enviad
 function validateFileSize(input) {
     const maxSize = 5 * 1024 * 1024; // 5 MB em bytes

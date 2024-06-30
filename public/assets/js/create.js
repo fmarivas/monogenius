@@ -6,33 +6,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const unorderedListBtn = document.getElementById('unordered-list-btn');
     const orderedListBtn = document.getElementById('ordered-list-btn');
 	const overlay = document.getElementById('overlay');
-//Moodal Success and Fail
-function showModal(success, message) {
-    const modal = document.getElementById('modal');
-    const modalTitle = document.getElementById('modal-title');
-    const modalMessage = document.getElementById('modal-message');
-    const modalIcon = document.getElementById('modal-icon');
-
-    if (success) {
-        modalTitle.textContent = 'Sucesso';
-        modalIcon.classList.remove('text-red-500');
-        modalIcon.classList.add('text-green-500');
-    } else {
-        modalTitle.textContent = 'Erro';
-        modalIcon.classList.remove('text-green-500');
-        modalIcon.classList.add('text-red-500');
-    }
-
-    modalMessage.textContent = message;
-    modal.classList.remove('invisible');
-}
-
-function hideModal() {
-    const modal = document.getElementById('modal');
-    modal.classList.add('invisible');
-}
-
-document.getElementById('close-modal').addEventListener('click', hideModal);
 
 //FOrmatacao do texto do textField
 	function formatText(command) {
@@ -147,8 +120,26 @@ form.addEventListener('submit', async (event) => {
 });
 
 
+//copy function
+function copyToClipboard() {
+    const textField = document.querySelector('.editable');
+    navigator.clipboard.writeText(textField.textContent).then(() => {
+        const button = document.getElementById('copy-btn');
+        
+        button.innerHTML = '<i class="fa-solid fa-check"></i> Copiado';
+        button.classList.add('bg-green-500', 'text-white');
+        button.classList.remove('bg-gray-200', 'text-gray-600');
 
+        setTimeout(() => {
+            button.innerHTML = '<i class="fas fa-copy mr-2"></i> Copiar';
+            button.classList.remove('bg-green-500', 'text-white');
+            button.classList.add('bg-gray-200', 'text-gray-600');
+        }, 3000);
+    }).catch(err => {
+        console.error('Erro ao copiar texto: ', err);
+    });
+}
 
-
+document.getElementById('copy-btn').addEventListener('click', copyToClipboard);
 	
 });

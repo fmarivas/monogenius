@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
+	<script src="/static/assets/js/common.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <title>Monogenius - Perfil</title>
 	<!-- Google tag (gtag.js) -->
 	<script async src="https://www.googletagmanager.com/gtag/js?id=G-PTD2W9YS10"></script>
@@ -47,42 +49,57 @@
                 <a href="/c/plagiarism" class="text-gray-600 hover:text-gray-800 mx-4">Verificador de Plágio</a>
                 <a href="/c/template" class="text-gray-600 hover:text-gray-800 mx-4">Templates</a>
                 <a href="/c/profile" class="text-gray-600 hover:text-gray-800 mx-4">Perfil</a>
+				<button id="suporte-btn" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-full ml-4">
+					Suporte
+				</button>				
             </div>
         </nav>
     </header>
-
-<main class="container mx-auto px-6 py-8">
-    <h1 class="text-3xl font-bold text-gray-800 mb-6">Perfil</h1>
-    <div class="bg-white shadow-md rounded-lg p-6 lg:max-w-3xl mx-auto">
-        <!-- <div class="flex items-center mb-6"> -->
-            <!-- <div class="w-24 h-24 rounded-full overflow-hidden mr-4"> -->
-                <!-- <% if (!user.profile_pic) { %> -->
-                    <!-- <img src="/static/assets/img/profile.jpg" alt="Profile Pic" id="imgProfile" class="rounded-full h-auto w-60 mb-2"> -->
-                <!-- <% } else { %> -->
-                    <!-- <img src="<%= user.profile_pic %>" alt="Profile Pic" id="imgProfile" class="rounded-full h-auto w-60 mb-2 m-auto"> -->
-                <!-- <% } %> -->
-            <!-- </div> -->
-            <!-- <div> -->
-                <!-- <label class="block text-gray-700 font-bold mb-2" for="photo-input"> -->
-                    <!-- Alterar Foto de Perfil -->
-                <!-- </label> -->
-                <!-- <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="photo-input" type="file" accept="image/*"> -->
-            <!-- </div> -->
-        <!-- </div> -->
-        <!-- <div class="flex justify-start mb-4"> -->
-            <!-- <button class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button"> -->
-                <!-- Salvar Alterações -->
-            <!-- </button> -->
-        <!-- </div> -->
-        <div class="mb-4 flex justify-center align-center ">
-			<form action="/logout">
-				<button id="logoutBtn" type="submit" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-					<i class="fas fa-sign-out-alt mr-2"></i>Sair
-				</button>
-			</form>
-        </div>
-    </div>
-</main>
+	<div id="notification-bar" class="bg-indigo-100 text-indigo-700 px-4 py-3 hidden">
+		<div class="container mx-auto flex justify-center items-center">
+			<p>
+				O Monogenius acabou de atualizar. 
+				<a href="/c/updates" target="_blank" class="font-bold underline hover:text-indigo-900">Veja as atualizações</a>
+			</p>
+			<!-- <button id="close-notification" class="text-indigo-700 hover:text-indigo-900"> -->
+				<!-- <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"> -->
+					<!-- <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path> -->
+				<!-- </svg> -->
+			<!-- </button> -->
+		</div>
+	</div>
+	<main class="container mx-auto px-6 py-8">
+		<h1 class="text-3xl font-bold text-gray-800 mb-6">Perfil</h1>
+		<div class="bg-white shadow-md rounded-lg p-6 lg:max-w-3xl mx-auto">
+			<!-- <div class="flex items-center mb-6"> -->
+				<!-- <div class="w-24 h-24 rounded-full overflow-hidden mr-4"> -->
+					<!-- <% if (!user.profile_pic) { %> -->
+						<!-- <img src="/static/assets/img/profile.jpg" alt="Profile Pic" id="imgProfile" class="rounded-full h-auto w-60 mb-2"> -->
+					<!-- <% } else { %> -->
+						<!-- <img src="<%= user.profile_pic %>" alt="Profile Pic" id="imgProfile" class="rounded-full h-auto w-60 mb-2 m-auto"> -->
+					<!-- <% } %> -->
+				<!-- </div> -->
+				<!-- <div> -->
+					<!-- <label class="block text-gray-700 font-bold mb-2" for="photo-input"> -->
+						<!-- Alterar Foto de Perfil -->
+					<!-- </label> -->
+					<!-- <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="photo-input" type="file" accept="image/*"> -->
+				<!-- </div> -->
+			<!-- </div> -->
+			<!-- <div class="flex justify-start mb-4"> -->
+				<!-- <button class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button"> -->
+					<!-- Salvar Alterações -->
+				<!-- </button> -->
+			<!-- </div> -->
+			<div class="mb-4 flex justify-center align-center ">
+				<form action="/logout">
+					<button id="logoutBtn" type="submit" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+						<i class="fas fa-sign-out-alt mr-2"></i>Sair
+					</button>
+				</form>
+			</div>
+		</div>
+	</main>
 
     <footer class="bg-gray-800 text-white py-6">
         <div class="container mx-auto px-6 flex justify-between items-center">
