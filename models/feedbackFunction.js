@@ -3,7 +3,6 @@ const { conn } = require('./db');
 class FeedbackController {
   static feedback(user, functionality, feedback_type, reason, description) {
     const userId = user.id;
-
     return new Promise((resolve, reject) => {
       const query = "INSERT INTO user_feedback(user_id, functionality, feedback_type, reason, description) VALUES(?, ?, ?, ?, ?)";
 

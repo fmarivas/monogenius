@@ -1,4 +1,35 @@
 document.addEventListener('DOMContentLoaded', () => {
+	
+function showModal(success, message) {
+    const modal = document.getElementById('modal');
+    const modalTitle = document.getElementById('modal-title');
+    const modalMessage = document.getElementById('modal-message');
+    const modalIcon = document.getElementById('modal-icon');
+
+    if (success) {
+        modalTitle.textContent = 'Sucesso';
+        modalIcon.classList.remove('text-red-500');
+        modalIcon.classList.add('text-green-500');
+    } else {
+        modalTitle.textContent = 'Erro';
+        modalIcon.classList.remove('text-green-500');
+        modalIcon.classList.add('text-red-500');
+    }
+
+    modalMessage.textContent = message;
+    modal.classList.remove('invisible');
+}
+
+
+function hideModal() {
+    const modal = document.getElementById('modal');
+    modal.classList.add('invisible');
+}
+
+if(document.getElementById('close-modal')){
+	document.getElementById('close-modal').addEventListener('click', hideModal);	
+}
+	
 // contar quantas palavras serao permitidas no input
 function updateCount() {
     const textInput = document.getElementById('text-input').value;
@@ -172,6 +203,64 @@ document.getElementById('file-input').addEventListener('change', (evt)=>{
 		document.getElementById('resultado').classList.add('hidden')
 		verificarPlagio()
 	})
+
+
+//feedback
+document.getElementById('feedback-reason-plagiarism').addEventListener('change', function() {
+    if (this.value === '') {
+        document.getElementById('feedback-other-plagiarism').classList.add('hidden');
+    } else {
+        document.getElementById('feedback-other-plagiarism').classList.remove('hidden');
+    }
+});
+
+document.getElementById('submit-feedback-plagiarism').addEventListener('click', async () => {
+    const feedbackType = document.getElementById('feedback-type-plagiarism').textContent;
+    const reason = document.getElementById('feedback-reason-plagiarism').value;
+    const otherReason = document.getElementById('feedback-other-plagiarism').value;
+    const functionality = document.getElementById('functionality-plagiarism').value;
+	
+    const formData = new FormData()
+	
+	formData.append('functionality', functionality)
+	formData.append('feedback_type', feedbackType)
+	formData.append('reason', reason)
+	formData.append('description', otherReason)
+	
+	try{
+		const response = await axios.post('/api/feedback', formData)
+		
+		
+		if(response.data.success){
+			showModal(response.data.success, response.data.message)
+			document.getElementById('feedback-modal-plagiarism').classList.add('hidden');
+			
+			setTimeout(hideModal, 3000)	
+		}else{
+			showModal(response.data.success, response.data.message)			
+			setTimeout(hideModal, 3000)	
+		}
+	}catch(err){
+		console.error(err)
+	}
+});
+
+document.getElementById('closeFeedback-modal-plagiarism').addEventListener('click', () => {
+    document.getElementById('feedback-modal-plagiarism').classList.add('hidden');
+});
+	
+
+document.getElementById('like-btn-plagiarism').addEventListener('click', () => showFeedbackModal('gostou'));
+document.getElementById('dislike-btn-plagiarism').addEventListener('click', () => showFeedbackModal('não gostou'));
+
+function showFeedbackModal(type) {
+    document.getElementById('feedback-modal-plagiarism').classList.remove('hidden');
+    document.getElementById('feedback-type-plagiarism').textContent = type;
+}
+
+
+
+
 
 
 

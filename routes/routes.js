@@ -8,6 +8,7 @@ const upload = multer();
 const rateLimit = require('express-rate-limit');
 
 const platformData = require('../models/platformMetrics')
+const Transaction = require('../models/transaction')
 const feedbackController = require('../models/feedbackFunction')
 
 const notificationController = require('../controllers/function/notificationController');
@@ -16,6 +17,8 @@ const Plagiarism = require('../controllers/function/Plagiarism')
 const fileReader = require('../controllers/function/fileFunction')
 const userRequest = require('../controllers/function/canMakeRequest')
 const isAuth = require('../controllers/function/middleware/auth')
+
+const paymentMpesa = require('../controllers/payment/MpesaFunction')
 
 const cloudinary = require('../controllers/cloudinaryClient')
 const Files = require('../controllers/function/uploadFILES');
@@ -53,6 +56,7 @@ const generalRoutes = {
 	},
   'about': 'about',
   'terms': 'terms',
+  'pricing': 'pricing',
   'privacy': 'privacy',
   'get-public-token': (req, res) => {
     const requestOrigin = req.headers.origin || `${req.protocol}://${req.headers.host}`;
@@ -153,6 +157,7 @@ const routes = {
         res.status(500).render('error', { message: 'Erro ao carregar atualizações' });
     }
   },
+  'pricing': 'pages/payment/pricing',
 };
 
 
@@ -188,7 +193,7 @@ router.get('/c/:id', isAuth, (req, res, next) => {
 });
 
 
-router.post('/api/create', upload.single('manuais'), async (req, res) => {
+router.post('/api/create', isAuth, upload.single('manuais'), async (req, res) => {
   const token = req.headers.authorization;
 
   if (token !== process.env.PUBLIC_ROUTE_TOKEN) {
@@ -208,13 +213,23 @@ router.post('/api/create', upload.single('manuais'), async (req, res) => {
 			manuais = []
 		}
 		
+		const tier = await userRequest.tierDisplay(req.session.user)
+		
 	  const canMakeRequest = await userRequest.canMakeRequest(req.session.user, 'createMono');
 	  
 	  if(canMakeRequest.success){
-		  const mono = await MonoCreator.createMono(tema, ideiaInicial, manuais)
-		  if(mono){
-			  res.json({success: true, mono: mono, message: 'Monografia criada com sucesso!'});		  
+		  const mono = await MonoCreator.createMono(tema, ideiaInicial, manuais, tier)
+		  
+		  if(mono.success){
+			  console.log('success')
+			  res.json({
+				  success: true, 
+				  mono: mono.monografia, 
+				  refer: mono.refer, 
+				  message: 'Monografia criada com sucesso!',
+			});
 		  }else{
+			  console.log('false')
 			  res.json({ success: false, message: 'Falha ao criar Monografia. Tente mais tarde!' });
 		  }
 	  }else{
@@ -375,4 +390,82 @@ router.post('/api/feedback', isAuth,feedbackLimiter, upload.none(), async (req,r
 		res.json({success: false, message: 'Error de servidor. Tente novamente mais tarde!'})
 	}
 })
+
+
+
+router.post('/process-payment', isAuth, async (req,res)=>{
+	let { payType, phoneNumber } = req.body;
+
+	if (!payType) {
+		return res.json({ success: false, message: "Payment Type of argument required" });
+	}
+
+	// Corrigindo a lógica da condição
+	if ((payType.toLowerCase() === 'mpesa' || payType.toLowerCase() === 'emola') && (!phoneNumber || phoneNumber.trim() === '')){
+		return res.json({ success: false, message: "Phone Number required" });
+	}
+
+	const tier = req.session.tier
+	const amount = req.session.amount
+	const tokenAmount = req.session.tokenAmount || null
+	
+    
+	try{	
+		const result = await paymentMpesa(phoneNumber, amount)
+		
+		if(result.success){
+			const transactionData = {
+                user_id: req.session.user.id, // Assumindo que você tem o ID do usuário disponível através do middleware isAuth
+                type: tier,
+				amount: amount,
+                transaction_date: new Date(),
+                token_amount: tokenAmount,
+                payment_method: payType,
+                status: 'Completed',
+                transaction_id: result.data.output_TransactionID,
+                conversation_id: result.data.output_ConversationID
+			}
+			
+			const transaction = await Transaction.transactionProcessing(transactionData)
+			
+			res.json({
+				success: true, 
+				message: 'Pagamento efetuado com sucesso', 
+				redirectUrl: '/c/dashboard',
+			})
+		}else{
+			res.json({success: false, message: result.error.output_ResponseDesc})
+		}
+	}catch(e){
+		console.error(e)
+		res.json({success: false, message: 'Erro de servidor. Tente mais tarde!'})
+	}
+})
+
+router.post('/checkout', isAuth, (req, res) => {
+    let { type } = req.body;
+    let amount;
+
+    // Correção na lógica de validação
+    if (type !== 'basic' && type !== 'premium' || !type) {
+        return res.status(400).json({ error: "Invalid type" });
+    }
+
+    if (type === 'basic') {
+        amount = 3200;
+    } else if (type === 'premium') {
+        amount = 10000;
+    }
+
+    // Armazenar informações na sessão
+    req.session.tier = type;
+    req.session.amount = amount;
+
+    // Renderizar a página de checkout
+    res.render('pages/payment/checkout', {
+        tier: type,
+        amount: amount,
+    });
+});
+
 module.exports = router

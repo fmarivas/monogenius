@@ -7,6 +7,61 @@ document.addEventListener('DOMContentLoaded', () => {
     const orderedListBtn = document.getElementById('ordered-list-btn');
 	const overlay = document.getElementById('overlay');
 
+//feedback
+document.getElementById('feedback-reason-create').addEventListener('change', function() {
+    if (this.value === '') {
+        document.getElementById('feedback-other-create').classList.add('hidden');
+    } else {
+        document.getElementById('feedback-other-create').classList.remove('hidden');
+    }
+});
+
+document.getElementById('submit-feedback-create').addEventListener('click', async () => {
+    // Aqui você pode implementar a lógica para enviar o feedback para o servidor
+    // Por exemplo:
+    const feedbackType = document.getElementById('feedback-type-create').textContent;
+    const reason = document.getElementById('feedback-reason-create').value;
+    const otherReason = document.getElementById('feedback-other-create').value;
+    const functionality = document.getElementById('functionality-create').value;
+	
+    const formData = new FormData()
+	
+	formData.append('functionality', functionality)
+	formData.append('feedback_type', feedbackType)
+	formData.append('reason', reason)
+	formData.append('description', otherReason)
+	
+	try{
+		const response = await axios.post('/api/feedback', formData)
+		
+		
+		if(response.data.success){
+			showModal(response.data.success, response.data.message)
+			document.getElementById('feedback-modal-create').classList.add('hidden');
+			
+			setTimeout(hideModal, 3000)	
+		}else{
+			showModal(response.data.success, response.data.message)			
+			setTimeout(hideModal, 3000)	
+		}
+	}catch(err){
+		console.error(err)
+	}
+});
+
+document.getElementById('closeFeedback-modal-create').addEventListener('click', () => {
+    document.getElementById('feedback-modal').classList.add('hidden');
+});
+	
+
+document.getElementById('like-btn-create').addEventListener('click', () => showFeedbackModal('gostou'));
+document.getElementById('dislike-btn-create').addEventListener('click', () => showFeedbackModal('não gostou'));
+
+function showFeedbackModal(type) {
+    document.getElementById('feedback-modal-create').classList.remove('hidden');
+    document.getElementById('feedback-type-create').textContent = type;
+}
+
 //FOrmatacao do texto do textField
 	function formatText(command) {
 		document.execCommand(command, false, null);
@@ -44,36 +99,39 @@ function showModal(success, message) {
     modalMessage.textContent = message;
     modal.classList.remove('invisible');
 }
-	
+
+
+function hideModal() {
+    const modal = document.getElementById('modal');
+    modal.classList.add('invisible');
+}
+
+if(document.getElementById('close-modal')){
+	document.getElementById('close-modal').addEventListener('click', hideModal);	
+}
 //validaca dos campos de referencia
 function formatMonographyHTML(mono) {
     let formattedHTML = '';
 
-    formattedHTML += `<h1>Introdução</h1>`;
-    formattedHTML += `<br>`;
-    formattedHTML += `<h2>Contextualização</h2><p>${mono.contextualizacao}</p>`;
-    formattedHTML += `<br>`;
-    formattedHTML += `<h2>Problematização</h2><p>${mono.problematizacao}</p>`;
-    formattedHTML += `<br>`;
-    formattedHTML += `<h2>Justificativa</h2><p>${mono.justificativa}</p>`;
-    formattedHTML += `<br>`;
-    formattedHTML += `<h2>Objetivo Geral</h2><p>${mono.objetivo_geral}</p>`;
-    formattedHTML += `<br>`;
-    formattedHTML += `<h2>Objetivos Específicos</h2><ul>${mono.objetivos_especificos.map(obj => `<li>${obj}</li>`).join('')}</ul>`;
-    formattedHTML += `<br>`;
-    formattedHTML += `<h2>Delimitação da Pesquisa</h2><p>${mono.delimitacao_pesquisa}</p>`;
-    formattedHTML += `<br>`;
-    formattedHTML += `<h2>Estrutura do Trabalho</h2><p>${mono.estrutura_trabalho}</p>`;
-	
-    // Preencher a lista de referências
-    const referenciasList = document.getElementById('referencias-lista');
-    referenciasList.innerHTML = ''; // Limpar a lista existente
-    mono.referencias_bibliograficas.forEach(ref => {
-        const li = document.createElement('li');
-        li.textContent = ref;
-        referenciasList.appendChild(li);
+    // Introdução
+    formattedHTML += '<h1>1. Introdução</h1>';
+    formattedHTML += `<h2>1.1 Contextualização</h2>${mono.introducao.contextualizacao.replace(/\n/g, '<br>')}<br><br>`;
+    formattedHTML += `<h2>1.2 Problematização</h2>${mono.introducao.problematizacao.replace(/\n/g, '<br>')}<br><br>`;
+    formattedHTML += `<h2>1.3 Justificativa</h2>${mono.introducao.justificativa.replace(/\n/g, '<br>')}<br><br>`;
+    formattedHTML += '<h2>1.4 Objetivos</h2>';
+    formattedHTML += `<h3>1.4.1 Objetivo Geral</h3>${mono.introducao.objetivo_geral.replace(/\n/g, '<br>')}<br><br>`;
+    formattedHTML += '<h3>1.4.2 Objetivos Específicos</h3><ul>';
+    mono.introducao.objetivos_especificos.forEach(obj => {
+        formattedHTML += `<li>${obj.replace(/\n/g, '<br>')}</li>`;
     });
-	
+    formattedHTML += '</ul><br>';
+    formattedHTML += `<h2>1.5 Delimitação da Pesquisa</h2>${mono.introducao.delimitacao_pesquisa.replace(/\n/g, '<br>')}<br><br>`;
+    formattedHTML += `<h2>1.6 Estrutura do Trabalho</h2>${mono.introducao.estrutura_trabalho.replace(/\n/g, '<br>')}<br><br>`;
+
+    // Revisão Bibliográfica
+    formattedHTML += '<h1>2. Revisão Bibliográfica</h1>';
+    formattedHTML += `${mono.revisao_bibliografica.replace(/\n/g, '<br>')}<br><br>`;
+
     return formattedHTML;
 }
 
@@ -132,11 +190,29 @@ form.addEventListener('submit', async (event) => {
 		
 		const formattedMono = formatMonographyHTML(response.data.mono);
 		textField.innerHTML = formattedMono;
+		// textField.innerHTML = ;
+		
+		
+		// Inserir as referências bibliográficas
+		const referenciasList = document.getElementById('referencias-lista');
+		if (referenciasList) {
+			referenciasList.innerHTML = ''; // Limpar conteúdo existente
+			response.data.refer.forEach(ref => {
+				const li = document.createElement('li');
+				li.textContent = ref;
+				referenciasList.appendChild(li);
+			});
+		}
+		
+		showModal(true, response.data.message);
+		
+		//funcao para gravar o conteudo
+		saveContent()
+		
 		overlay.classList.add('hidden')
 		
-		showModal(true, );
+		//ocultar modal
 		setTimeout(hideModal, 3000)
-		
 	}else{
 		overlay.classList.add('hidden')
 		showModal(false, response.data.message);
@@ -157,7 +233,7 @@ form.addEventListener('submit', async (event) => {
 function copyToClipboard() {
     const textField = document.querySelector('.editable');
     navigator.clipboard.writeText(textField.textContent).then(() => {
-        const button = document.getElementById('copy-btn');
+        const button = document.getElementById('copy-btn-create');
         
         button.innerHTML = '<i class="fa-solid fa-check"></i> Copiado';
         button.classList.add('bg-green-500', 'text-white');
@@ -173,6 +249,81 @@ function copyToClipboard() {
     });
 }
 
-document.getElementById('copy-btn').addEventListener('click', copyToClipboard);
+document.getElementById('copy-btn-create').addEventListener('click', copyToClipboard);
+	
+	
+	
+//salvar automaticamente
+// Função para salvar o conteúdo no localStorage
+function saveContent() {
+	const tema = document.getElementById('tema').value;
+	const ideiaInicial = document.getElementById('ideia-inicial').value;
+    const content = textField.innerHTML;
+    const referencias = document.getElementById('referencias-lista').innerHTML;
+	
+	if(tema){
+		localStorage.setItem('monografiaTema', tema);		
+	}
+    
+	if(ideiaInicial){
+		localStorage.setItem('monografiaIdeia', ideiaInicial);		
+	}
+    
+	if(content){
+		localStorage.setItem('monografiaContent', content);		
+	}
+    
+	if(referencias){
+		localStorage.setItem('monografiaReferencias', referencias);		
+	}
+}
+
+
+setInterval(saveContent, 30000);
+
+// Também salvar quando o usuário sair da página
+window.addEventListener('beforeunload', saveContent);
+
+// Função para carregar o conteúdo salvo
+function loadSavedContent() {
+    const savedTema = localStorage.getItem('monografiaTema');
+    const savedideiaInicial = localStorage.getItem('monografiaIdeia');
+    const savedContent = localStorage.getItem('monografiaContent');
+    const savedReferencias = localStorage.getItem('monografiaReferencias');
+    
+    if (savedTema) {
+        document.getElementById('tema').value = savedTema;
+    }
+    	
+    if (savedideiaInicial) {
+        document.getElementById('ideia-inicial').value = savedideiaInicial;
+    }
+    	
+    if (savedContent) {
+        textField.innerHTML = savedContent;
+    }
+    
+    if (savedReferencias) {
+        document.getElementById('referencias-container').classList.remove('hidden')
+        document.getElementById('referencias-lista').innerHTML = savedReferencias;
+    }
+}
+
+// Chamar a função de carregamento quando a página for carregada
+window.addEventListener('load', loadSavedContent);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	
 });

@@ -89,76 +89,6 @@ document.getElementById('close-modal').addEventListener('click', hideModal);
 			console.error(err)
 		}
 	})	
-	
-//feedback
-document.getElementById('feedback-reason').addEventListener('change', function() {
-    if (this.value === '') {
-        document.getElementById('feedback-other').classList.add('hidden');
-    } else {
-        document.getElementById('feedback-other').classList.remove('hidden');
-    }
-});
-
-document.getElementById('submit-feedback').addEventListener('click', async () => {
-    // Aqui você pode implementar a lógica para enviar o feedback para o servidor
-    const feedbackType = document.getElementById('feedback-type').textContent;
-    const reason = document.getElementById('feedback-reason').value;
-    const otherReason = document.getElementById('feedback-other').value;
-    const functionality = document.getElementById('functionality').value;
-	
-    const formData = new FormData()
-	
-	formData.append('functionality', functionality)
-	if(feedbackType){
-		formData.append('feedback_type', feedbackType)		
-	}
-	formData.append('reason', reason)
-	formData.append('description', otherReason)
-	
-	try{
-		console.log(functionality)
-		console.log(feedbackType)
-		console.log(reason)
-		console.log(otherReason)
-		const response = await axios.post('/api/feedback', formData)
-		
-		if(response.data.success){
-			showModal(response.data.success, response.data.message)
-			document.getElementById('feedback-modal').classList.add('hidden');
-			
-			setTimeout(hideModal, 3000)	
-		}else{
-			showModal(response.data.success, response.data.message)			
-			setTimeout(hideModal, 3000)	
-		}
-	}catch(err){
-		console.error(err)
-	}
-});
-
-document.getElementById('closeFeedback-modal').addEventListener('click', () => {
-	document.getElementById('feedback-modal').classList.add('hidden');
-});
-
-document.getElementById('like-btn').addEventListener('click', () => showFeedbackModal('gostou'));
-document.getElementById('dislike-btn').addEventListener('click', () => showFeedbackModal('não gostou'));
-
-function showFeedbackModal(type) {
-    document.getElementById('feedback-modal').classList.remove('hidden');
-    document.getElementById('feedback-type').textContent = type;
-}
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -220,10 +150,12 @@ async function uploadFile(files) {
     }
 }
 
-document.getElementById('file-input').addEventListener('change', (evt)=>{
-	validateFileSize(evt.target)
-	uploadFile(evt.target.files)
-})
+if(document.getElementById('file-input')){
+	document.getElementById('file-input').addEventListener('change', (evt)=>{
+		validateFileSize(evt.target)
+		uploadFile(evt.target.files)
+	})
+}
 
 //Resultado
 	const btnResult = document.getElementById('result-btn')
@@ -318,65 +250,12 @@ document.getElementById('file-input').addEventListener('change', (evt)=>{
 		resultadoDiv.classList.remove('hidden');
 	}
 	
-	
-	btnResult.addEventListener('click', ()=>{
-		document.getElementById('resultado').classList.add('hidden')
-		verificarPlagio()
-	})
-
-//feedback
-document.getElementById('feedback-reason').addEventListener('change', function() {
-    if (this.value === '') {
-        document.getElementById('feedback-other').classList.add('hidden');
-    } else {
-        document.getElementById('feedback-other').classList.remove('hidden');
-    }
-});
-
-document.getElementById('submit-feedback').addEventListener('click', async () => {
-    // Aqui você pode implementar a lógica para enviar o feedback para o servidor
-    // Por exemplo:
-    const feedbackType = document.getElementById('feedback-type').textContent;
-    const reason = document.getElementById('feedback-reason').value;
-    const otherReason = document.getElementById('feedback-other').value;
-    const functionality = document.getElementById('functionality').value;
-	
-    const formData = new FormData()
-	
-	formData.append('functionality', functionality)
-	formData.append('feedback_type', feedbackType)
-	formData.append('reason', reason)
-	formData.append('description', otherReason)
-	
-	try{
-		const response = await axios.post('/api/feedback', formData)
-		
-		
-		if(response.data.success){
-			showModal(response.data.success, response.data.message)
-			document.getElementById('feedback-modal').classList.add('hidden');
-			
-			setTimeout(hideModal, 3000)	
-		}else{
-			showModal(response.data.success, response.data.message)			
-			setTimeout(hideModal, 3000)	
-		}
-	}catch(err){
-		console.error(err)
+	if(btnResult){
+		btnResult.addEventListener('click', ()=>{
+			document.getElementById('resultado').classList.add('hidden')
+			verificarPlagio()
+		})		
 	}
-});
 
-document.getElementById('closeFeedback-modal').addEventListener('click', () => {
-    document.getElementById('feedback-modal').classList.add('hidden');
-});
-	
-
-document.getElementById('like-btn').addEventListener('click', () => showFeedbackModal('gostou'));
-document.getElementById('dislike-btn').addEventListener('click', () => showFeedbackModal('não gostou'));
-
-function showFeedbackModal(type) {
-    document.getElementById('feedback-modal').classList.remove('hidden');
-    document.getElementById('feedback-type').textContent = type;
-}
 	
 })

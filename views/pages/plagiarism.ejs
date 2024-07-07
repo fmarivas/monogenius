@@ -27,11 +27,11 @@
 </head>
 <body class="bg-gray-100 font-sans">
 
-	<div id="feedback-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
+	<div id="feedback-modal-plagiarism" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
 		<div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-			<h3 class="text-lg font-bold text-gray-900 mb-4" id="modal-title">Seu feedback</h3>
-			<p class="mb-4">Por que você <span id="feedback-type" class="font-semibold"></span> deste conteúdo?</p>
-			<select id="feedback-reason" class="w-full p-2 mb-4 border rounded">
+			<h3 class="text-lg font-bold text-gray-900 mb-4" id="modal-title-plagiarism">Seu feedback</h3>
+			<p class="mb-4">Por que você <span id="feedback-type-plagiarism" class="font-semibold"></span> deste conteúdo?</p>
+			<select id="feedback-reason-plagiarism" class="w-full p-2 mb-4 border rounded">
 				<option value="">Selecione uma razão</option>
 				<option value="precisao">Precisão da detecção</option>
 				<option value="velocidade">Velocidade da verificação</option>
@@ -41,11 +41,11 @@
 				<option value="interface">Interface do usuário</option>
 				<option value="outros">Outros</option>
 			</select>
-			<textarea id="feedback-other" class="w-full p-2 mb-4 border rounded hidden" placeholder="Por favor, explique..."></textarea>
-			<input type="hidden" id="functionality" value="plagiarism">
+			<textarea id="feedback-other-plagiarism" class="w-full p-2 mb-4 border rounded hidden" placeholder="Por favor, explique..."></textarea>
+			<input type="hidden" id="functionality-plagiarism" value="plagiarism">
 			<div class="flex justify-end">
-				<button id="submit-feedback" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Enviar</button>
-				<button id="closeFeedback-modal" class="ml-2 px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400">Fechar</button>
+				<button id="submit-feedback-plagiarism" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Enviar</button>
+				<button id="closeFeedback-modal-plagiarism" class="ml-2 px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400">Fechar</button>
 			</div>
 		</div>
 	</div>	
@@ -128,7 +128,7 @@
                 </div>
             </form>
         </div>
-		<div id="resultado" class="bg-white shadow-md rounded-lg p-6 mt-6 hidden">
+		<div id="resultado" class="hidden bg-white shadow-md rounded-lg p-6 mt-6">
 			<h2 class="text-xl font-bold text-gray-800 mb-4">Resultado</h2>
 			<div class="grid grid-cols-2 gap-4 mb-4">
 				<div class="bg-blue-100 p-4 rounded-lg">
@@ -156,10 +156,10 @@
 			</div>
 			<div class="flex justify-between items-center mt-4">
 				<div class="">
-					<button id="like-btn" class="bg-green-500 text-white hover:bg-green-600 px-4 py-2 rounded-l">
+					<button id="like-btn-plagiarism" class="bg-green-500 text-white hover:bg-green-600 px-4 py-2 rounded-l">
 						<i class="fas fa-thumbs-up mr-2"></i>Gostei
 					</button>
-					<button id="dislike-btn" class="bg-red-500 text-white hover:bg-red-600 px-4 py-2 rounded-r">
+					<button id="dislike-btn-plagiarism" class="bg-red-500 text-white hover:bg-red-600 px-4 py-2 rounded-r">
 						<i class="fas fa-thumbs-down mr-2"></i>Não Gostei
 					</button>
 				</div>

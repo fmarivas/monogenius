@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/static/assets/js/checkout.js"></script>
+    <script src="//code.tidio.co/mwu2j13oujaafzownf2hemd6v6mfeyfl.js" async></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <title>Monogenius - Checkout</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/assets/img/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/assets/img/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/assets/img/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/static/assets/img/favicon/site.webmanifest">  	
+</head>
+<body class="bg-gray-100 font-sans flex flex-col min-h-screen">
+
+    <div id="modal" class="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 invisible">
+        <div class="bg-white rounded-lg shadow-lg p-4 max-w-sm mx-auto my-4">
+            <div class="flex items-start justify-between mb-2">
+                <div class="flex items-center">
+                    <svg id="modal-icon" class="w-6 h-6 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <h3 id="modal-title" class="text-lg font-medium text-gray-900"></h3>
+                </div>
+                <button id="close-modal" type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg p-1.5 ml-auto inline-flex items-center">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                    </svg>
+                </button>
+            </div>
+            <p id="modal-message" class="text-gray-700"></p>
+        </div>
+    </div>
+	
+	<div id="phoneModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
+		<div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+			<div class="mt-3 text-center">
+				<h3 class="text-lg leading-6 font-medium text-gray-900">Insira seu número de celular</h3>
+				<div class="mt-2 px-7 py-3">
+					<input type="tel" id="phoneNumber" placeholder="258xxxxxxxxx" 
+						   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+				</div>
+				<div class="items-center px-4 py-3">
+					<button id="confirmPhone" class="px-4 py-2 bg-indigo-600 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+						Confirmar
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>	
+	<div id="overlay" class="fixed inset-0 flex items-center justify-center z-50 hidden">
+		<div class="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-green-600"></div>
+	</div>
+    <header class="bg-white shadow">
+        <nav class="container mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center">
+                <a href="/c/dashboard" class="text-xl font-bold text-gray-800">Monogenius</a>
+            </div>
+            <div class="flex items-center">
+                <button id="suporte-btn" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-full">
+                    Suporte
+                </button>				
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-6 py-8 flex-grow">
+        <div class="bg-white shadow-md rounded-lg p-8 max-w-4xl mx-auto">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Checkout</h2>
+            
+            <div class="mb-8">
+                <h3 class="text-xl font-semibold text-gray-700 mb-4">Seu Pedido</h3>
+                <div class="bg-gray-50 p-4 rounded-md">
+                    <p class="text-lg font-medium text-gray-800">Plano <%=tier%></p>
+                    <p class="text-gray-600">30 dias</p>
+                    <p class="text-xl font-bold text-indigo-600 mt-2"><%=formatNumber(amount)%> MZN</p>
+                </div>
+            </div>
+
+            <div class="mb-8">
+                <h3 class="text-xl font-semibold text-gray-700 mb-4">Método de Pagamento</h3>
+                <div class="space-y-4">
+                    <div class="flex items-center p-4 border border-gray-200 rounded-md">
+                        <input type="radio" id="mpesa" name="payment" value="mpesa" class="payment h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300" checked>
+                        <label for="mpesa" class="ml-3 block text-sm font-medium text-gray-700">
+                            M-Pesa
+                        </label>
+                        <img src="/static/assets/img/M-pesa-logo.png" alt="M-Pesa Logo" class="h-8 ml-auto">
+                    </div>
+                    <!-- <div class="flex items-center p-4 border border-gray-200 rounded-md"> -->
+                        <!-- <input type="radio" id="emola" name="payment" value="emola" class="payment h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"> -->
+                        <!-- <label for="emola" class="ml-3 block text-sm font-medium text-gray-700"> -->
+                            <!-- Emola -->
+                        <!-- </label> -->
+                        <!-- <img src="/static/assets/img/M-pesa-logo.png" alt="M-Pesa Logo" class="h-8 ml-auto"> -->
+                    <!-- </div> -->
+                    <!-- Adicione mais métodos de pagamento aqui no futuro -->
+                </div>
+            </div>
+
+            <div class="mt-8">
+                <button id="pay-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-md transition-colors duration-300">
+                    Pagar <%=formatNumber(amount)%> MZN
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-gray-800 text-white py-6 mt-auto">
+        <div class="container mx-auto px-6 flex justify-between items-center">
+            <p>&copy; 2024 Monogenius</p>
+            <div>
+                <a href="/terms" class="hover:text-gray-400 mx-2">Termos de Serviço</a>
+                <a href="/privacy" class="hover:text-gray-400 mx-2">Política de Privacidade</a>
+                <a href="/about" class="hover:text-gray-400 mx-2">Sobre Nós</a>
+            </div>
+        </div>
+    </footer>
+<%
+function formatNumber(num) {
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+}
+%>
+
+<script>
+
+</script>
+</body>
+</html>
