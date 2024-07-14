@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<div class="flex flex-col h-full justify-between">
+  <div>
+    <div id="autorContainer" class="text-right mb-8 border-2 border-dashed border-gray-300 p-2" contenteditable="true" data-placeholder="Nome do Autor">
+      <%= content.autor %>
+    </div>
+
+    <div id="tituloContainer" class="text-center font-bold text-xl mb-4 border-2 border-dashed border-gray-300 p-2" contenteditable="true" data-placeholder="Título do Trabalho">
+      <%= content.titulo %>
+    </div>
+
+    <% if (content.subtitulo) { %>
+      <div id="subtituloContainer" class="text-center text-lg mb-8 border-2 border-dashed border-gray-300 p-2" contenteditable="true" data-placeholder="Subtítulo">
+        <%= content.subtitulo %>
+      </div>
+    <% } %>
+  </div>
+
+  <div>
+    <div id="descricaoContainer" class="text-center mb-8 border-2 border-dashed border-gray-300 p-2" contenteditable="true" data-placeholder="Descrição do Trabalho">
+      <%= content.descricao %>
+    </div>
+
+    <div id="orientadorContainer" class="text-center mb-8 border-2 border-dashed border-gray-300 p-2" contenteditable="true" data-placeholder="Nome do Orientador">
+      <%= content.orientador %>
+    </div>
+  </div>
+
+  <div id="localAnoContainer" class="text-center border-2 border-dashed border-gray-300 p-2" contenteditable="true" data-placeholder="Local e Ano">
+    <%= content.local %>, <%= content.ano %>
+  </div>
+</div>

@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<% if (pageResources && pageResources.css) { %>
+	  <% pageResources.css.forEach(function(css) { %>
+		<link rel="stylesheet" href="<%= assetPath(css) %>">
+	  <% }); %>
+	<% } %>
+	
+	<% if (pageResources && pageResources.inlineStyles) { %>
+	  <style>
+		<%- pageResources.inlineStyles %>
+	  </style>
+	<% } %>	
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/assets/img/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/assets/img/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/assets/img/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/static/assets/img/favicon/site.webmanifest">  	
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+	
+	<script src="https://cdn.tailwindcss.com"></script>
+    <script src="/static/assets/js/common.js"></script>
+    <script src="//code.tidio.co/mwu2j13oujaafzownf2hemd6v6mfeyfl.js" async></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+	<script type='text/javascript' src='//code.jquery.com/jquery-2.2.2.min.js'></script>
+	
+	<!-- Google tag (gtag.js) -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-PTD2W9YS10"></script>
+	<script>
+	  window.dataLayer = window.dataLayer || [];
+	  function gtag(){dataLayer.push(arguments);}
+	  gtag('js', new Date());
+
+	  gtag('config', 'G-PTD2W9YS10');
+	</script>   	
+	<title>Monogenius - <%=title%></title>
+</head>
+<body class="bg-gray-100 font-sans">
+    <!-- Modal de aviso -->
+    <div id="warning-modal" class="fixed top-0 left-0 w-full lg:left-64 lg:w-[calc(100%-16rem)] bg-yellow-100 text-yellow-800 px-4 py-3 shadow-md z-50 hidden">
+        <div class="container mx-auto flex justify-between items-center">
+            <p>
+                <strong>Aviso importante:</strong> Até 1º de agosto, você poderá usar todos os recursos do Monogenius. Aproveite!
+            </p>
+            <button id="close-modal" class="text-yellow-800 hover:text-yellow-900">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <div id="modal" class="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 invisible">
+        <div class="bg-white rounded-lg shadow-lg p-4 max-w-sm mx-auto my-4">
+            <div class="flex items-start justify-between mb-2">
+                <div class="flex items-center">
+                    <svg id="modal-icon" class="w-6 h-6 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <h3 id="modal-title" class="text-lg font-medium text-gray-900"></h3>
+                </div>
+                <button id="close-modal" type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg p-1.5 ml-auto inline-flex items-center">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                    </svg>
+                </button>
+            </div>
+            <p id="modal-message" class="text-gray-700"></p>
+        </div>
+    </div>	
+
+	<div id="overlay" class="fixed inset-0 flex items-center justify-center z-50 hidden">
+		<div class="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-green-600"></div>
+	</div>
+
+    <!-- Header for small screens -->
+    <header class="lg:hidden bg-indigo-600 text-white p-4 flex justify-between items-center">
+        <a href="/c/dashboard"><img src="/static/assets/img/logo.png" alt="Logo" class="h-8" /></a>
+        <button id="mobile-menu-button" class="text-white">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+        </button>
+    </header>
+
+    <div class="flex">
+        <!-- Sidebar -->
+		<div id="sidebar" class="fixed lg:relative hidden lg:flex w-64 h-screen flex-col p-2 bg-gray-800 text-white z-50">
+			<div class="mb-4 lg:block hidden">
+				<a href="/c/dashboard"><img src="/static/assets/img/logo.png" alt="Logo" class="w-full h-auto" /></a>
+			</div>
+			<nav class="flex-grow flex flex-col justify-between">
+				<div>
+					<ul class="list-none p-0 mb-4">
+						<% Object.entries(pageDetails.main).forEach(([pageKey, details]) => { %>
+						<% const isActive = page && page === pageKey; %>
+						<% const activeClass = isActive ? 'bg-gray-700' : ''; %>
+						<li class="mb-2 rounded <%= activeClass %> hover:bg-gray-700 transition-colors duration-200">
+							<a href="/c/<%= pageKey %>" class="font-bold text-decoration-none block text-base p-2">
+								<i class="<%= details.icon %> mr-2"></i>
+								<span class=""><%= details.name %></span>
+							</a>
+						</li>
+						<% }); %>
+					</ul>
+					
+					<div class="border w-full h-0 mb-2"></div>
+					
+					<ul class="list-none p-0 mb-4">
+						<% Object.entries(pageDetails.features).forEach(([pageKey, details]) => { %>
+						<% const isActive = page && page === pageKey; %>
+						<% const activeClass = isActive ? 'bg-gray-700' : ''; %>
+						<li class="mb-2 rounded <%= activeClass %> hover:bg-gray-700 transition-colors duration-200">
+							<a href="/c/<%= pageKey %>" class="font-bold text-decoration-none block text-base p-2">
+								<i class="<%= details.icon %> mr-2"></i>
+								<span class=""><%= details.name %></span>
+							</a>
+						</li>
+						<% }); %>
+					</ul>
+
+				</div>
+				<ul class="list-none p-0 mt-auto">
+				<div class="border w-full h-0 mt-auto mb-2"></div>
+					<% Object.entries(pageDetails.bottom).forEach(([pageKey, details]) => { %>
+					<% const isActive = page && page === pageKey; %>
+					<% const activeClass = isActive ? 'bg-gray-700' : ''; %>
+					<li class="mb-2 rounded <%= activeClass %> hover:bg-gray-700 transition-colors duration-200">
+						<a href="/c/<%= pageKey %>" class="font-bold text-decoration-none block text-base p-2">
+							<i class="<%= details.icon %> mr-2"></i>
+							<span class=""><%= details.name %></span>
+						</a>
+					</li>
+					<% }); %>
+				</ul>
+
+					<div class="border w-full h-0 mb-2"></div>
+
+					<ul class="list-none p-0">
+						<% Object.entries(pageDetails.cta).forEach(([pageKey, details]) => { %>
+						<% const isActive = page && page === pageKey; %>
+						<li class="mb-2 rounded bg-gradient-to-r from-yellow-400 to-red-500 hover:from-yellow-500 hover:to-red-600 transition-colors duration-200">
+							<a href="/c/<%= pageKey %>" class="font-bold text-decoration-none block text-base p-2 text-white">
+								<i class="<%= details.icon %> mr-2 animate-pulse"></i>
+								<span class=""><%= details.name %></span>
+							</a>
+						</li>
+						<% }); %>
+					</ul>	
+			</nav>
+		</div>
+
+        <!-- Main content -->
+        <div id="content" class="w-full h-screen p-4 lg:p-10 overflow-auto">
+            <div id="notification-bar" class="bg-indigo-100 text-indigo-700 px-4 py-3 hidden">
+                <div class="container mx-auto flex justify-center items-center">
+                    <p>
+                        O Monogenius acabou de atualizar. 
+                        <a href="/c/updates" target="_blank" class="font-bold underline hover:text-indigo-900">Veja as atualizações</a>
+                    </p>
+                </div>
+            </div>	
+            <%- include('pages/' + body) %>
+        </div>
+    </div>
+
+	<% if (page === 'plagiarism') { %>
+		<script src="/static/assets/js/plagiarism.js?v=2"></script>
+	<% } %>
+	
+	<% if (page === 'template') { %>
+		<script src="/static/assets/js/template.js"></script>
+	<% } %>
+	
+	<% if (page === 'create') { %>
+		<script src="/static/assets/js/create.js"></script>
+		<script type='text/javascript' src='src/simple-editor.js'></script>	
+	<% } %>
+	
+	<% if (page === 'settings') { %>
+		<script>
+			const photoInput = document.getElementById('photo-input');
+			const profilePhoto = document.getElementById('profile-photo');
+
+			photoInput.addEventListener('change', function() {
+				const file = this.files[0];
+				if (file) {
+					const reader = new FileReader();
+					reader.addEventListener('load', function() {
+						profilePhoto.src = reader.result;
+					});
+					reader.readAsDataURL(file);
+				}
+			});
+		</script>
+	<% } %>
+	
+	<%
+		function assetPath(path) {
+		  return path + '?v=' + (process.env.ASSET_VERSION || '1');
+		}
+	%>
+	
+	<% if (pageResources && pageResources.js) { %>
+	  <% pageResources.js.forEach(function(js) { %>
+		<script src="<%= assetPath(js) %>"></script>
+	  <% }); %>
+	<% } %>	
+    <script>
+        document.getElementById('mobile-menu-button').addEventListener('click', function() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('hidden');
+            sidebar.classList.toggle('w-full');
+            sidebar.classList.toggle('w-64');
+        });
+		
+		const modal = document.getElementById('warning-modal');
+		const closeButton = document.getElementById('close-modal');
+		const currentDate = new Date();
+		const august1st2024 = new Date('2024-08-01');
+		const warningDismissed = localStorage.getItem('warningDismissed');
+
+		if (currentDate < august1st2024 && !warningDismissed) {
+			modal.classList.remove('hidden');
+		}
+
+		closeButton.addEventListener('click', function() {
+			modal.classList.add('hidden');
+			localStorage.setItem('warningDismissed', 'true');
+		});
+    </script>
+</body>
+</html>

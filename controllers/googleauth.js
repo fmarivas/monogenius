@@ -41,7 +41,7 @@ router.get("/success", async (req, res, next) => {
 		if(user){
 			req.session.user = user
 			
-			res.redirect('/c/dashboard')
+			res.redirect('/c/create')
 		}else{
 			res.redirect('/error')
 		}

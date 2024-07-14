@@ -80,8 +80,7 @@ async function uploadFile(files) {
 			}
 			
 			const response = await axios.post('/api/read-file', formData, config)
-			
-			
+						
 			if(response.data.success){
 				const fileContent = response.data.content;
 				document.getElementById('text-input').value = fileContent;
@@ -135,6 +134,12 @@ document.getElementById('file-input').addEventListener('change', (evt)=>{
 			overlay.classList.remove('hidden');
 
 			const response = await axios.post('/api/plagiarism', formData, config)
+			
+
+			if (response.data.redirect) {
+				window.location.href = response.data.redirect;
+				return;
+			}
 			
 			if(response.data.success){
 				const resultado = response.data.result

@@ -12,11 +12,22 @@ const Transaction = require('../models/transaction')
 const feedbackController = require('../models/feedbackFunction')
 
 const notificationController = require('../controllers/function/notificationController');
+
 const MonoCreator = require('../controllers/function/MonoCreatorComponent')
 const Plagiarism = require('../controllers/function/Plagiarism')
+const additionalFeatures = require('../controllers/function/additionalFeatures')
+
 const fileReader = require('../controllers/function/fileFunction')
 const userRequest = require('../controllers/function/canMakeRequest')
+const {getPricingPlansWithDiscount} = require('../controllers/function/pricingConfig')
+
+const featuresConfig = require('../controllers/function/featuresConfig')
+const preTextualElements = require('../controllers/function/preTextualElements')
+
 const isAuth = require('../controllers/function/middleware/auth')
+const checkSubscription = require('../controllers/function/middleware/checkSubscription')
+
+const pageResources = require('../controllers/config/pageResources')
 
 const paymentMpesa = require('../controllers/payment/MpesaFunction')
 
@@ -87,44 +98,6 @@ const generalRoutes = {
             res.redirect('/auth/login');
         }
     });
-  }  
-}
-
-const routes = {
-  'create': async (req, res)=>{
-	try{
-		const insertId = await platformData.addPageVisit(req);
-		res.render('pages/create')
-	}catch(err){
-		console.error(err)
-	}		  
-  },
-  'template': async (req,res)=>{
-	try{
-		const insertId = await platformData.addPageVisit(req);
-		res.render('pages/template')
-	}catch(err){
-		console.error(err)
-	}	  
-  },
-  'plagiarism': async (req,res)=>{
-	try{
-		const insertId = await platformData.addPageVisit(req);
-		res.render('pages/plagiarism')
-	}catch(err){
-		console.error(err)
-	}
-  },
-  'profile': async (req,res)=>{
-	  try{
-		const insertId = await platformData.addPageVisit(req);
-		res.render('pages/profile',  {user: req.session.user})
-	  }catch(err){
-		  console.error(err)
-	  }
-  },
-  'dashboard': (req,res)=>{
-	  res.render('dashboard', {user: req.user})
   },
   'updates': async (req,res)=>{
     try {
@@ -157,8 +130,47 @@ const routes = {
         res.status(500).render('error', { message: 'Erro ao carregar atualizações' });
     }
   },
-  'pricing': 'pages/payment/pricing',
-};
+}
+
+// const routes = {
+  // 'create': async (req, res)=>{
+	// try{
+		// const insertId = await platformData.addPageVisit(req);
+		// res.render('pages/create')
+	// }catch(err){
+		// console.error(err)
+	// }		  
+  // },
+  // 'template': async (req,res)=>{
+	// try{
+		// const insertId = await platformData.addPageVisit(req);
+		// res.render('pages/template')
+	// }catch(err){
+		// console.error(err)
+	// }	  
+  // },
+  // 'plagiarism': async (req,res)=>{
+	// try{
+		// const insertId = await platformData.addPageVisit(req);
+		// res.render('pages/plagiarism')
+	// }catch(err){
+		// console.error(err)
+	// }
+  // },
+  // 'profile': async (req,res)=>{
+	  // try{
+		// const insertId = await platformData.addPageVisit(req);
+		// res.render('pages/profile',  {user: req.session.user})
+	  // }catch(err){
+		  // console.error(err)
+	  // }
+  // },
+  // 'dashboard': (req,res)=>{
+	  // res.render('dashboard', {user: req.user})
+  // },
+
+  // 'pricing': 'pages/payment/pricing',
+// };
 
 
 
@@ -177,23 +189,80 @@ router.get('/:id', (req, res, next) => {
   }
 });
 
-router.get('/c/:id', isAuth, (req, res, next) => {
-  const id = req.params.id;
-  const route = routes[id];
+router.get('/c/:id', isAuth, async (req, res, next) => {
+    const id = req.params.id;
+    
+	const pageDetails = {
+		main: {
+			dashboard: { name: 'Dashboard', icon: 'fas fa-tachometer-alt' },
+		},
+		features: {
+			create: { name: 'Criar Monografia', icon: 'fas fa-pen-fancy' },
+			plagiarism: { name: 'Verificador de Plágio', icon: 'fas fa-search' },
+			template: { name: 'Templates', icon: 'fas fa-file-alt' },
+		},
+		cta: {
+			pricing: { name: 'Planos e Preços', icon: 'fas fa-fire' },
+		},
+		bottom: {
+			support: { name: 'Suporte', icon: 'fas fa-headset' },
+			settings: { name: 'Configurações', icon: 'fas fa-cog' }
+		},
+		additionalFeatures: {
+			references: { name: 'Gerador de Referências', icon: 'fas fa-book', description: 'Crie referências bibliográficas automaticamente.' },
+			themes: { name: 'Gerador de Temas', icon: 'fas fa-lightbulb', description: 'Obtenha sugestões de temas inovadores para sua pesquisa.' },
+			hypothesis: { name: 'Gerador de Hipóteses', icon: 'fas fa-flask', description: 'Formule hipóteses para sua pesquisa de forma assistida.' }
+		}		
+	};
 
-  if (typeof route === 'function') {
-    route(req, res);
-  } else if (route) {
-    res.render(route);
-  } else {
-    let error = new Error("Page not found");
-    error.status = 404;
-    next(error);
-  }
+
+    let imgData;
+	let pricingPlans;
+	
+    try {
+		pricingPlans = await getPricingPlansWithDiscount(req.session.user.id)
+        
+    } catch(err) {
+        console.error(err);
+        let error = new Error("Erro de processamento. Tente mais tarde");
+        error.status = 500;
+        return next(error);
+    }
+
+    // Função para encontrar a página nos detalhes
+    const findPage = (details, targetId) => {
+        for (let category in details) {
+            if (details[category][targetId]) {
+                return details[category][targetId];
+            }
+        }
+        return null;
+    };
+
+    const pageDetail = findPage(pageDetails, id);
+
+    if (pageDetail) {
+        res.render('layout', {
+            title: pageDetail.name,
+            body: id,
+            pageDetails: pageDetails,
+            page: id,
+            user: req.session.user,
+            imgData: imgData,
+			pageResources: pageResources[id] || {},
+			preTextualElements: preTextualElements,
+			plans: pricingPlans,
+			dashboardFeatures: featuresConfig,
+        });
+    } else {
+        let error = new Error("Page not found");
+        error.status = 404;
+        next(error);
+    }
 });
 
 
-router.post('/api/create', isAuth, upload.single('manuais'), async (req, res) => {
+router.post('/api/create', isAuth, checkSubscription, upload.single('manuais'), async (req, res) => {
   const token = req.headers.authorization;
 
   if (token !== process.env.PUBLIC_ROUTE_TOKEN) {
@@ -221,7 +290,6 @@ router.post('/api/create', isAuth, upload.single('manuais'), async (req, res) =>
 		  const mono = await MonoCreator.createMono(tema, ideiaInicial, manuais, tier)
 		  
 		  if(mono.success){
-			  console.log('success')
 			  res.json({
 				  success: true, 
 				  mono: mono.monografia, 
@@ -229,7 +297,6 @@ router.post('/api/create', isAuth, upload.single('manuais'), async (req, res) =>
 				  message: 'Monografia criada com sucesso!',
 			});
 		  }else{
-			  console.log('false')
 			  res.json({ success: false, message: 'Falha ao criar Monografia. Tente mais tarde!' });
 		  }
 	  }else{
@@ -241,7 +308,7 @@ router.post('/api/create', isAuth, upload.single('manuais'), async (req, res) =>
   }
 });
 
-router.post('/api/read-file', upload.single('file'), async (req,res) =>{
+router.post('/api/read-file', isAuth, upload.single('file'), async (req,res) =>{
 	const token = req.headers.authorization;
 	
 	if (token !== process.env.PUBLIC_ROUTE_TOKEN) {
@@ -269,7 +336,7 @@ router.post('/api/read-file', upload.single('file'), async (req,res) =>{
 })
 
 
-router.post('/api/plagiarism', async (req,res)=> {
+router.post('/api/plagiarism', isAuth, checkSubscription, async (req,res)=> {
 	const token = req.headers.authorization;
 	const textField = req.body.textInput
 	
@@ -301,7 +368,7 @@ router.post('/api/plagiarism', async (req,res)=> {
 	}
 })
 
-router.post('/template/download', upload.single('logo'), (req, res) => {
+router.post('/template/download', isAuth, checkSubscription, upload.single('logo'), (req, res) => {
     const { instituicao, tema, autor, supervisor, local, mes, ano } = req.body;
     const logoBuffer = req.file ? req.file.buffer : null;
 
@@ -442,30 +509,145 @@ router.post('/process-payment', isAuth, async (req,res)=>{
 	}
 })
 
-router.post('/checkout', isAuth, (req, res) => {
+router.post('/checkout', isAuth, async (req, res) => {
     let { type } = req.body;
     let amount;
+    let pricingPlans;
 
     // Correção na lógica de validação
-    if (type !== 'basic' && type !== 'premium' || !type) {
+    if (!type || (type !== 'basic' && type !== 'premium')) {
         return res.status(400).json({ error: "Invalid type" });
     }
 
-    if (type === 'basic') {
-        amount = 3200;
-    } else if (type === 'premium') {
-        amount = 10000;
+    try {
+        pricingPlans = await getPricingPlansWithDiscount(req.session.user.id);
+        
+        // Encontrar o plano correspondente
+        const selectedPlan = Object.values(pricingPlans).find(plan => plan.name.toLowerCase() === type.toLowerCase());
+        
+        if (selectedPlan) {
+            amount = selectedPlan.price; // Use 'price' instead of 'basePrice' as it's already discounted if applicable
+        } else {
+            throw new Error("Plan not found");
+        }
+
+        // Armazenar informações na sessão
+        req.session.tier = type;
+        req.session.amount = amount;
+
+        // Renderizar a página de checkout
+        res.render('pages/payment/checkout', {
+            tier: type,
+            amount: amount,
+        });
+    } catch (err) {
+        console.error("Error in checkout route:", err);
+        res.status(500).json({ error: "An error occurred during checkout" });
     }
-
-    // Armazenar informações na sessão
-    req.session.tier = type;
-    req.session.amount = amount;
-
-    // Renderizar a página de checkout
-    res.render('pages/payment/checkout', {
-        tier: type,
-        amount: amount,
-    });
 });
+
+router.post('/additionalFeatures', isAuth, checkSubscription, upload.none(), async (req,res)=>{
+	const {typeOfFeature} = req.body
+	
+	try{
+		if(typeOfFeature === 'hypothesis'){
+			const {
+					researchTopic, 
+					generalObjective, 
+					specificObjectives, 
+					researchProblem, 
+					methodology
+				}= req.body
+						
+			if(!researchTopic || !generalObjective || !specificObjectives || !researchProblem){
+				return res.json({success: false, message: 'Preencha os campos obrigatorios'})
+			}
+			
+			const result = await additionalFeatures.hypothesisCreator(
+				researchTopic, 
+				generalObjective, 
+				specificObjectives, 
+				researchProblem, 
+				methodology, 
+				req.session.user.tier
+			)
+			
+			if(result){
+				res.json({
+						success: true, 
+						message: 'Hipoteses criadas com sucesso',
+						result: result
+					})
+			}else{
+				res.json({success: false, message: 'Erro de criacao. Tente novamente!'})
+			}
+		}else if(typeOfFeature === 'themeCreator'){
+			const {
+				studyArea,
+				specificInterest,
+				academicLevel,
+				themeCount,
+			} = req.body
+			
+			
+			if(!studyArea || !academicLevel || !themeCount){
+				return res.json({success: false, message: 'Preencha os campos obrigatorios'})
+			}
+			
+			const result = await additionalFeatures.themesCreator(
+				studyArea,
+				specificInterest,
+				academicLevel,
+				themeCount,
+				req.session.user.tier,
+			)
+			
+			if(result){
+				res.json({
+						success: true, 
+						message: 'Temas gerados com sucesso',
+						result: result
+					})
+			}else{
+				res.json({success: false, message: 'Erro de criacao. Tente novamente!'})
+			}
+		}else if(typeOfFeature === 'referencesCreator'){
+			const {
+				researchTopic,
+				initialIdea,
+			} = req.body
+			
+			
+			if(!researchTopic || !initialIdea){
+				return res.json({success: false, message: 'Preencha os campos obrigatorios'})
+			}
+			
+			const result = await additionalFeatures.referencesCreator(
+				researchTopic,
+				initialIdea,
+				req.session.user.tier,
+			)
+			
+			if(result){
+				res.json({
+						success: true, 
+						message: 'Referencias geradas com sucesso',
+						result: result
+					})
+			}else{
+				res.json({success: false, message: 'Erro de criacao. Tente novamente!'})
+			}
+		}else{
+			res.json({success: false, message: 'Infelizmente esse recurso esta indisponivel por agora!'})
+		}
+	}catch(err){
+		console.error(err)
+		return res.json({success: false, message: 'Error de servidor. Tente mais tarde!'})
+	}
+})
+
+// router.post('/additionalFeatures', isAuth, async (req,res)=>{
+	
+// })
 
 module.exports = router

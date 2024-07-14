@@ -1,55 +1,4 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="/static/assets/js/create.js"></script>
-	<script src="/static/assets/js/common.js"></script>
-	<link rel="apple-touch-icon" sizes="180x180" href="/static/assets/img/favicon/apple-touch-icon.png">
-	<link rel="icon" type="image/png" sizes="32x32" href="/static/assets/img/favicon/favicon-32x32.png">
-	<link rel="icon" type="image/png" sizes="16x16" href="/static/assets/img/favicon/favicon-16x16.png">
-	<link rel="manifest" href="/static/assets/img/favicon/site.webmanifest">  	
-	<script src="//code.tidio.co/mwu2j13oujaafzownf2hemd6v6mfeyfl.js" async></script>
-	<link rel='stylesheet' type='text/css' href='src/simple-editor.css'>
-	<script type='text/javascript' src='//code.jquery.com/jquery-2.2.2.min.js'></script>
-	<script type='text/javascript' src='src/simple-editor.js'></script>	
-	<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <title>Monogenius - Criar Monografia</title>
-	<!-- Google tag (gtag.js) -->
-	<script async src="https://www.googletagmanager.com/gtag/js?id=G-PTD2W9YS10"></script>
-	<script>
-	  window.dataLayer = window.dataLayer || [];
-	  function gtag(){dataLayer.push(arguments);}
-	  gtag('js', new Date());
-
-	  gtag('config', 'G-PTD2W9YS10');
-	</script>   
-	
-	<style>
-		#modal {
-			visibility: visible;
-			opacity: 1;
-			transition: opacity 0.3s ease;
-		}
-
-		#modal.invisible {
-			visibility: hidden;
-			opacity: 0;
-		}
-
-		#modal-icon.text-green-500 {
-			color: #22c55e;
-		}
-
-		#modal-icon.text-red-500 {
-			color: #ef4444;
-		}	
-	</style>
-	
-</head>
-<body class="bg-gray-100 font-sans">
     <!-- Modal -->
     <div id="modal" class="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 invisible">
         <div class="bg-white rounded-lg shadow-lg p-4 max-w-sm mx-auto my-4">
@@ -90,32 +39,6 @@
 			</div>
 		</div>
 	</div>	
-	
-    <header class="bg-white shadow sticky top-0 z-10">
-        <nav class="container mx-auto px-6 py-4 flex items-center justify-between">
-            <div class="flex items-center">
-                <a href="/c/dashboard" class="text-xl font-bold text-gray-800">Monogenius</a>
-            </div>
-            <div class="flex items-center">
-                <a href="/c/plagiarism" class="text-gray-600 hover:text-gray-800 mx-4">Verificador de Plágio</a>
-                <a href="/c/template" class="text-gray-600 hover:text-gray-800 mx-4">Templates</a>
-                <a href="/c/profile" class="text-gray-600 hover:text-gray-800 mx-4">Perfil</a>
-				<button id="suporte-btn" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-full ml-4">
-					Suporte
-				</button>				
-            </div>
-        </nav>
-    </header>
-	
-	<div id="notification-bar" class="bg-indigo-100 text-indigo-700 px-4 py-3 hidden">
-		<div class="container mx-auto flex justify-center items-center">
-			<p>
-				O Monogenius acabou de atualizar. 
-				<a href="/c/updates" target="_blank" class="font-bold underline hover:text-indigo-900">Veja as atualizações</a>
-			</p>
-		</div>
-	</div>
-	
     <main class="container mx-auto px-6 py-8 flex flex-col md:flex-row overflow-auto">
 		<div id="overlay" class="fixed inset-0 flex items-center justify-center z-50 hidden">
 			<div class="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-green-600"></div>
@@ -202,20 +125,3 @@
 			</form>
         </div>
     </main>
-
-    <footer class="bg-gray-800 text-white py-6">
-        <div class="container mx-auto px-6 flex justify-between items-center">
-            <p>&copy; 2024 Monogenius</p>
-            <div>
-                <a href="/terms" class="hover:text-gray-400 mx-2">Termos de Serviço</a>
-                <a href="/privacy" class="hover:text-gray-400 mx-2">Política de Privacidade</a>
-                <a href="/about" class="hover:text-gray-400 mx-2">Sobre Nós</a>
-            </div>
-        </div>
-    </footer>
-	
-    <script>
-
-    </script>
-</body>
-</html>

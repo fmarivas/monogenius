@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<main class="">
+	<section class="p-4 md:p-8">
+		<div class="py-8 max-w-screen-xl lg:py-16">
+			<div class="mx-auto max-w-3xl text-center pb-12 md:pb-20">
+				<h2 class="text-3xl font-bold sm:text-4xl mb-4 text-gray-800">Planos e Preços</h2>
+				<p class="text-xl text-gray-600">Escolha o plano que melhor atende às suas necessidades acadêmicas.</p>
+			</div>
+			<div class="space-y-8 lg:grid lg:grid-cols-3 sm:gap-6 xl:gap-10 lg:space-y-0">
+				<% Object.keys(plans).forEach(function(planKey) { %>
+					<% const plan = plans[planKey]; %>
+					<div class="flex flex-col p-6 mx-auto max-w-md text-center rounded-lg shadow-xl xl:p-8 bg-white border border-gray-200 transition hover:border-indigo-300 hover:shadow-indigo-100">
+						<h3 class="mb-4 text-2xl font-semibold text-gray-800"><%= plan.name %></h3>
+						<p class="font-light text-gray-500 sm:text-lg mb-4">Impulsione sua produção acadêmica</p>
+						<div class="flex flex-col items-center my-8">
+							<% if (plan.price) { %>
+								<% if (plan.originalPrice && plan.originalPrice > plan.price) { %>
+									<div class="mb-2">
+										<span class="text-xl font-bold text-gray-400 line-through">MZN <%= plan.originalPrice %></span>
+									</div>
+								<% } %>
+								<div class="flex items-baseline">
+									<span class="text-3xl font-extrabold text-gray-800">MZN <%= plan.price %></span>
+									<span class="text-lg text-gray-500 ml-2">/mês</span>
+								</div>
+								<% if (plan.originalPrice && plan.originalPrice > plan.price) { %>
+									<div class="mt-2">
+										<span class="text-sm font-medium text-green-600">Economize MZN <%= plan.originalPrice - plan.price %></span>
+									</div>
+								<% } %>
+							<% } else { %>
+								<span class="text-3xl font-extrabold text-gray-800">Preço Customizado</span>
+							<% } %>
+						</div>
+						<ul role="list" class="mb-8 space-y-4 text-left">
+							<% plan.features.forEach(function(feature) { %>
+								<li class="flex items-center space-x-3">
+									<svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+									<span class="text-gray-600"><%= feature %></span>
+								</li>
+							<% }); %>
+						</ul>
+						<% if (plan.price) { %>
+							<form action="/checkout" method="post">
+								<input type="hidden" value="<%= planKey %>" name="type">
+								<button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded transition-colors duration-300">
+									Assinar Agora
+								</button>
+							</form>
+						<% } else { %>
+							<a href="/contact" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded transition-colors duration-300 inline-block">
+								Contacte-nos
+							</a>
+						<% } %>
+					</div>
+				<% }); %>
+			</div>
+		</div>
+	</section>
+</main>

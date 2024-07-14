@@ -32,12 +32,14 @@ document.getElementById('close-modal').addEventListener('click', hideModal);
     // const closeButton = document.getElementById('close-notification');
     const updateLink = notificationBar.querySelector('a');
 	
-    document.getElementById('suporte-btn').addEventListener('click', function() {
-        var numero = "258877734582";
-        var mensagem = "Olá! Preciso de ajuda com o Monogenius."; // Você pode personalizar esta mensagem
-        var url = "https://api.whatsapp.com/send?phone=" + numero + "&text=" + encodeURIComponent(mensagem);
-        window.open(url, '_blank');
-    });	
+	if(document.getElementById('suporte-btn')){
+		document.getElementById('suporte-btn').addEventListener('click', function() {
+			var numero = "258877734582";
+			var mensagem = "Olá! Preciso de ajuda com o Monogenius."; // Você pode personalizar esta mensagem
+			var url = "https://api.whatsapp.com/send?phone=" + numero + "&text=" + encodeURIComponent(mensagem);
+			window.open(url, '_blank');
+		});			
+	}
 	
 	
 	//funcao para verificar novas atualizacoes ao usuario

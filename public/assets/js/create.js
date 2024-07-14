@@ -183,7 +183,12 @@ form.addEventListener('submit', async (event) => {
 		Authorization: token,
       },
     });
-
+	
+	if (response.data.redirect) {
+		window.location.href = response.data.redirect;
+		return;
+	}
+	
     if(response.data.success){
 		referenciasContainer.classList.remove('hidden')
 		

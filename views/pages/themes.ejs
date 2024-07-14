@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<main class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold text-gray-800 mb-8 text-center">Gerador de Temas de Pesquisa</h1>
+    
+    <div class="max-w-2xl mx-auto bg-white shadow-md rounded-lg p-6">
+        <form id="themeGeneratorForm" class="space-y-6">
+            <div>
+                <label for="studyArea" class="block text-sm font-medium text-gray-700 mb-1">Área de Estudo</label>
+                <input type="text" id="studyArea" name="studyArea" required placeholder="Psicologia"
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+            
+            <div>
+                <label for="specificInterest" class="block text-sm font-medium text-gray-700 mb-1">Interesse Específico (opcional)</label>
+                <input type="text" id="specificInterest" name="specificInterest" placeholder="Psicologia Cognitiva"
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+            
+            <div>
+                <label for="academicLevel" class="block text-sm font-medium text-gray-700 mb-1">Nível Acadêmico</label>
+                <select id="academicLevel" name="academicLevel" required
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    <option value="">Selecione o nível acadêmico</option>
+                    <option value="undergraduate">Graduação</option>
+                    <option value="masters">Mestrado</option>
+                    <option value="phd">Doutorado</option>
+                    <option value="postdoc">Pós-Doutorado</option>
+                </select>
+            </div>
+            
+            <div>
+                <label for="themeCount" class="block text-sm font-medium text-gray-700 mb-1">Número de Temas Sugeridos</label>
+                <input type="number" id="themeCount" name="themeCount" min="1" max="10" value="5" required
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+            
+            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded transition-colors duration-300">
+                Gerar Temas
+            </button>
+        </form>
+        
+        <div id="results" class="mt-8 hidden">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Temas Sugeridos</h2>
+            <div id="themeOutput" class="space-y-4">
+                <!-- Os temas gerados serão inseridos aqui -->
+            </div>
+        </div>
+    </div>
+</main>

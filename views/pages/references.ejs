@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<main class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold text-gray-800 mb-8 text-center">Gerador de Referências</h1>
+    
+    <div class="max-w-2xl mx-auto bg-white shadow-md rounded-lg p-6">
+        <form id="referenceForm" class="space-y-6">
+            <div>
+                <label for="researchTopic" class="block text-sm font-medium text-gray-700 mb-1">Tema de Pesquisa</label>
+                <input type="text" id="researchTopic" name="researchTopic" required value="O impacto da inteligência artificial na educação superior"
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+            
+            <div>
+                <label for="initialIdea" class="block text-sm font-medium text-gray-700 mb-1">Ideia Inicial</label>
+                <textarea id="initialIdea" name="initialIdea" rows="4" required
+                          class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+Explorar como a implementação de tecnologias de inteligência artificial está transformando os métodos de ensino e aprendizagem nas universidades. Analisar os benefícios potenciais, como personalização do aprendizado e eficiência administrativa, bem como os desafios éticos e práticos enfrentados pelas instituições de ensino superior ao adotar essas tecnologias.
+				</textarea>
+            </div>
+            
+            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded transition-colors duration-300">
+                Gerar Referências
+            </button>
+        </form>
+        
+        <div id="results" class="mt-8 hidden">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Referências Geradas</h2>
+            <div id="referenceOutput" class="p-4 bg-gray-50 rounded-md">
+                <!-- As referências geradas serão inseridas aqui -->
+            </div>
+        </div>
+    </div>
+</main>
