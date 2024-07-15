@@ -262,50 +262,53 @@ router.get('/c/:id', isAuth, async (req, res, next) => {
 });
 
 
-router.post('/api/create', isAuth, checkSubscription, upload.single('manuais'), async (req, res) => {
-  const token = req.headers.authorization;
+router.post('/api/create', isAuth, checkSubscription, upload.array('manuais'), async (req, res) => {
+	const token = req.headers.authorization;
 
-  if (token !== process.env.PUBLIC_ROUTE_TOKEN) {
-    return res.status(403).json({ error: 'Token inválido' });
-  }
+	if (token !== process.env.PUBLIC_ROUTE_TOKEN) {
+		return res.status(403).json({ error: 'Token inválido' });
+	}
 
-  const { tema, ideiaInicial } = req.body;
-  const files = req.file;
-  let manuais
+	const { tema, ideiaInicial } = req.body;
+	const files = req.files;
+	let manuais = []
   
-  try{
+	try{
 		
-		if(files){
-			const readFile = await fileReader.readFile(files)
-			manuais = readFile.success ? readFile.content : []
-		}else{
-			manuais = []
+		if (files && files.length > 0) {
+		  for (const file of files) {
+			const readFile = await fileReader.readFile(file);
+			if (readFile.success) {
+			  manuais.push(readFile.content);
+			}
+		  }
 		}
+		
 		
 		const tier = await userRequest.tierDisplay(req.session.user)
 		
-	  const canMakeRequest = await userRequest.canMakeRequest(req.session.user, 'createMono');
-	  
-	  if(canMakeRequest.success){
-		  const mono = await MonoCreator.createMono(tema, ideiaInicial, manuais, tier)
+		const canMakeRequest = await userRequest.canMakeRequest(req.session.user, 'createMono');
 		  
-		  if(mono.success){
-			  res.json({
-				  success: true, 
-				  mono: mono.monografia, 
-				  refer: mono.refer, 
-				  message: 'Monografia criada com sucesso!',
-			});
-		  }else{
-			  res.json({ success: false, message: 'Falha ao criar Monografia. Tente mais tarde!' });
-		  }
-	  }else{
-		  res.json({success: false, message: canMakeRequest.message})	
-	  }
-  }catch(err){
-	  console.error(err)
-	  res.json({success: false, message: 'Erro interno do servidor.Tente novamente mais tarde!'});
-  }
+			if(canMakeRequest.success){
+			  const mono = await MonoCreator.createMono(tema, ideiaInicial, manuais, tier)
+			  
+			  if(mono.success){
+				  res.json({
+					  success: true, 
+					  mono: mono.monografia, 
+					  refer: mono.refer, 
+					  message: 'Monografia criada com sucesso!',
+				});
+			  }else{
+				  res.json({ success: false, message: 'Falha ao criar Monografia. Tente mais tarde!' });
+			  }
+			}else{
+				res.json({success: false, message: canMakeRequest.message})	
+			}
+		}catch(err){
+			console.error(err)
+			res.json({success: false, message: 'Erro interno do servidor.Tente novamente mais tarde!'});
+		}
 });
 
 router.post('/api/read-file', isAuth, upload.single('file'), async (req,res) =>{
@@ -407,7 +410,7 @@ router.post('/api/mark-notification-seen',isAuth, async (req,res)=>{
 		const userNotificationMarker = await notificationController.markNotificationSeen(req.session.user)
 		
 		if(userNotificationMarker){
-			res.json({success: true, url: '/c/updates'});			
+			res.json({success: true, url: '/updates'});			
 		}else{
 			res.json({success:false})
 		}
@@ -416,6 +419,7 @@ router.post('/api/mark-notification-seen',isAuth, async (req,res)=>{
 		res.status(500).json({ error: 'Erro interno do servidor' });
 	}	
 });
+
 //verificar o status da notificação
 router.get('/api/check-notification-status', isAuth, async (req,res)=>{
 	try {

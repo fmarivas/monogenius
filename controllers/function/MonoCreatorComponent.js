@@ -7,7 +7,7 @@ class Monography {
 			let aiModel
 			
 			if(tier === "free"){
-				aiModel = 'gpt-3.5-turbo'
+				aiModel = 'gpt-4o'
 			}else if(tier === 'basic' || tier === 'premium'){
 				aiModel = 'gpt-4o'
 			}
@@ -89,7 +89,7 @@ class Monography {
 			let aiModel
 			
 			if(tier === "free"){
-				aiModel = 'gpt-3.5-turbo'
+				aiModel = 'gpt-4o'
 			}else if(tier === 'basic' || tier === 'premium'){
 				aiModel = 'gpt-4o'
 			}

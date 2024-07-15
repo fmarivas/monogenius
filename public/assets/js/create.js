@@ -1,4 +1,15 @@
 document.addEventListener('DOMContentLoaded', () => {
+
+	function sendGAEvent(category, action, label = null, value = null) {
+	  gtag('event', action, {
+		'event_category': category,
+		'event_label': label,
+		'value': value
+	  });
+	}
+	
+	sendGAEvent('Monograph Creator', 'Page View');
+	
     const textField = document.querySelector('.editable');
     const boldBtn = document.getElementById('bold-btn');
     const italicBtn = document.getElementById('italic-btn');
@@ -40,6 +51,8 @@ document.getElementById('submit-feedback-create').addEventListener('click', asyn
 			document.getElementById('feedback-modal-create').classList.add('hidden');
 			
 			setTimeout(hideModal, 3000)	
+			
+			sendGAEvent('Monograph Creator', 'Feedback Submitted', feedbackType);
 		}else{
 			showModal(response.data.success, response.data.message)			
 			setTimeout(hideModal, 3000)	
@@ -70,14 +83,17 @@ function showFeedbackModal(type) {
 
     boldBtn.addEventListener('click', () => {
         formatText('bold')
+		sendGAEvent('Monograph Creator', 'Formatting Used', 'Bold');
     });
 
     italicBtn.addEventListener('click', () => {
         formatText('italic')
+		sendGAEvent('Monograph Creator', 'Formatting Used', 'Italic');
     });
 
     underlineBtn.addEventListener('click', () => {
         formatText('underline')
+		sendGAEvent('Monograph Creator', 'Formatting Used', 'Underline');
     });
 	
 function showModal(success, message) {
@@ -104,6 +120,31 @@ function showModal(success, message) {
 function hideModal() {
     const modal = document.getElementById('modal');
     modal.classList.add('invisible');
+}
+
+let timerInterval;
+let startTime;
+
+function startTimer() {
+    startTime = Date.now();
+    timerInterval = setInterval(updateTimer, 1000);
+}
+
+function stopTimer() {
+    clearInterval(timerInterval);
+}
+
+function updateTimer() {
+    const elapsedTime = Date.now() - startTime;
+    const seconds = Math.floor(elapsedTime / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const formattedTime = `${minutes.toString().padStart(2, '0')}:${(seconds % 60).toString().padStart(2, '0')}`;
+    document.getElementById('timer').textContent = formattedTime;
+
+    // Aviso após 2 minutos (120 segundos)
+    if (seconds >= 120 && seconds % 30 === 0) { // Avisa a cada 30 segundos após 2 minutos
+        showModal(false, "A resposta está demorando mais que o esperado. Por favor, aguarde.");
+    }
 }
 
 if(document.getElementById('close-modal')){
@@ -143,7 +184,9 @@ const referenciasContainer = document.getElementById('referencias-container');
 
 form.addEventListener('submit', async (event) => {
   event.preventDefault();
-
+  
+  sendGAEvent('Monograph Creator', 'Form Submitted');
+  
   // Validar campos obrigatórios
   if (!temaInput.value.trim()) {
     alert('Por favor, insira um tema.');
@@ -170,6 +213,7 @@ form.addEventListener('submit', async (event) => {
   }
   
   overlay.classList.remove('hidden')
+  startTimer();
   referenciasContainer.classList.add('hidden')
   try {
     // Enviar os dados para o servidor usando Axios
@@ -192,6 +236,7 @@ form.addEventListener('submit', async (event) => {
     if(response.data.success){
 		referenciasContainer.classList.remove('hidden')
 		
+		sendGAEvent('Monograph Creator', 'Monograph Generated', 'Success');
 		
 		const formattedMono = formatMonographyHTML(response.data.mono);
 		textField.innerHTML = formattedMono;
@@ -215,20 +260,26 @@ form.addEventListener('submit', async (event) => {
 		saveContent()
 		
 		overlay.classList.add('hidden')
+		stopTimer();
 		
 		//ocultar modal
 		setTimeout(hideModal, 3000)
 	}else{
 		overlay.classList.add('hidden')
+		stopTimer();
 		showModal(false, response.data.message);
 		setTimeout(hideModal, 3000)
 	}
     
   } catch (error) {
     console.error('Erro ao enviar dados:', error);
+
 	showModal(false, error.response.data.message || 'Falha ao criar Monografia. Tente mais tarde!');
 	overlay.classList.add('hidden')
+	stopTimer();
 	setTimeout(hideModal, 3000)
+	
+	sendGAEvent('Monograph Creator', 'Generation Error', error.message);
     
   }
 });
@@ -249,8 +300,12 @@ function copyToClipboard() {
             button.classList.remove('bg-green-500', 'text-white');
             button.classList.add('bg-gray-200', 'text-gray-600');
         }, 3000);
+		
+		sendGAEvent('Monograph Creator', 'Content Copied');
+		
     }).catch(err => {
         console.error('Erro ao copiar texto: ', err);
+		sendGAEvent('Monograph Creator', 'Error while copying');
     });
 }
 

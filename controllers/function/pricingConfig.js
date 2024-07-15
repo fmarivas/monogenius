@@ -5,7 +5,7 @@ const pricingPlans = {
     name: "Basic",
     basePrice: 3500,
     features: [
-      "Verificador de Plágio (limitado)",
+      "Verificador de Plágio",
       "Gerador de Templates",
       "Gerador de Referências Bibliográficas",
       "Suporte por e-mail"
@@ -17,8 +17,8 @@ const pricingPlans = {
     features: [
       "Tudo do pacote Basic",
       "Criador de Monografia",
-      "Gerador de Temas Inovadores (brevemente)",
-      "Gerador de Hipóteses (brevemente)",
+      "Gerador de Temas Inovadores",
+      "Gerador de Hipóteses",
       "Suporte por chat"
     ]
   },

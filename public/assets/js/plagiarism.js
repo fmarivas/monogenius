@@ -1,5 +1,14 @@
 document.addEventListener('DOMContentLoaded', () => {
-	
+	function sendGAEvent(category, action, label = null, value = null) {
+	  gtag('event', action, {
+		'event_category': category,
+		'event_label': label,
+		'value': value
+	  });
+	}
+
+sendGAEvent('Plagiarism Checker', 'Page View');
+
 function showModal(success, message) {
     const modal = document.getElementById('modal');
     const modalTitle = document.getElementById('modal-title');
@@ -25,6 +34,33 @@ function hideModal() {
     const modal = document.getElementById('modal');
     modal.classList.add('invisible');
 }
+
+
+let timerInterval;
+let startTime;
+
+function startTimer() {
+    startTime = Date.now();
+    timerInterval = setInterval(updateTimer, 1000);
+}
+
+function stopTimer() {
+    clearInterval(timerInterval);
+}
+
+function updateTimer() {
+	const elapsedTime = Date.now() - startTime;
+	const seconds = Math.floor(elapsedTime / 1000);
+	const minutes = Math.floor(seconds / 60);
+	const formattedTime = `${minutes.toString().padStart(2, '0')}:${(seconds % 60).toString().padStart(2, '0')}`;
+	document.getElementById('timer').textContent = formattedTime;
+
+	// Aviso após 2 minutos (120 segundos)
+	if (seconds >= 120 && seconds % 30 === 0) { // Avisa a cada 30 segundos após 2 minutos
+		showModal(false, "A resposta está demorando mais que o esperado. Por favor, aguarde.");
+	}
+}
+
 
 if(document.getElementById('close-modal')){
 	document.getElementById('close-modal').addEventListener('click', hideModal);	
@@ -65,9 +101,10 @@ async function uploadFile(files) {
         const formData = new FormData();
         formData.append('file', file);
 		
+		// Exibir o overlay
+		overlay.classList.remove('hidden');
+		startTimer();
 		try{
-			// Exibir o overlay
-			overlay.classList.remove('hidden');
 			
 			const responseToken = await axios.get('/get-public-token')
 			const token = responseToken.data.token
@@ -84,17 +121,22 @@ async function uploadFile(files) {
 			if(response.data.success){
 				const fileContent = response.data.content;
 				document.getElementById('text-input').value = fileContent;
-				updateCount();	
+				updateCount()	
+				
+				sendGAEvent('Plagiarism Checker', 'File Uploaded', file.name, file.size);
 				
 				overlay.classList.add('hidden');
+				stopTimer();
 			}else{
                 const errorMessage = response.data.message || 'Ocorreu um erro ao ler o arquivo.';
-                alert(errorMessage);				
+                showModal(false, errorMessage);				
 			}
 			
 		}catch(err){
 			console.error(err)
-			alert("Ocorreu um erro ao ler o arquivo.");
+			showModal(false,"Ocorreu um erro ao ler o arquivo.");
+			
+			sendGAEvent('Plagiarism Checker', 'Error', err.message);
 		}
     }
 }
@@ -108,8 +150,11 @@ document.getElementById('file-input').addEventListener('change', (evt)=>{
 	const btnResult = document.getElementById('result-btn')
 	
 	async function verificarPlagio() {
+		sendGAEvent('Plagiarism Checker', 'Check Started', textInput.length);
+		
 		const textInput = document.getElementById('text-input').value;
-
+		
+		
 		if(textInput == ''){
 			alert('Não foi encontrado texto suficiente! Insira o texto para verificar')
 			document.getElementById('text-input').focus()
@@ -132,7 +177,7 @@ document.getElementById('file-input').addEventListener('change', (evt)=>{
 			}
 			// Exibir o overlay
 			overlay.classList.remove('hidden');
-
+			startTimer()
 			const response = await axios.post('/api/plagiarism', formData, config)
 			
 
@@ -144,12 +189,16 @@ document.getElementById('file-input').addEventListener('change', (evt)=>{
 			if(response.data.success){
 				const resultado = response.data.result
 				
+				sendGAEvent('Plagiarism Checker', 'Result Displayed', 'Plagiarism Percentage', resultado.percentPlagiarism);
+				sendGAEvent('Plagiarism Checker', 'Result Displayed', 'Source Count', resultado.sources.length);				
 				
 				overlay.classList.add('hidden');
+				stopTimer()
 				exibirResultado(resultado);	
 
 			}else{
 				overlay.classList.add('hidden');
+				stopTimer()
 				const resultadoDiv = document.getElementById('resultado');
 				
 				resultadoDiv.innerHTML = `<span class="text-red-500">${response.data.message}</span>`
@@ -159,6 +208,9 @@ document.getElementById('file-input').addEventListener('change', (evt)=>{
 		}catch(err){
 			console.error(err)
 			overlay.classList.add('hidden');
+			stopTimer()
+			
+			sendGAEvent('Plagiarism Checker', 'Error', err.message);
 			exibirResultado('<span class="text-red-500">Não foi possivel processar o seu pedido</span>')
 		}
 	}
@@ -240,10 +292,14 @@ document.getElementById('submit-feedback-plagiarism').addEventListener('click', 
 			showModal(response.data.success, response.data.message)
 			document.getElementById('feedback-modal-plagiarism').classList.add('hidden');
 			
+			sendGAEvent('Plagiarism Checker', 'Feedback Submitted', feedbackType);
+			
 			setTimeout(hideModal, 3000)	
 		}else{
 			showModal(response.data.success, response.data.message)			
 			setTimeout(hideModal, 3000)	
+			
+			sendGAEvent('Plagiarism Checker', 'Feedback Failed', feedbackType);
 		}
 	}catch(err){
 		console.error(err)

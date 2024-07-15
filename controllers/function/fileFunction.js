@@ -8,8 +8,8 @@ class FileReaderPro {
   static async readFile(file) {
     const SUPPORTED_EXTENSIONS = ['.doc', '.docx', '.pdf', '.txt'];
     const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
-
     const extension = path.extname(file.originalname).toLowerCase();
+
 
     if (!SUPPORTED_EXTENSIONS.includes(extension)) {
       return { success: false, message: 'Extensão de arquivo não suportada.' };
@@ -21,7 +21,6 @@ class FileReaderPro {
 
     try {
       let content = '';
-
       switch (extension) {
         case '.txt':
           content = file.buffer.toString('utf-8');
@@ -38,11 +37,10 @@ class FileReaderPro {
           const extractor = new WordExtractor();
           const extracted = await extractor.extract(file.buffer);
           content = extracted.getBody();
-		  break;
+          break;
         default:
           return { success: false, message: 'Tipo de arquivo não suportado.' };
       }
-
       return { success: true, content };
     } catch (error) {
       console.error(error);

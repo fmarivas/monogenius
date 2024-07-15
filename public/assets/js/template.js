@@ -1,15 +1,27 @@
 document.addEventListener('DOMContentLoaded', () => {
+	function sendGAEvent(category, action, label = null, value = null) {
+	  gtag('event', action, {
+		'event_category': category,
+		'event_label': label,
+		'value': value
+	  });
+	}
+
   // Controle de visibilidade das páginas e elementos
   document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
     checkbox.addEventListener('change', function() {
       if (this.id.endsWith('Check')) {
         const pageName = this.id.replace('Check', 'Page');
-        document.getElementById(pageName).style.display = this.checked ? 'block' : 'none';
+        const isVisible = this.checked;
+		document.getElementById(pageName).style.display = isVisible ? 'block' : 'none';
+		sendGAEvent('Page Visibility', isVisible ? 'Shown' : 'Hidden', pageName);
       } else {
         const [pageName, elementName] = this.id.split('_');
         const element = document.querySelector(`#${pageName}Page [data-element="${elementName}"]`);
         if (element) {
-          element.style.display = this.checked ? 'block' : 'none';
+			const isVisible = this.checked;
+			element.style.display = isVisible ? 'block' : 'none';
+			sendGAEvent('Element Visibility', isVisible ? 'Shown' : 'Hidden', `${pageName}_${elementName}`);
         }
       }
     });
@@ -25,6 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
     element.addEventListener('blur', function() {
       if (this.textContent.trim() === '') {
         this.textContent = this.getAttribute('data-placeholder');
+		sendGAEvent('Document', 'Content Edited', this.getAttribute('data-element'));
       }
     });
     
@@ -42,12 +55,14 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.pageA4').forEach(page => {
       page.style.transform = `scale(${zoom})`;
     });
+	sendGAEvent('Document', 'Zoom Adjusted', 'Zoom Level', Math.round(zoom * 100));
   });
 
   // Funcionalidade de download
   document.getElementById('downloadBtn').addEventListener('click', function() {
     // Implemente a lógica de download aqui
     alert('Funcionalidade de download a ser implementada');
+	sendGAEvent('Document', 'Download Initiated');
   });
 
   // Upload de logo
@@ -58,6 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('logoUpload').addEventListener('change', function(event) {
     const file = event.target.files[0];
     if (file) {
+		sendGAEvent('Document', 'Logo Uploaded', file.type);
       const reader = new FileReader();
       reader.onload = function(e) {
         const logoContainers = document.querySelectorAll('[data-element="logo"]');
@@ -115,6 +131,8 @@ document.addEventListener('DOMContentLoaded', () => {
         parent.insertBefore(draggedElement, this);
         parent.insertBefore(this, placeholder);
         parent.removeChild(placeholder);
+		
+		sendGAEvent('Document', 'Element Reordered', draggedElement.getAttribute('data-element'));
       }
     });
   });
