@@ -7,9 +7,9 @@ class Monography {
 			let aiModel
 			
 			if(tier === "free"){
-				aiModel = 'gpt-4o'
-			}else if(tier === 'basic' || tier === 'premium'){
-				aiModel = 'gpt-4o'
+				aiModel = 'gpt-4o-mini'
+			}else if(tier === 'basic' || tier === 'premium' || tier === 'supreme'){
+				aiModel = 'gpt-4o-mini'
 			}
 			const tools = [
 				{
@@ -89,9 +89,9 @@ class Monography {
 			let aiModel
 			
 			if(tier === "free"){
-				aiModel = 'gpt-4o'
+				aiModel = 'gpt-4o-mini'
 			}else if(tier === 'basic' || tier === 'premium'){
-				aiModel = 'gpt-4o'
+				aiModel = 'gpt-4o-mini'
 			}
 
 			const tools = [
