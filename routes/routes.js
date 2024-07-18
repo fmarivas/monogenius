@@ -273,12 +273,6 @@ router.post('/onboarding', isAuth, async (req, res) => {
 
 
 router.post('/api/create', isAuth, checkSubscription, upload.array('manuais'), async (req, res) => {
-	const token = req.headers.authorization;
-
-	if (token !== process.env.PUBLIC_ROUTE_TOKEN) {
-		return res.status(403).json({ error: 'Token inválido' });
-	}
-
 	const { tema, ideiaInicial } = req.body;
 	const files = req.files;
 	let manuais = []

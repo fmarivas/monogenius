@@ -79,6 +79,9 @@ app.use((err, req, res, next) => {
   }
 });
 
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(`Server running on port http://localhost:${port}`);
 });
+
+// Aumentar o timeout do servidor para 5 minutos (300000 ms)
+server.timeout = 300000;
