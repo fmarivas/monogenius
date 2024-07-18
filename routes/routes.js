@@ -16,6 +16,7 @@ const notificationController = require('../controllers/function/notificationCont
 const MonoCreator = require('../controllers/function/MonoCreatorComponent')
 const Plagiarism = require('../controllers/function/Plagiarism')
 const additionalFeatures = require('../controllers/function/additionalFeatures')
+const UserDetails = require('../controllers/function/userDetails')
 
 const fileReader = require('../controllers/function/fileFunction')
 const userRequest = require('../controllers/function/canMakeRequest')
@@ -26,6 +27,7 @@ const preTextualElements = require('../controllers/function/preTextualElements')
 
 const isAuth = require('../controllers/function/middleware/auth')
 const checkSubscription = require('../controllers/function/middleware/checkSubscription')
+const checkUserHasDetails = require('../controllers/function/middleware/checkUserDetails')
 
 const pageResources = require('../controllers/config/pageResources')
 
@@ -132,47 +134,6 @@ const generalRoutes = {
   },
 }
 
-// const routes = {
-  // 'create': async (req, res)=>{
-	// try{
-		// const insertId = await platformData.addPageVisit(req);
-		// res.render('pages/create')
-	// }catch(err){
-		// console.error(err)
-	// }		  
-  // },
-  // 'template': async (req,res)=>{
-	// try{
-		// const insertId = await platformData.addPageVisit(req);
-		// res.render('pages/template')
-	// }catch(err){
-		// console.error(err)
-	// }	  
-  // },
-  // 'plagiarism': async (req,res)=>{
-	// try{
-		// const insertId = await platformData.addPageVisit(req);
-		// res.render('pages/plagiarism')
-	// }catch(err){
-		// console.error(err)
-	// }
-  // },
-  // 'profile': async (req,res)=>{
-	  // try{
-		// const insertId = await platformData.addPageVisit(req);
-		// res.render('pages/profile',  {user: req.session.user})
-	  // }catch(err){
-		  // console.error(err)
-	  // }
-  // },
-  // 'dashboard': (req,res)=>{
-	  // res.render('dashboard', {user: req.user})
-  // },
-
-  // 'pricing': 'pages/payment/pricing',
-// };
-
-
 
 router.get('/:id', (req, res, next) => {
   const id = req.params.id;
@@ -215,7 +176,17 @@ router.get('/c/:id', isAuth, async (req, res, next) => {
 		}		
 	};
 
+    const tierThemeLimits = {
+        free: 2,
+        basic: 5,
+        premium: 10,
+        supreme: 15
+    };
 
+    const userTier = (req.session.user.tier).toLowerCase() || 'free';
+    const maxThemes = tierThemeLimits[userTier];
+	
+	
     let imgData;
 	let pricingPlans;
 	
@@ -253,12 +224,51 @@ router.get('/c/:id', isAuth, async (req, res, next) => {
 			preTextualElements: preTextualElements,
 			plans: pricingPlans,
 			dashboardFeatures: featuresConfig,
+			maxThemes: maxThemes,
         });
     } else {
         let error = new Error("Page not found");
         error.status = 404;
         next(error);
     }
+});
+
+
+//Rota de inicio de pesquisa
+router.get('/survey/onboarding', isAuth, checkUserHasDetails, (req,res)=>{
+	res.render('onboarding',{user: req.session.user})
+})
+
+
+router.post('/onboarding', isAuth, async (req, res) => {
+  const { academicPhase, mainChallenges, expectedGraduation, researchArea, toolsUsed } = req.body;
+
+  if (!academicPhase || !mainChallenges || !expectedGraduation || !researchArea) {
+    return res.render('survey/onboarding', { 
+      errorMessage: 'Por favor, preencha todos os campos obrigatórios!',
+      user: req.session.user
+    });
+  }
+
+  try {
+    const result = await UserDetails.onboarding(req.session.user.id, req.body);
+
+    if (result.success) {
+      req.session.user.hasCompletedOnboarding = true; // Opcional: marcar que o usuário completou o onboarding
+      return res.redirect('/c/create');
+    } else {
+      return res.render('survey/onboarding', { 
+        errorMessage: 'Erro ao configurar sua conta. Por favor, tente novamente.',
+        user: req.session.user
+      });
+    }
+  } catch (err) {
+    console.error('Erro no servidor durante o onboarding:', err);
+    return res.render('survey/onboarding', { 
+      errorMessage: 'Ocorreu um erro no servidor. Por favor, tente novamente mais tarde.',
+      user: req.session.user
+    });
+  }
 });
 
 
@@ -649,9 +659,5 @@ router.post('/additionalFeatures', isAuth, checkSubscription, upload.none(), asy
 		return res.json({success: false, message: 'Error de servidor. Tente mais tarde!'})
 	}
 })
-
-// router.post('/additionalFeatures', isAuth, async (req,res)=>{
-	
-// })
 
 module.exports = router

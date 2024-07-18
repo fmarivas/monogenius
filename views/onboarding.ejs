@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bem-vindo ao Monogenius</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/assets/img/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/assets/img/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/assets/img/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/static/assets/img/favicon/site.webmanifest">  		
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .bg-custom-gradient {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="min-h-screen flex items-center justify-center">
+        <div class="bg-white shadow-xl rounded-lg p-8 max-w-2xl w-full">
+            <div class="text-center mb-8">
+                <!-- <img src="/static/assets/img/logo-2.png" alt="Monogenius Logo" class="mx-auto h-16 mb-4"> -->
+                <h1 class="text-3xl font-bold text-gray-800">Bem-vindo, <%= user.fname %>!</h1>
+                <p class="text-gray-600 mt-2">Para melhorar sua experiência aqui na plataforma <span class="font-semibold">Monogenius</span>, por favor, responda às seguintes perguntas:</p>
+            </div>
+            
+<form action="/onboarding" method="POST" class="space-y-6">
+	
+    <div>
+        <label for="academicPhase" class="block text-sm font-medium text-gray-700 mb-1">Em que fase do seu trabalho acadêmico você está?</label>
+        <select name="academicPhase" id="academicPhase" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+            <option value="">Selecione uma opção</option>
+            <option value="Escolha do Tema">Escolha do Tema</option>
+            <option value="Projeto">Projeto</option>
+            <option value="Coleta de Dados">Coleta de Dados</option>
+            <option value="Escrita">Escrita da Monografia</option>
+            <option value="Revisão">Revisão</option>
+        </select>
+    </div>
+
+    <div>
+        <label for="mainChallenges" class="block text-sm font-medium text-gray-700 mb-1">Quais são seus principais desafios? (Selecione todos que se aplicam)</label>
+        <div class="space-y-2">
+            <label class="flex items-center">
+                <input type="checkbox" name="mainChallenges" value="tema" class="form-checkbox h-5 w-5 text-indigo-600">
+                <span class="ml-2 text-gray-700">Dificuldade para escolher um bom tema</span>
+            </label>
+            <label class="flex items-center">
+                <input type="checkbox" name="mainChallenges" value="formatacao" class="form-checkbox h-5 w-5 text-indigo-600">
+                <span class="ml-2 text-gray-700">Muito tempo gasto com a formatação do trabalho</span>
+            </label>
+            <label class="flex items-center">
+                <input type="checkbox" name="mainChallenges" value="plagio" class="form-checkbox h-5 w-5 text-indigo-600">
+                <span class="ml-2 text-gray-700">Preocupação com plágio acidental</span>
+            </label>
+            <label class="flex items-center">
+                <input type="checkbox" name="mainChallenges" value="organizacao" class="form-checkbox h-5 w-5 text-indigo-600">
+                <span class="ml-2 text-gray-700">Dificuldade para organizar e escrever o trabalho de forma eficiente</span>
+            </label>
+            <label class="flex items-center">
+                <input type="checkbox" name="mainChallenges" value="orientacao" class="form-checkbox h-5 w-5 text-indigo-600">
+                <span class="ml-2 text-gray-700">Falta de orientação clara sobre o que fazer em cada etapa</span>
+            </label>
+            <label class="flex items-center">
+                <input type="checkbox" name="mainChallenges" value="sobrecarga" class="form-checkbox h-5 w-5 text-indigo-600">
+                <span class="ml-2 text-gray-700">Sensação de sobrecarga ao tentar fazer tudo ao mesmo tempo</span>
+            </label>
+            <label class="flex items-center">
+                <input type="checkbox" name="mainChallenges" value="qualidade" class="form-checkbox h-5 w-5 text-indigo-600">
+                <span class="ml-2 text-gray-700">Dificuldade em manter a qualidade do trabalho enquanto tenta ser rápido</span>
+            </label>
+            <label class="flex items-center">
+                <input type="checkbox" name="mainChallenges" value="tempo" class="form-checkbox h-5 w-5 text-indigo-600">
+                <span class="ml-2 text-gray-700">Pouco tempo para coletar e analisar dados originais</span>
+            </label>
+        </div>
+    </div>
+
+    <div>
+        <label for="expectedGraduation" class="block text-sm font-medium text-gray-700 mb-1">Quando você espera se formar?</label>
+        <input type="date" name="expectedGraduation" id="expectedGraduation" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+    </div>
+
+    <div>
+        <label for="researchArea" class="block text-sm font-medium text-gray-700 mb-1">Qual é sua área de pesquisa?</label>
+        <input type="text" name="researchArea" id="researchArea" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" placeholder="Ex: Psicologia Cognitiva">
+    </div>
+
+    <div>
+        <label for="toolsUsed" class="block text-sm font-medium text-gray-700 mb-1">Quais ferramentas você já utiliza para sua pesquisa?</label>
+        <input type="text" name="toolsUsed" id="toolsUsed" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" placeholder="Ex: Mendeley, SPSS, Zotero">
+    </div>
+
+    <button type="submit" class="w-full bg-custom-gradient text-white font-bold py-3 px-4 rounded-md hover:opacity-90 transition-opacity duration-300 flex items-center justify-center">
+        <span>Continuar</span>
+        <i class="fas fa-arrow-right ml-2"></i>
+    </button>
+</form>
+        </div>
+    </div>
+</body>
+</html>

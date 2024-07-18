@@ -61,6 +61,20 @@ const pageResources = {
 	},
 	themes:{
 		js: ['/static/assets/js/themeCreator.js'],
+		// js: ['/static/assets/js/tour.js'],
+		// inlineStyles: `
+			// .shepherd-button {
+			  // @apply bg-indigo-500 text-white px-4 py-2 rounded-md hover:bg-indigo-600 transition-colors;
+			// }
+
+			// .shepherd-text {
+			  // @apply text-gray-800;
+			// }
+
+			// .shepherd-content {
+			  // @apply bg-white rounded-lg shadow-lg;
+			// }		
+		// `,
 	},
 	references:{
 		js: ['/static/assets/js/referencesCreator.js']

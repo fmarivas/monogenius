@@ -41,7 +41,7 @@ router.get("/success", async (req, res, next) => {
 		if(user){
 			req.session.user = user
 			
-			res.redirect('/c/create')
+			res.redirect('/survey/onboarding')
 		}else{
 			res.redirect('/error')
 		}

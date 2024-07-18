@@ -1,23 +1,29 @@
-const Authorization = require('../function/authorization')
+const { conn } = require('../../../models/db');
 
-function checkUserHasDetails(req, res, next) {
+async function checkUserHasDetails(req, res, next) {
     if (!req.session.user) {
         return res.redirect('/auth/login');
     }
 
-    Authorization.checkUserDetails(req.session.user.user_id_info)
-        .then(hasDetails => {
-            if (hasDetails) {
-                res.redirect('/dashboard?page=profile');
-            } else {
-                next(); // Usuário não preencheu o formulário, permita acesso à rota
+    try {
+        const query = 'SELECT * FROM user_details WHERE user_id = ?';
+        
+        conn.query(query, [req.session.user.id], (err, results) => {
+            if (err) {
+                console.error('Erro ao verificar detalhes do usuário:', err);
+                return res.status(500).send('Erro interno do servidor');
             }
-        })
-        .catch(err => {
-            console.error(err);
-            res.status(500).send("Erro ao verificar detalhes do usuário");
+            
+            if (results.length > 0) {
+                res.redirect('/c/create');
+            } else {
+                next();
+            }
         });
+    } catch (error) {
+        console.error('Erro inesperado:', error);
+        res.status(500).send('Erro interno do servidor');
+    }
 }
 
-
-module.exports = checkUserHasDetails
+module.exports = checkUserHasDetails;
