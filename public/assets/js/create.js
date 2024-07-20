@@ -18,6 +18,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const orderedListBtn = document.getElementById('ordered-list-btn');
 	const overlay = document.getElementById('overlay');
 
+    const placeholderText = "Compartilhe sua inspiração inicial aqui.\n\nInclua brevemente:\n- Motivação para o tema\n- Principais questões a abordar\n- Impacto esperado da pesquisa\n- Local do estudo (opcional, mas recomendado para melhor delimitação)";
+    
+    textarea.placeholder = placeholderText;
 //feedback
 document.getElementById('feedback-reason-create').addEventListener('change', function() {
     if (this.value === '') {
@@ -370,7 +373,7 @@ function loadSavedContent() {
 }
 
 // Chamar a função de carregamento quando a página for carregada
-window.addEventListener('load', loadSavedContent);
+// window.addEventListener('load', loadSavedContent);
 
 
 

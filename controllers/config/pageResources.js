@@ -64,6 +64,9 @@ const pageResources = {
 	},
 	references:{
 		js: ['/static/assets/js/referencesCreator.js']
+	},
+	favorites:{
+		js: ['/static/assets/js/favorites.js'],
 	}
 };
 

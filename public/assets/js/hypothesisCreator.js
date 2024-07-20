@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
 	const hypothesisList = document.getElementById('hypothesisList')
 	const overlay = document.getElementById('overlay')
 
-	//Moodal Success and Fail
+	//Modal Success and Fail
 	function showModal(success, message) {
 		const modal = document.getElementById('modal');
 		const modalTitle = document.getElementById('modal-title');

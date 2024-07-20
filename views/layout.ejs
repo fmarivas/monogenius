@@ -54,7 +54,7 @@
             <p>
                 <strong>Aviso importante:</strong> Até 1º de agosto, você poderá usar todos os recursos do Monogenius. Aproveite!
             </p>
-            <button id="close-modal" class="text-yellow-800 hover:text-yellow-900">
+            <button id="close-warningModal" class="text-yellow-800 hover:text-yellow-900">
                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
                 </svg>
@@ -228,7 +228,7 @@
         });
 		
 		const modal = document.getElementById('warning-modal');
-		const closeButton = document.getElementById('close-modal');
+		const closeButton = document.getElementById('close-warningModal');
 		const currentDate = new Date();
 		const august1st2024 = new Date('2024-08-01');
 		const warningDismissed = localStorage.getItem('warningDismissed');
@@ -241,7 +241,15 @@
 			modal.classList.add('hidden');
 			localStorage.setItem('warningDismissed', 'true');
 		});
-			
+		
+		function hideModal() {
+			const modal = document.getElementById('modal');
+			modal.classList.add('invisible');
+		}
+		
+		if(document.getElementById('close-modal')){
+			document.getElementById('close-modal').addEventListener('click', hideModal);
+		}
     </script>
 </body>
 </html>

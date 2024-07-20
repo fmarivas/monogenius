@@ -41,6 +41,7 @@
     "path": "^0.12.7",
     "pdf-parse": "^1.1.1",
     "shepherd.js": "^13.0.1",
+    "util": "^0.12.5",
     "word-extractor": "^1.0.4"
   }
 }

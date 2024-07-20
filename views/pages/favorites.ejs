@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<main class="container mx-auto px-6 py-8">
+    <h1 class="text-3xl font-bold text-gray-800 mb-6">Meus Favoritos</h1>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Temas Favoritos -->
+        <div class="bg-white shadow-md rounded-lg p-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">
+                <i class="fas fa-star text-yellow-500 mr-2"></i>Temas Favoritos
+            </h2>
+            <ul id="favorite-themes" class="space-y-2">
+                <% if (userFavorites.favorites.length === 0) { %>
+                    <li class="text-gray-500 italic">Nenhum tema favorito ainda.</li>
+                <% } else { %>
+                    <% userFavorites.favorites.forEach(function(theme) { %>
+                        <li class="flex justify-between items-center bg-white border border-gray-200 rounded-lg shadow-sm p-3 hover:shadow-md transition-shadow duration-200">
+                            <span class="flex-grow truncate mr-2"><%= theme %></span>
+                            <div class="flex items-center">
+                                <button class="text-blue-500 hover:text-blue-700 transition-colors duration-200 mr-2" onclick="selectTheme('theme', '<%= theme %>')">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                                <div class="h-5 w-px bg-gray-300 mx-2"></div>
+                                <button class="text-red-500 hover:text-red-700 transition-colors duration-200" onclick="removeFavorite('theme', '<%= theme %>')">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </li>
+                    <% }); %>
+                <% } %>
+            </ul>
+        </div>
+        <!-- Monografias Favoritas -->
+        <div class="bg-white shadow-md rounded-lg p-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">
+                <i class="fas fa-file-alt text-blue-500 mr-2"></i>Monografias Favoritas
+            </h2>
+            <ul id="favorite-monographs" class="space-y-2">
+				<% if (userFavorites.mono.length === 0) { %>
+					<li class="text-gray-500 italic">Nenhuma monografia favorita ainda.</li>
+				<% } else { %>
+					<% userFavorites.mono.forEach(function(mono) { %>
+						<li class="flex justify-between items-center bg-white border border-gray-200 rounded-lg shadow-sm p-3 hover:shadow-md transition-shadow duration-200">
+							<span class="flex-grow truncate mr-2"><%= mono %></span>
+							<div class="flex items-center">
+								<div class="h-5 w-px bg-gray-300 mx-2"></div>
+								<button class="text-red-500 hover:text-red-700 transition-colors duration-200" onclick="removeFavorite('mono', '<%= mono %>')">
+									<i class="fas fa-trash-alt"></i>
+								</button>
+							</div>
+						</li>
+					<% }); %>
+				<% } %>
+            </ul>
+        </div>
+        <!-- Referências Favoritas -->
+        <div class="bg-white shadow-md rounded-lg p-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">
+                <i class="fas fa-book text-green-500 mr-2"></i>Referências Favoritas
+            </h2>
+            <ul id="favorite-references" class="space-y-2">
+				<% if (userFavorites.refer.length === 0) { %>
+					<li class="text-gray-500 italic">Nenhuma referências favorita ainda.</li>
+				<% } else { %>
+					<% userFavorites.refer.forEach(function(refer) { %>
+						<li class="flex justify-between items-center bg-white border border-gray-200 rounded-lg shadow-sm p-3 hover:shadow-md transition-shadow duration-200">
+							<span class="flex-grow truncate mr-2"><%= refer %></span>
+							<div class="flex items-center">
+								<div class="h-5 w-px bg-gray-300 mx-2"></div>
+								<button class="text-red-500 hover:text-red-700 transition-colors duration-200" onclick="removeFavorite('refer', '<%= refer %>')">
+									<i class="fas fa-trash-alt"></i>
+								</button>
+							</div>
+						</li>
+					<% }); %>
+				<% } %>
+            </ul>
+        </div>
+    </div>
+</main>
+
+<script>
+	const overlay = document.getElementById('overlay')
+	
+	async function removeFavorite(type, item) {
+		const confirmed = confirm(`Deseja eliminar o ${type} "${item}"?\n\nEsta ação não poderá ser desfeita.`);
+		
+		if (!confirmed) {
+			return; // Se o usuário não confirmar, não fazemos nada
+		}
+		
+		overlay.classList.remove('hidden')
+		startTimer()
+		try {
+			const response = await fetch(`/api/favorites/${type}/${encodeURIComponent(item)}`, {
+				method: 'DELETE',
+			});
+			const data = await response.json();
+			if (data.success) {
+				showModal(true, `${type.charAt(0).toUpperCase() + type.slice(1)} removido com sucesso!`);
+				stopTimer()
+				setTimeout(() => location.reload(), 3000);
+			} else {
+				console.error('Failed to remove favorite:', data.message);
+				stopTimer()
+				showModal(false,`Falha ao remover o ${type}. Por favor, tente novamente.`);
+			}
+		} catch (error) {
+			stopTimer()
+			console.error('Error removing favorite:', error);
+			showModal(false, `Erro ao remover o ${type}. Por favor, tente novamente.`);
+		}finally {
+			stopTimer();
+			overlay.classList.add('hidden');
+		}		
+	}
+	
+	async function selectTheme(type, item) {
+		const confirmed = confirm(`Deseja começar sua monografia com o tema "${item}"?`);
+		
+		if (!confirmed) {
+			return; // Se o usuário não confirmar, não fazemos nada
+		}
+		
+		overlay.classList.remove('hidden')
+		startTimer()
+		
+		try {
+			const response = await fetch(`/api/favorites/${type}/select`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({ theme: item }),
+			});
+			const data = await response.json();
+			if (data.success) {
+				stopTimer()
+				overlay.classList.add('hidden')
+				showModal(true, 'Tema selecionado com sucesso!');
+				
+				window.location.href = data.redirectUrl;
+			} else {
+				stopTimer()
+				overlay.classList.add('hidden')
+				console.error('Failed to select theme:', data.message);
+				showModal(false, 'Falha ao selecionar o tema. Por favor, tente novamente.');
+				
+				setTimeout(hideModal,3000)
+			}
+		} catch (error) {
+			stopTimer()
+			overlay.classList.add('hidden')
+			console.error('Error selecting theme:', error);
+			showModal(false,'Erro ao selecionar o tema. Por favor, tente novamente.');
+
+			setTimeout(hideModal,3000)
+		}
+	}	
+	
+	
+	//Modal Success and Fail
+	function showModal(success, message) {
+		const modal = document.getElementById('modal');
+		const modalTitle = document.getElementById('modal-title');
+		const modalMessage = document.getElementById('modal-message');
+		const modalIcon = document.getElementById('modal-icon');
+
+		if (success) {
+			modalTitle.textContent = 'Sucesso';
+			modalIcon.classList.remove('text-red-500');
+			modalIcon.classList.add('text-green-500');
+		} else {
+			modalTitle.textContent = 'Erro';
+			modalIcon.classList.remove('text-green-500');
+			modalIcon.classList.add('text-red-500');
+		}
+
+		modalMessage.textContent = message;
+		modal.classList.remove('invisible');
+	}
+
+
+	function hideModal() {
+		const modal = document.getElementById('modal');
+		modal.classList.add('invisible');
+	}
+
+	let timerInterval;
+	let startTime;
+
+	function startTimer() {
+		startTime = Date.now();
+		timerInterval = setInterval(updateTimer, 1000);
+	}
+
+	function stopTimer() {
+		clearInterval(timerInterval);
+	}
+
+	function updateTimer() {
+		const elapsedTime = Date.now() - startTime;
+		const seconds = Math.floor(elapsedTime / 1000);
+		const minutes = Math.floor(seconds / 60);
+		const formattedTime = `${minutes.toString().padStart(2, '0')}:${(seconds % 60).toString().padStart(2, '0')}`;
+		document.getElementById('timer').textContent = formattedTime;
+
+		// Aviso após 2 minutos (120 segundos)
+		if (seconds >= 120 && seconds % 30 === 0) { // Avisa a cada 30 segundos após 2 minutos
+			showModal(false, "A resposta está demorando mais que o esperado. Por favor, aguarde.");
+			sendGAEvent('Hypothesis Generator', 'Long Response Time', `${minutes}:${seconds % 60}`);
+		}
+	}
+	
+	
+
+</script>

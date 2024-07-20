@@ -17,19 +17,22 @@ const MonoCreator = require('../controllers/function/MonoCreatorComponent')
 const Plagiarism = require('../controllers/function/Plagiarism')
 const additionalFeatures = require('../controllers/function/additionalFeatures')
 const UserDetails = require('../controllers/function/userDetails')
+const themeHandler = require('../controllers/function/themeHandler')
+const FavoritesHandler = require('../controllers/function/userFavorites')
 
 const fileReader = require('../controllers/function/fileFunction')
 const userRequest = require('../controllers/function/canMakeRequest')
-const {getPricingPlansWithDiscount} = require('../controllers/function/pricingConfig')
 
-const featuresConfig = require('../controllers/function/featuresConfig')
-const preTextualElements = require('../controllers/function/preTextualElements')
 
 const isAuth = require('../controllers/function/middleware/auth')
 const checkSubscription = require('../controllers/function/middleware/checkSubscription')
 const checkUserHasDetails = require('../controllers/function/middleware/checkUserDetails')
 
 const pageResources = require('../controllers/config/pageResources')
+const preTextualElements = require('../controllers/config/preTextualElements')
+const {getPricingPlansWithDiscount} = require('../controllers/config/pricingConfig')
+const featuresConfig = require('../controllers/config/featuresConfig')
+const pageDetails = require('../controllers/config/sidebarConfig')
 
 const paymentMpesa = require('../controllers/payment/MpesaFunction')
 
@@ -152,36 +155,16 @@ router.get('/:id', (req, res, next) => {
 
 router.get('/c/:id', isAuth, async (req, res, next) => {
     const id = req.params.id;
-    
-	const pageDetails = {
-		main: {
-			dashboard: { name: 'Dashboard', icon: 'fas fa-tachometer-alt' },
-		},
-		features: {
-			create: { name: 'Criar Monografia', icon: 'fas fa-pen-fancy' },
-			plagiarism: { name: 'Verificador de Plágio', icon: 'fas fa-search' },
-			template: { name: 'Templates', icon: 'fas fa-file-alt' },
-		},
-		cta: {
-			pricing: { name: 'Planos e Preços', icon: 'fas fa-fire' },
-		},
-		bottom: {
-			support: { name: 'Suporte', icon: 'fas fa-headset' },
-			settings: { name: 'Configurações', icon: 'fas fa-cog' }
-		},
-		additionalFeatures: {
-			references: { name: 'Gerador de Referências', icon: 'fas fa-book', description: 'Crie referências bibliográficas automaticamente.' },
-			themes: { name: 'Gerador de Temas', icon: 'fas fa-lightbulb', description: 'Obtenha sugestões de temas inovadores para sua pesquisa.' },
-			hypothesis: { name: 'Gerador de Hipóteses', icon: 'fas fa-flask', description: 'Formule hipóteses para sua pesquisa de forma assistida.' }
-		}		
-	};
 
-    const tierThemeLimits = {
-        free: 2,
-        basic: 5,
-        premium: 10,
-        supreme: 15
-    };
+	const currentDate = new Date();
+	const isAugustFirst = currentDate.getMonth() === 7 && currentDate.getDate() === 1; // Agosto é mês 7 em JavaScript (0-indexed)
+
+	const tierThemeLimits = {
+		free: isAugustFirst ? 3 : 15,
+		basic: isAugustFirst ? 5 : 15,
+		premium: isAugustFirst ? 10 : 15,
+		supreme: 15
+	};
 
     const userTier = (req.session.user.tier).toLowerCase() || 'free';
     const maxThemes = tierThemeLimits[userTier];
@@ -189,10 +172,13 @@ router.get('/c/:id', isAuth, async (req, res, next) => {
 	
     let imgData;
 	let pricingPlans;
+	let userFavorites
+	let userSelectedMonoTheme = req.session.selectedTheme || ''
 	
     try {
 		pricingPlans = await getPricingPlansWithDiscount(req.session.user.id)
-        
+		
+		userFavorites = await FavoritesHandler.getUserFavorites(req.session.user.id)
     } catch(err) {
         console.error(err);
         let error = new Error("Erro de processamento. Tente mais tarde");
@@ -225,6 +211,8 @@ router.get('/c/:id', isAuth, async (req, res, next) => {
 			plans: pricingPlans,
 			dashboardFeatures: featuresConfig,
 			maxThemes: maxThemes,
+			userFavorites: userFavorites,
+			userSelectedMonoTheme: userSelectedMonoTheme,
         });
     } else {
         let error = new Error("Page not found");
@@ -272,6 +260,9 @@ router.post('/onboarding', isAuth, async (req, res) => {
 });
 
 
+
+
+
 router.post('/api/create', isAuth, checkSubscription, upload.array('manuais'), async (req, res) => {
 	const { tema, ideiaInicial } = req.body;
 	const files = req.files;
@@ -316,12 +307,6 @@ router.post('/api/create', isAuth, checkSubscription, upload.array('manuais'), a
 });
 
 router.post('/api/read-file', isAuth, upload.single('file'), async (req,res) =>{
-	const token = req.headers.authorization;
-	
-	if (token !== process.env.PUBLIC_ROUTE_TOKEN) {
-		return res.status(403).json({ error: 'Token inválido' });
-	}
-	
 	const file = req.file;
 	
 	if(!file){
@@ -344,12 +329,8 @@ router.post('/api/read-file', isAuth, upload.single('file'), async (req,res) =>{
 
 
 router.post('/api/plagiarism', isAuth, checkSubscription, async (req,res)=> {
-	const token = req.headers.authorization;
 	const textField = req.body.textInput
 	
-	if (token !== process.env.PUBLIC_ROUTE_TOKEN) {
-		return res.json({ success: false, error: 'Token inválido' });
-	}
 	
 	if(!textField){
 		return res.status(401).json({success: false, message: 'Preencha o campo do texto!'})
@@ -654,4 +635,100 @@ router.post('/additionalFeatures', isAuth, checkSubscription, upload.none(), asy
 	}
 })
 
+
+// Rota para adicionar, deletar e tudo relacionar a um tema aos favoritos
+router.post('/api/themes/:id', isAuth, async (req, res) => {
+	const id = req.params.id
+	const userId = req.session.user.id;
+	
+    try {
+		if(id === 'favoriteTheme'){
+			const { theme } = req.body;
+			
+			if (!theme) {
+				return res.status(400).json({ success: false, message: 'Theme is required' });
+			}
+			const result = await themeHandler.addFavoriteTheme(userId, theme);
+			res.json({ 
+				success: result, 
+				message: result ? 'Theme favorited successfully' : 'Failed to favorite theme',
+				redirectUrl: result ? '/c/favorites' : null // Exemplo de URL de redirecionamento
+			});
+		} else {
+			let error = new Error("Page not found");
+			error.status = 404;
+			next(error);
+		}
+    } catch (error) {
+        console.error('Error in favoriteTheme route:', error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+// Rota para remover um tema dos favoritos
+router.delete('/api/favorites/theme/:theme', isAuth, async (req, res) => {
+    try {
+        const userId = req.session.user.id;
+        const { theme } = req.params;
+        
+        if (!theme) {
+            return res.status(400).json({ success: false, message: 'Theme is required' });
+        }
+        const result = await themeHandler.removeFavoriteTheme(userId, theme);
+        res.json({ success: result, message: result ? 'Theme unfavorited successfully' : 'Theme was not in favorites' });
+    } catch (error) {
+        console.error('Error in unfavoriteTheme route:', error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+// Rota para selecionar um tema
+router.post('/api/favorites/theme/select', isAuth, async (req, res) => {
+    try {
+        const userId = req.session.user.id;
+        const { theme } = req.body;
+        
+        if (!theme) {
+            return res.status(400).json({ success: false, message: 'Theme is required' });
+        }
+
+        const selectedTheme = await themeHandler.selectTheme(userId, theme);
+        
+        // Armazenar o tema selecionado na sessão
+        req.session.selectedTheme = selectedTheme;
+
+        res.json({ 
+            success: true, 
+            message: 'Theme selected successfully', 
+            redirectUrl: '/c/create'
+        });
+    } catch (error) {
+        console.error('Error in selectTheme route:', error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+// Rota para obter os temas favoritos do usuário
+// router.get('/favoriteThemes', isAuth, async (req, res) => {
+    // try {
+        // const userId = req.session.user.id;
+        // const favorites = await themeHandler.getFavoriteThemes(userId);
+        // res.json({ success: true, favorites });
+    // } catch (error) {
+        // console.error('Error in getFavoriteThemes route:', error);
+        // res.status(500).json({ success: false, message: error.message });
+    // }
+// });
+
+// Rota para obter o tema selecionado do usuário
+// router.get('/selectedTheme', isAuth, async (req, res) => {
+    // try {
+        // const userId = req.session.user.id;
+        // const selectedTheme = await themeHandler.getSelectedTheme(userId);
+        // res.json({ success: true, selectedTheme });
+    // } catch (error) {
+        // console.error('Error in getSelectedTheme route:', error);
+        // res.status(500).json({ success: false, message: error.message });
+    // }
+// });
 module.exports = router

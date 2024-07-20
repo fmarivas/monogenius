@@ -145,8 +145,17 @@ class additionalFeatures {
 		];
 
 		const message = `
-			Crie ${themeCount} temas para trabalhos acadêmicos na área de ${studyArea}${specificInterest ? `, com foco em ${specificInterest}` : ''}, adequados para o nível de ${academicLevel}. Os temas devem ser relevantes, específicos e adequados para pesquisa acadêmica no nível indicado. Apresente cada tema em uma linha separada, precedido por um número.
-			`;
+				Crie ${themeCount} temas para trabalhos acadêmicos na área de ${studyArea}, com foco em ${specificInterest}, adequados para o nível de ${academicLevel}. Os temas devem ser:
+				1. Relevantes, contribuindo significativamente para o campo de estudo e abordando questões contemporâneas importantes.
+				2. Originais, oferecendo novas perspectivas ou explorando áreas ainda não investigadas extensivamente.
+				3. Viáveis, com disponibilidade de fontes e recursos necessários para a pesquisa, e exequíveis dentro do prazo e recursos disponíveis.
+				4. Claros e delimitados, com escopo bem definido para permitir uma investigação aprofundada e específica.
+				5. De interesse pessoal, potencialmente motivando o estudante a se dedicar ao tema.
+				6. Com contribuição prática, sempre que possível, oferecendo soluções ou insights aplicáveis na prática.
+
+				Apresente cada tema em uma linha separada.
+
+			`
 		
 		try{
 			const completion = await openai.chat.completions.create({

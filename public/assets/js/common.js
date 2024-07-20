@@ -115,15 +115,5 @@ document.getElementById('close-modal').addEventListener('click', hideModal);
 			console.error(err)
 		}
 	})	
-
-
-if(document.getElementById('file-input')){
-	document.getElementById('file-input').addEventListener('change', (evt)=>{
-		validateFileSize(evt.target)
-		uploadFile(evt.target.files)
-	})
-}
-
-
 	
 })
