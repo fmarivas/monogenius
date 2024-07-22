@@ -576,6 +576,7 @@ router.post('/additionalFeatures', isAuth, checkSubscription, upload.none(), asy
 				specificInterest,
 				academicLevel,
 				themeCount,
+				keywords
 			} = req.body
 			
 			
@@ -589,6 +590,7 @@ router.post('/additionalFeatures', isAuth, checkSubscription, upload.none(), asy
 				academicLevel,
 				themeCount,
 				req.session.user.tier,
+				keywords
 			)
 			
 			if(result){
@@ -604,8 +606,8 @@ router.post('/additionalFeatures', isAuth, checkSubscription, upload.none(), asy
 			const {
 				researchTopic,
 				initialIdea,
+				language
 			} = req.body
-			
 			
 			if(!researchTopic || !initialIdea){
 				return res.json({success: false, message: 'Preencha os campos obrigatorios'})
@@ -615,6 +617,7 @@ router.post('/additionalFeatures', isAuth, checkSubscription, upload.none(), asy
 				researchTopic,
 				initialIdea,
 				req.session.user.tier,
+				language,
 			)
 			
 			if(result){
@@ -637,6 +640,19 @@ router.post('/additionalFeatures', isAuth, checkSubscription, upload.none(), asy
 
 
 // Rota para adicionar, deletar e tudo relacionar a um tema aos favoritos
+router.post('/api/keywordsGen', async (req, res) => {
+    try {
+        const { studyArea, specificInterest } = req.body;
+        const data = `${studyArea} ${specificInterest}`.trim();
+        const keywords = await additionalFeatures.keywordGenerator(data);
+        
+		res.json(keywords);
+    } catch (error) {
+        console.error('Erro ao gerar palavras-chave:', error);
+        res.status(500).json({ error: 'Erro ao gerar palavras-chave' });
+    }
+});
+
 router.post('/api/themes/:id', isAuth, async (req, res) => {
 	const id = req.params.id
 	const userId = req.session.user.id;

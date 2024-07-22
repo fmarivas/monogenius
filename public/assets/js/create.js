@@ -1,392 +1,301 @@
 document.addEventListener('DOMContentLoaded', () => {
-
-	function sendGAEvent(category, action, label = null, value = null) {
-	  gtag('event', action, {
-		'event_category': category,
-		'event_label': label,
-		'value': value
-	  });
-	}
-	
-	sendGAEvent('Monograph Creator', 'Page View');
-	
+    // DOM Elements
     const textField = document.querySelector('.editable');
     const boldBtn = document.getElementById('bold-btn');
     const italicBtn = document.getElementById('italic-btn');
     const underlineBtn = document.getElementById('underline-btn');
     const unorderedListBtn = document.getElementById('unordered-list-btn');
     const orderedListBtn = document.getElementById('ordered-list-btn');
-	const overlay = document.getElementById('overlay');
+    const overlay = document.getElementById('overlay');
+    const form = document.getElementById('formCreator');
+    const temaInput = document.getElementById('tema');
+    const ideiaInicialInput = document.getElementById('ideia-inicial');
+    const manuaisInput = document.getElementById('manuais');
+    const referenciasContainer = document.getElementById('referencias-container');
 
-    const placeholderText = "Compartilhe sua inspiração inicial aqui.\n\nInclua brevemente:\n- Motivação para o tema\n- Principais questões a abordar\n- Impacto esperado da pesquisa\n- Local do estudo (opcional, mas recomendado para melhor delimitação)";
-    
-    textarea.placeholder = placeholderText;
-//feedback
-document.getElementById('feedback-reason-create').addEventListener('change', function() {
-    if (this.value === '') {
-        document.getElementById('feedback-other-create').classList.add('hidden');
-    } else {
-        document.getElementById('feedback-other-create').classList.remove('hidden');
-    }
-});
 
-document.getElementById('submit-feedback-create').addEventListener('click', async () => {
-    // Aqui você pode implementar a lógica para enviar o feedback para o servidor
-    // Por exemplo:
-    const feedbackType = document.getElementById('feedback-type-create').textContent;
-    const reason = document.getElementById('feedback-reason-create').value;
-    const otherReason = document.getElementById('feedback-other-create').value;
-    const functionality = document.getElementById('functionality-create').value;
-	
-    const formData = new FormData()
-	
-	formData.append('functionality', functionality)
-	formData.append('feedback_type', feedbackType)
-	formData.append('reason', reason)
-	formData.append('description', otherReason)
-	
-	try{
-		const response = await axios.post('/api/feedback', formData)
-		
-		
-		if(response.data.success){
-			showModal(response.data.success, response.data.message)
-			document.getElementById('feedback-modal-create').classList.add('hidden');
-			
-			setTimeout(hideModal, 3000)	
-			
-			sendGAEvent('Monograph Creator', 'Feedback Submitted', feedbackType);
-		}else{
-			showModal(response.data.success, response.data.message)			
-			setTimeout(hideModal, 3000)	
-		}
-	}catch(err){
-		console.error(err)
-	}
-});
+    // Event Listeners
+    boldBtn.addEventListener('click', () => formatText('bold'));
+    italicBtn.addEventListener('click', () => formatText('italic'));
+    underlineBtn.addEventListener('click', () => formatText('underline'));
+    document.getElementById('copy-btn-create').addEventListener('click', copyToClipboard);
+    document.getElementById('like-btn-create').addEventListener('click', () => showFeedbackModal('gostou'));
+    document.getElementById('dislike-btn-create').addEventListener('click', () => showFeedbackModal('não gostou'));
+    form.addEventListener('submit', handleFormSubmit);
 
-document.getElementById('closeFeedback-modal-create').addEventListener('click', () => {
-    document.getElementById('feedback-modal').classList.add('hidden');
-});
-	
-
-document.getElementById('like-btn-create').addEventListener('click', () => showFeedbackModal('gostou'));
-document.getElementById('dislike-btn-create').addEventListener('click', () => showFeedbackModal('não gostou'));
-
-function showFeedbackModal(type) {
-    document.getElementById('feedback-modal-create').classList.remove('hidden');
-    document.getElementById('feedback-type-create').textContent = type;
-}
-
-//FOrmatacao do texto do textField
-	function formatText(command) {
-		document.execCommand(command, false, null);
-	}
-	
-
-    boldBtn.addEventListener('click', () => {
-        formatText('bold')
-		sendGAEvent('Monograph Creator', 'Formatting Used', 'Bold');
-    });
-
-    italicBtn.addEventListener('click', () => {
-        formatText('italic')
-		sendGAEvent('Monograph Creator', 'Formatting Used', 'Italic');
-    });
-
-    underlineBtn.addEventListener('click', () => {
-        formatText('underline')
-		sendGAEvent('Monograph Creator', 'Formatting Used', 'Underline');
-    });
-	
-function showModal(success, message) {
-    const modal = document.getElementById('modal');
-    const modalTitle = document.getElementById('modal-title');
-    const modalMessage = document.getElementById('modal-message');
-    const modalIcon = document.getElementById('modal-icon');
-
-    if (success) {
-        modalTitle.textContent = 'Sucesso';
-        modalIcon.classList.remove('text-red-500');
-        modalIcon.classList.add('text-green-500');
-    } else {
-        modalTitle.textContent = 'Erro';
-        modalIcon.classList.remove('text-green-500');
-        modalIcon.classList.add('text-red-500');
+    if (document.getElementById('close-modal')) {
+        document.getElementById('close-modal').addEventListener('click', hideModal);
     }
 
-    modalMessage.textContent = message;
-    modal.classList.remove('invisible');
-}
+    // Feedback-related event listeners
+    setupFeedbackEventListeners();
 
 
-function hideModal() {
-    const modal = document.getElementById('modal');
-    modal.classList.add('invisible');
-}
+    function setupFeedbackEventListeners() {
+        document.getElementById('feedback-reason-create').addEventListener('change', function() {
+            document.getElementById('feedback-other-create').classList.toggle('hidden', this.value === '');
+        });
 
-let timerInterval;
-let startTime;
-
-function startTimer() {
-    startTime = Date.now();
-    timerInterval = setInterval(updateTimer, 1000);
-}
-
-function stopTimer() {
-    clearInterval(timerInterval);
-}
-
-function updateTimer() {
-    const elapsedTime = Date.now() - startTime;
-    const seconds = Math.floor(elapsedTime / 1000);
-    const minutes = Math.floor(seconds / 60);
-    const formattedTime = `${minutes.toString().padStart(2, '0')}:${(seconds % 60).toString().padStart(2, '0')}`;
-    document.getElementById('timer').textContent = formattedTime;
-
-    // Aviso após 2 minutos (120 segundos)
-    if (seconds >= 120 && seconds % 30 === 0) { // Avisa a cada 30 segundos após 2 minutos
-        showModal(false, "A resposta está demorando mais que o esperado. Por favor, aguarde.");
+        document.getElementById('submit-feedback-create').addEventListener('click', submitFeedback);
+        document.getElementById('closeFeedback-modal-create').addEventListener('click', () => {
+            document.getElementById('feedback-modal').classList.add('hidden');
+        });
     }
-}
 
-if(document.getElementById('close-modal')){
-	document.getElementById('close-modal').addEventListener('click', hideModal);	
-}
-//validaca dos campos de referencia
-function formatMonographyHTML(mono) {
-    let formattedHTML = '';
 
-    // Introdução
-    formattedHTML += '<h1>1. Introdução</h1>';
-    formattedHTML += `<h2>1.1 Contextualização</h2>${mono.introducao.contextualizacao.replace(/\n/g, '<br>')}<br><br>`;
-    formattedHTML += `<h2>1.2 Problematização</h2>${mono.introducao.problematizacao.replace(/\n/g, '<br>')}<br><br>`;
-    formattedHTML += `<h2>1.3 Justificativa</h2>${mono.introducao.justificativa.replace(/\n/g, '<br>')}<br><br>`;
-    formattedHTML += '<h2>1.4 Objetivos</h2>';
-    formattedHTML += `<h3>1.4.1 Objetivo Geral</h3>${mono.introducao.objetivo_geral.replace(/\n/g, '<br>')}<br><br>`;
-    formattedHTML += '<h3>1.4.2 Objetivos Específicos</h3><ul>';
-    mono.introducao.objetivos_especificos.forEach(obj => {
-        formattedHTML += `<li>${obj.replace(/\n/g, '<br>')}</li>`;
-    });
-    formattedHTML += '</ul><br>';
-    formattedHTML += `<h2>1.5 Delimitação da Pesquisa</h2>${mono.introducao.delimitacao_pesquisa.replace(/\n/g, '<br>')}<br><br>`;
-    formattedHTML += `<h2>1.6 Estrutura do Trabalho</h2>${mono.introducao.estrutura_trabalho.replace(/\n/g, '<br>')}<br><br>`;
+    // Timer
+    let timerInterval;
+    let startTime;
 
-    // Revisão Bibliográfica
-    formattedHTML += '<h1>2. Revisão Bibliográfica</h1>';
-    formattedHTML += `${mono.revisao_bibliografica.replace(/\n/g, '<br>')}<br><br>`;
+    // Functions
+    function sendGAEvent(category, action, label = null, value = null) {
+        gtag('event', action, {
+            'event_category': category,
+            'event_label': label,
+            'value': value
+        });
+    }
 
-    return formattedHTML;
-}
+    function formatText(command) {
+        document.execCommand(command, false, null);
+        sendGAEvent('Monograph Creator', 'Formatting Used', command);
+    }
 
-const form = document.getElementById('formCreator');
-const temaInput = document.getElementById('tema');
-const ideiaInicialInput = document.getElementById('ideia-inicial');
-const manuaisInput = document.getElementById('manuais');
-const referenciasContainer = document.getElementById('referencias-container');
+    function showModal(success, message) {
+        const modal = document.getElementById('modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalMessage = document.getElementById('modal-message');
+        const modalIcon = document.getElementById('modal-icon');
 
-form.addEventListener('submit', async (event) => {
-  event.preventDefault();
-  
-  sendGAEvent('Monograph Creator', 'Form Submitted');
-  
-  // Validar campos obrigatórios
-  if (!temaInput.value.trim()) {
-    alert('Por favor, insira um tema.');
-    temaInput.focus();
-    return;
-  }
+        modalTitle.textContent = success ? 'Sucesso' : 'Erro';
+        modalIcon.classList.toggle('text-green-500', success);
+        modalIcon.classList.toggle('text-red-500', !success);
+        modalMessage.textContent = message;
+        modal.classList.remove('invisible');
+    }
 
-  if (!ideiaInicialInput.value.trim()) {
-    alert('Por favor, insira uma ideia inicial.');
-    ideiaInicialInput.focus();
-    return;
-  }
+    function hideModal() {
+        document.getElementById('modal').classList.add('invisible');
+    }
 
-  // Criar um objeto FormData para enviar os dados
-  const formData = new FormData();
-  formData.append('tema', temaInput.value.trim());
-  formData.append('ideiaInicial', ideiaInicialInput.value.trim());
+    function startTimer() {
+        startTime = Date.now();
+        timerInterval = setInterval(updateTimer, 1000);
+    }
 
-  // Adicionar arquivos selecionados, se houver
-  if (manuaisInput.files.length > 0) {
-    Array.from(manuaisInput.files).forEach((file) => {
-      formData.append('manuais', file);
-    });
-  }
-  
-  overlay.classList.remove('hidden')
-  startTimer();
-  referenciasContainer.classList.add('hidden')
-  try {
-    // Enviar os dados para o servidor usando Axios
-	const responseToken = await axios.get('/get-public-token')
-	const token = responseToken.data.token
-	
-		
-    const response = await axios.post('/api/create', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-		Authorization: token,
-      },
-    });
-	
-	if (response.data.redirect) {
-		window.location.href = response.data.redirect;
-		return;
+    function stopTimer() {
+        clearInterval(timerInterval);
+    }
+
+    function updateTimer() {
+        const elapsedTime = Date.now() - startTime;
+        const seconds = Math.floor(elapsedTime / 1000);
+        const minutes = Math.floor(seconds / 60);
+        const formattedTime = `${minutes.toString().padStart(2, '0')}:${(seconds % 60).toString().padStart(2, '0')}`;
+        document.getElementById('timer').textContent = formattedTime;
+
+        if (seconds >= 120 && seconds % 30 === 0) {
+            showModal(false, "A resposta está demorando mais que o esperado. Por favor, aguarde.");
+        }
+    }
+
+	function formatMonographyHTML(mono) {
+		let formattedHTML = '';
+
+		// Introdução
+		formattedHTML += '<h1>1. Introdução</h1>';
+		formattedHTML += `<h2>1.1 Contextualização</h2>${mono.introducao.contextualizacao.replace(/\n/g, '<br>')}<br><br>`;
+		formattedHTML += `<h2>1.2 Problematização</h2>${mono.introducao.problematizacao.replace(/\n/g, '<br>')}<br><br>`;
+		formattedHTML += `<h2>1.3 Justificativa</h2>${mono.introducao.justificativa.replace(/\n/g, '<br>')}<br><br>`;
+		formattedHTML += '<h2>1.4 Objetivos</h2>';
+		formattedHTML += `<h3>1.4.1 Objetivo Geral</h3>${mono.introducao.objetivo_geral.replace(/\n/g, '<br>')}<br><br>`;
+		formattedHTML += '<h3>1.4.2 Objetivos Específicos</h3><ul>';
+		mono.introducao.objetivos_especificos.forEach(obj => {
+			formattedHTML += `<li>${obj.replace(/\n/g, '<br>')}</li>`;
+		});
+		formattedHTML += '</ul><br>';
+		formattedHTML += `<h2>1.5 Delimitação da Pesquisa</h2>${mono.introducao.delimitacao_pesquisa.replace(/\n/g, '<br>')}<br><br>`;
+		formattedHTML += `<h2>1.6 Estrutura do Trabalho</h2>${mono.introducao.estrutura_trabalho.replace(/\n/g, '<br>')}<br><br>`;
+
+		// Revisão Bibliográfica
+		formattedHTML += '<h1>2. Revisão Bibliográfica</h1>';
+		formattedHTML += `${mono.revisao_bibliografica.replace(/\n/g, '<br>')}<br><br>`;
+
+		return formattedHTML;
 	}
 	
-    if(response.data.success){
-		referenciasContainer.classList.remove('hidden')
-		
-		sendGAEvent('Monograph Creator', 'Monograph Generated', 'Success');
-		
-		const formattedMono = formatMonographyHTML(response.data.mono);
-		textField.innerHTML = formattedMono;
-		// textField.innerHTML = ;
-		
-		
-		// Inserir as referências bibliográficas
-		const referenciasList = document.getElementById('referencias-lista');
-		if (referenciasList) {
-			referenciasList.innerHTML = ''; // Limpar conteúdo existente
-			response.data.refer.forEach(ref => {
-				const li = document.createElement('li');
-				li.textContent = ref;
-				referenciasList.appendChild(li);
-			});
-		}
-		
-		showModal(true, response.data.message);
-		
-		//funcao para gravar o conteudo
-		saveContent()
-		
-		overlay.classList.add('hidden')
-		stopTimer();
-		
-		//ocultar modal
-		setTimeout(hideModal, 3000)
-	}else{
-		overlay.classList.add('hidden')
-		stopTimer();
-		showModal(false, response.data.message);
-		setTimeout(hideModal, 3000)
-	}
-    
-  } catch (error) {
-    console.error('Erro ao enviar dados:', error);
 
-	showModal(false, error.response.data.message || 'Falha ao criar Monografia. Tente mais tarde!');
-	overlay.classList.add('hidden')
-	stopTimer();
-	setTimeout(hideModal, 3000)
-	
-	sendGAEvent('Monograph Creator', 'Generation Error', error.message);
-    
-  }
-});
+    function copyToClipboard() {
+        navigator.clipboard.writeText(textField.textContent)
+            .then(() => {
+                updateCopyButton(true);
+                sendGAEvent('Monograph Creator', 'Content Copied');
+            })
+            .catch(err => {
+                console.error('Erro ao copiar texto: ', err);
+                sendGAEvent('Monograph Creator', 'Error while copying');
+            });
+    }
 
-
-//copy function
-function copyToClipboard() {
-    const textField = document.querySelector('.editable');
-    navigator.clipboard.writeText(textField.textContent).then(() => {
+    function updateCopyButton(copied) {
         const button = document.getElementById('copy-btn-create');
-        
-        button.innerHTML = '<i class="fa-solid fa-check"></i> Copiado';
-        button.classList.add('bg-green-500', 'text-white');
-        button.classList.remove('bg-gray-200', 'text-gray-600');
+        button.innerHTML = copied ? '<i class="fa-solid fa-check"></i> Copiado' : '<i class="fas fa-copy mr-2"></i> Copiar';
+        button.classList.toggle('bg-green-500', copied);
+        button.classList.toggle('text-white', copied);
+        button.classList.toggle('bg-gray-200', !copied);
+        button.classList.toggle('text-gray-600', !copied);
 
-        setTimeout(() => {
-            button.innerHTML = '<i class="fas fa-copy mr-2"></i> Copiar';
-            button.classList.remove('bg-green-500', 'text-white');
-            button.classList.add('bg-gray-200', 'text-gray-600');
-        }, 3000);
-		
-		sendGAEvent('Monograph Creator', 'Content Copied');
-		
-    }).catch(err => {
-        console.error('Erro ao copiar texto: ', err);
-		sendGAEvent('Monograph Creator', 'Error while copying');
-    });
-}
-
-document.getElementById('copy-btn-create').addEventListener('click', copyToClipboard);
-	
-	
-	
-//salvar automaticamente
-// Função para salvar o conteúdo no localStorage
-function saveContent() {
-	const tema = document.getElementById('tema').value;
-	const ideiaInicial = document.getElementById('ideia-inicial').value;
-    const content = textField.innerHTML;
-    const referencias = document.getElementById('referencias-lista').innerHTML;
-	
-	if(tema){
-		localStorage.setItem('monografiaTema', tema);		
-	}
-    
-	if(ideiaInicial){
-		localStorage.setItem('monografiaIdeia', ideiaInicial);		
-	}
-    
-	if(content){
-		localStorage.setItem('monografiaContent', content);		
-	}
-    
-	if(referencias){
-		localStorage.setItem('monografiaReferencias', referencias);		
-	}
-}
-
-
-setInterval(saveContent, 30000);
-
-// Também salvar quando o usuário sair da página
-window.addEventListener('beforeunload', saveContent);
-
-// Função para carregar o conteúdo salvo
-function loadSavedContent() {
-    const savedTema = localStorage.getItem('monografiaTema');
-    const savedideiaInicial = localStorage.getItem('monografiaIdeia');
-    const savedContent = localStorage.getItem('monografiaContent');
-    const savedReferencias = localStorage.getItem('monografiaReferencias');
-    
-    if (savedTema) {
-        document.getElementById('tema').value = savedTema;
+        if (copied) {
+            setTimeout(() => updateCopyButton(false), 3000);
+        }
     }
-    	
-    if (savedideiaInicial) {
-        document.getElementById('ideia-inicial').value = savedideiaInicial;
+
+    function saveContent() {
+        const content = {
+            tema: temaInput.value,
+            ideiaInicial: ideiaInicialInput.value,
+            content: textField.innerHTML,
+            referencias: document.getElementById('referencias-lista').innerHTML
+        };
+
+        Object.entries(content).forEach(([key, value]) => {
+            if (value) localStorage.setItem(`monografia${key.charAt(0).toUpperCase() + key.slice(1)}`, value);
+        });
     }
-    	
-    if (savedContent) {
-        textField.innerHTML = savedContent;
+
+    async function handleFormSubmit(event) {
+        event.preventDefault();
+        sendGAEvent('Monograph Creator', 'Form Submitted');
+
+        if (!validateForm()) return;
+
+        const formData = new FormData(form);
+        overlay.classList.remove('hidden');
+        startTimer();
+        referenciasContainer.classList.add('hidden');
+
+        try {
+            const response = await axios.post('/api/create', formData);
+            handleApiResponse(response);
+        } catch (error) {
+            console.error('Erro ao enviar dados:', error);
+            showModal(false, error.response?.data?.message || 'Falha ao criar Monografia. Tente mais tarde!');
+            sendGAEvent('Monograph Creator', 'Generation Error', error.message);
+        } finally {
+            overlay.classList.add('hidden');
+            stopTimer();
+        }
     }
-    
-    if (savedReferencias) {
-        document.getElementById('referencias-container').classList.remove('hidden')
-        document.getElementById('referencias-lista').innerHTML = savedReferencias;
+    async function submitFeedback() {
+        const feedbackData = {
+            functionality: document.getElementById('functionality-create').value,
+            feedback_type: document.getElementById('feedback-type-create').textContent,
+            reason: document.getElementById('feedback-reason-create').value,
+            description: document.getElementById('feedback-other-create').value
+        };
+
+        try {
+            const response = await axios.post('/api/feedback', feedbackData);
+            if (response.data.success) {
+                showModal(true, response.data.message);
+                document.getElementById('feedback-modal-create').classList.add('hidden');
+                sendGAEvent('Monograph Creator', 'Feedback Submitted', feedbackData.feedback_type);
+            } else {
+                showModal(false, response.data.message);
+            }
+        } catch (err) {
+            console.error(err);
+            showModal(false, 'Erro ao enviar feedback');
+        } finally {
+            setTimeout(hideModal, 3000);
+        }
     }
-}
 
-// Chamar a função de carregamento quando a página for carregada
-// window.addEventListener('load', loadSavedContent);
+    function showFeedbackModal(type) {
+        document.getElementById('feedback-modal-create').classList.remove('hidden');
+        document.getElementById('feedback-type-create').textContent = type;
+    }
+    function validateForm() {
+        if (!temaInput.value.trim()) {
+            alert('Por favor, insira um tema.');
+            temaInput.focus();
+            return false;
+        }
+        if (!ideiaInicialInput.value.trim()) {
+            alert('Por favor, insira uma ideia inicial.');
+            ideiaInicialInput.focus();
+            return false;
+        }
+        return true;
+    }
+
+    function handleApiResponse(response) {
+        if (response.data.redirect) {
+            window.location.href = response.data.redirect;
+            return;
+        }
+
+        if (response.data.success) {
+            referenciasContainer.classList.remove('hidden');
+            sendGAEvent('Monograph Creator', 'Monograph Generated', 'Success');
+            
+            const formattedMono = formatMonographyHTML(response.data.mono);
+            textField.innerHTML = formattedMono;
+            
+            updateReferences(response.data.refer);
+            showModal(true, response.data.message);
+            saveContent();
+        } else {
+            showModal(false, response.data.message);
+        }
+
+        setTimeout(hideModal, 3000);
+    }
+
+    function updateReferences(references) {
+        const referenciasList = document.getElementById('referencias-lista');
+        if (referenciasList) {
+            referenciasList.innerHTML = '';
+            references.forEach(ref => {
+                const li = document.createElement('li');
+                li.textContent = ref;
+                referenciasList.appendChild(li);
+            });
+        }
+    }	
+    function loadSavedContent() {
+        const savedContent = {
+            Tema: temaInput,
+            IdeiaInicial: ideiaInicialInput,
+            Content: textField,
+            Referencias: document.getElementById('referencias-lista')
+        };
+
+        Object.entries(savedContent).forEach(([key, element]) => {
+            const saved = localStorage.getItem(`monografia${key}`);
+            if (saved) {
+                if (element.tagName === 'INPUT') {
+                    element.value = saved;
+                } else {
+                    element.innerHTML = saved;
+                }
+            }
+        });
+
+        if (localStorage.getItem('monografiaReferencias')) {
+            referenciasContainer.classList.remove('hidden');
+        }
+    }
 
 
+    // Autosave
+    setInterval(saveContent, 30000);
+    window.addEventListener('beforeunload', saveContent);
 
+    // Load saved content on page load
+    loadSavedContent();
 
+    // Initial GA event
+    sendGAEvent('Monograph Creator', 'Page View');
 
-
-
-
-
-
-
-
-
-
-	
 });

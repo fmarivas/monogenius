@@ -6,16 +6,23 @@
         <form id="referenceForm" class="space-y-6">
             <div>
                 <label for="researchTopic" class="block text-sm font-medium text-gray-700 mb-1">Tema de Pesquisa</label>
-                <input type="text" id="researchTopic" name="researchTopic" required value="O impacto da inteligência artificial na educação superior"
+                <input type="text" id="researchTopic" name="researchTopic" required placeholder="O impacto da inteligência artificial na educação superior"
                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
             </div>
             
             <div>
                 <label for="initialIdea" class="block text-sm font-medium text-gray-700 mb-1">Ideia Inicial</label>
                 <textarea id="initialIdea" name="initialIdea" rows="4" required
-                          class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-Explorar como a implementação de tecnologias de inteligência artificial está transformando os métodos de ensino e aprendizagem nas universidades. Analisar os benefícios potenciais, como personalização do aprendizado e eficiência administrativa, bem como os desafios éticos e práticos enfrentados pelas instituições de ensino superior ao adotar essas tecnologias.
-				</textarea>
+                          class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" placeholder="Explorar como a implementação de tecnologias de inteligência artificial está transformando os métodos de ensino e aprendizagem nas universidades..."></textarea>
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Idioma das Referências</label>
+                <select id="language" name="language" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    <option value="pt">Português</option>
+                    <option value="en">Inglês</option>
+                    <option value="both">Ambos</option>
+                </select>
             </div>
             
             <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded transition-colors duration-300">
@@ -25,6 +32,14 @@ Explorar como a implementação de tecnologias de inteligência artificial está
         
         <div id="results" class="mt-8 hidden">
             <h2 class="text-xl font-semibold text-gray-800 mb-4">Referências Geradas</h2>
+            <!-- <div class="mb-4"> -->
+                <!-- <label for="sort" class="text-sm font-medium text-gray-700 mr-2">Ordenar por:</label> -->
+                <!-- <select id="sort" class="px-2 py-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"> -->
+                    <!-- <option value="relevance">Relevância</option> -->
+                    <!-- <option value="date">Data</option> -->
+                    <!-- <option value="author">Autor</option> -->
+                <!-- </select> -->
+            <!-- </div> -->
             <div id="referenceOutput" class="p-4 bg-gray-50 rounded-md">
                 <!-- As referências geradas serão inseridas aqui -->
             </div>

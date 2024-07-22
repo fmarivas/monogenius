@@ -122,7 +122,7 @@ class additionalFeatures {
         }
     }
 	
-	static async themesCreator(studyArea,specificInterest,academicLevel,themeCount,tier){
+	static async themesCreator(studyArea, specificInterest, academicLevel, themeCount, tier, keywords) {
 		const tools = [
 			{
 				type: "function",
@@ -144,18 +144,22 @@ class additionalFeatures {
 			}
 		];
 
+		let keywordsPrompt = "";
+		if (keywords && keywords.length > 0) {
+			keywordsPrompt = `Considere as seguintes palavras-chave em sua criação de temas: ${keywords}.`;
+		}
+
 		const message = `
-				Crie ${themeCount} temas para trabalhos acadêmicos na área de ${studyArea}, com foco em ${specificInterest}, adequados para o nível de ${academicLevel}. Os temas devem ser:
-				1. Relevantes, contribuindo significativamente para o campo de estudo e abordando questões contemporâneas importantes.
-				2. Originais, oferecendo novas perspectivas ou explorando áreas ainda não investigadas extensivamente.
-				3. Viáveis, com disponibilidade de fontes e recursos necessários para a pesquisa, e exequíveis dentro do prazo e recursos disponíveis.
-				4. Claros e delimitados, com escopo bem definido para permitir uma investigação aprofundada e específica.
-				5. De interesse pessoal, potencialmente motivando o estudante a se dedicar ao tema.
-				6. Com contribuição prática, sempre que possível, oferecendo soluções ou insights aplicáveis na prática.
-
-				Apresente cada tema em uma linha separada.
-
-			`
+			Crie ${themeCount} temas para trabalhos acadêmicos na área de ${studyArea}, com foco em ${specificInterest}, adequados para o nível de ${academicLevel}. ${keywordsPrompt}
+			Os temas devem ser:
+			1. Relevantes, contribuindo significativamente para o campo de estudo e abordando questões contemporâneas importantes.
+			2. Originais, oferecendo novas perspectivas ou explorando áreas ainda não investigadas extensivamente.
+			3. Viáveis, com disponibilidade de fontes e recursos necessários para a pesquisa, e exequíveis dentro do prazo e recursos disponíveis.
+			4. Claros e delimitados, com escopo bem definido para permitir uma investigação aprofundada e específica.
+			5. De interesse pessoal, potencialmente motivando o estudante a se dedicar ao tema.
+			6. Com contribuição prática, sempre que possível, oferecendo soluções ou insights aplicáveis na prática.
+			Apresente cada tema em uma linha separada.
+		`;
 		
 		try{
 			const completion = await openai.chat.completions.create({
@@ -188,12 +192,73 @@ class additionalFeatures {
 		
 	}
 	
-	static async referencesCreator(tema, ideiaInicial, tier){
+	static async referencesCreator(tema, ideiaInicial, tier, language){
 		try{
-			const referencias = await MonoCreator.generateReferences(tema, ideiaInicial, tier);
+			const referencias = await MonoCreator.generateReferences(tema, ideiaInicial, tier, language);
 			return referencias
 		}catch(err){
 			console.error(err)
+		}
+	}
+	
+	static async keywordGenerator(data) {
+		const tools = [
+			{
+				type: "function",
+				function: {
+					name: "generate_keywords",
+					description: "Gera palavras-chave relevantes baseadas nos dados fornecidos",
+					parameters: {
+						type: "object",
+						properties: {
+							keywords: {
+								type: "array",
+								items: { type: "string" },
+								description: "Lista de palavras-chave relevantes"
+							}
+						},
+						required: ["keywords"]
+					}
+				}
+			}
+		];
+
+		const allText = Array.isArray(data) ? data.join(' ') : data.toString();
+
+		const message = `
+			Analise o seguinte texto e extraia de 3 a 5 palavras-chave relevantes.
+			Estas palavras-chave devem representar os conceitos mais importantes e específicos do texto.
+			Apresente apenas as palavras-chave, sem numeração ou explicações adicionais.
+
+			Texto: ${allText}
+		`;
+
+		try {
+			const completion = await openai.chat.completions.create({
+				model: 'gpt-4o-mini',
+				messages: [
+					{ role: "system", content: "Você é um assistente especializado em análise de texto e extração de palavras-chave." },
+					{ role: "user", content: message }
+				],
+				tools: tools,
+				tool_choice: "auto"
+			});
+
+			const response = completion.choices[0].message;
+			if (response.tool_calls && response.tool_calls.length > 0) {
+				const functionCall = response.tool_calls[0];
+				if (functionCall.function.name === "generate_keywords") {
+					const functionArguments = JSON.parse(functionCall.function.arguments);
+					return functionArguments.keywords.slice(0, 5);  // Garantir que não haja mais de 5 palavras-chave
+				} else {
+					throw new Error(`Função inesperada chamada: ${functionCall.function.name}`);
+				}
+			} else {
+				throw new Error('Falha ao gerar palavras-chave');
+			}
+		} catch (err) {
+			console.error("Erro ao gerar palavras-chave:", err);
+			return [];
 		}
 	}
 }

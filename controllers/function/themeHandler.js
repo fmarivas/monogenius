@@ -38,7 +38,11 @@ class themeHandler {
             }
 
             // Inserir o tema selecionado na tabela selected_themes
-            const insertSelectedSql = 'INSERT INTO selected_themes (user_id, theme) VALUES (?, ?)';
+			const insertSelectedSql = `
+				INSERT INTO selected_themes (user_id, theme) 
+				VALUES (?, ?) 
+				ON DUPLICATE KEY UPDATE theme = VALUES(theme)
+			`;
             await query(insertSelectedSql, [userId, theme]);
 
             // Retornar o tema selecionado

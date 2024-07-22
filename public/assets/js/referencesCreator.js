@@ -88,9 +88,18 @@ document.addEventListener('DOMContentLoaded', ()=>{
 	referenceForm.addEventListener('submit', async function(e){
 		e.preventDefault()
 		
+		const languageSelect = document.getElementById('language');
+		let language = languageSelect.value;
+		
+		// Interpretação da opção "ambos"
+		if (language === 'both') {
+			language = ['pt', 'en'];
+		}
+		
 		const data = {
 			researchTopic: researchTopic.value,
 			initialIdea: initialIdea.value,
+			language: language,
 			typeOfFeature: 'referencesCreator',
 		}
 		

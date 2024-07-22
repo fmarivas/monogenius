@@ -3,14 +3,9 @@ const OpenAI = require('openai');
 const openai = new OpenAI(process.env.OPENAI_API_KEY);
 
 class Monography {
-		static async generateReferences(tema, ideiaInicial, tier) {
-			let aiModel
+		static async generateReferences(tema, ideiaInicial, tier, language) {
+			let aiModel = tier === "free" ? 'gpt-3.5-turbo' : 'gpt-4o-mini';
 			
-			if(tier === "free"){
-				aiModel = 'gpt-4o-mini'
-			}else if(tier === 'basic' || tier === 'premium' || tier === 'supreme'){
-				aiModel = 'gpt-4o-mini'
-			}
 			const tools = [
 				{
 					type: "function",
@@ -32,9 +27,19 @@ class Monography {
 				}
 			];
 
+			let languageInstruction = "";
+			if (language) {
+				if (Array.isArray(language) && language.includes('pt') && language.includes('en')) {
+					languageInstruction = "Forneça as referências em uma mistura de português e inglês, priorizando as fontes mais relevantes em ambos os idiomas.";
+				} else if (language === 'pt') {
+					languageInstruction = "Forneça as referências preferencialmente em português, mas inclua fontes importantes em inglês se necessário.";
+				} else if (language === 'en') {
+					languageInstruction = "Provide the references preferably in English, but include important sources in Portuguese if necessary.";
+				}
+			}
+
 			const apaInstructions = `
 			Ao gerar as referências, siga estritamente o estilo APA (American Psychological Association):
-
 			1. Livro (1 autor): Apelido, N. (Ano). Título. (Edição). Local: Editor.
 			2. Livro (2-7 autores): Apelido, N., & Apelido, N. (Ano). Título. (Edição). Local: Editor.
 			3. Livro (mais de 7 autores): Apelido, N., Apelido, N., Apelido, N., Apelido, N., Apelido, N., Apelido, N., ... Apelido, N. (Ano). Título. (Edição). Local: Editor.
@@ -44,17 +49,16 @@ class Monography {
 			7. Conferência: Apelido, N. (Ano). Título da comunicação. In Título da Conferência, Local, Data. Local: Editor.
 			8. Artigo eletrônico: Apelido, N. (Ano). Título do artigo. Título da Publicação, Volume(número). URL
 			9. E-book: Apelido, N. (Ano). Título [E-book]. Editor. URL
-
 			Certifique-se de que cada referência siga exatamente este formato, adequando-se ao tipo de fonte.
 			`;
-
+			
 			const message = `
 				Gere uma lista de 10 referências bibliográficas relevantes e atuais para um trabalho acadêmico 
 				com o tema "${tema}" e a ideia inicial "${ideiaInicial}". As referências devem ser variadas, 
 				incluindo livros, artigos científicos e outras fontes acadêmicas confiáveis. 
 				
 				${apaInstructions}
-
+				${languageInstruction}
 				Garanta que as referências sejam diversificadas em termos de tipo de fonte e data de publicação, 
 				priorizando fontes dos últimos 5-10 anos quando possível.
 			`;
@@ -69,9 +73,7 @@ class Monography {
 					tools: tools,
 					tool_choice: "auto"
 				});
-
 				const responseMessage = completion.choices[0].message;
-
 				if (responseMessage.tool_calls) {
 					const functionCall = responseMessage.tool_calls[0];
 					const functionArguments = JSON.parse(functionCall.function.arguments);
@@ -86,13 +88,7 @@ class Monography {
 		}
 		
 		static async generateMonographyWithReferences(tema, ideiaInicial, manuais, referencias, tier) {
-			let aiModel
-			
-			if(tier === "free"){
-				aiModel = 'gpt-4o-mini'
-			}else if(tier === 'basic' || tier === 'premium'){
-				aiModel = 'gpt-4o-mini'
-			}
+			let aiModel = tier === "free" ? 'gpt-3.5-turbo' : 'gpt-4o-mini';
 
 			const tools = [
 				{
@@ -176,13 +172,17 @@ class Monography {
 				});
 
 				const responseMessage = completion.choices[0].message;
-
+				
 				if (responseMessage.tool_calls) {
 					const functionCall = responseMessage.tool_calls[0];
 					const functionArguments = JSON.parse(functionCall.function.arguments);
-									
-					const formattedResponse = this.formatMonography(functionArguments);
-					return functionArguments;					
+					
+					// Verificar se a estrutura esperada está presente
+					if (this.isValidMonographyStructure(functionArguments)) {
+						return functionArguments;
+					} else {
+						throw new Error('A estrutura da monografia retornada é inválida');
+					}			
 				} else {
 					throw new Error('Falha ao gerar a estrutura da monografia');
 				}
@@ -192,7 +192,24 @@ class Monography {
 			}
 		}
 
+		static isValidMonographyStructure(monografia) {
+			return monografia &&
+				   monografia.introducao &&
+				   monografia.introducao.contextualizacao &&
+				   monografia.introducao.problematizacao &&
+				   monografia.introducao.justificativa &&
+				   monografia.introducao.objetivo_geral &&
+				   Array.isArray(monografia.introducao.objetivos_especificos) &&
+				   monografia.introducao.delimitacao_pesquisa &&
+				   monografia.introducao.estrutura_trabalho &&
+				   monografia.revisao_bibliografica;
+		}
+
 		static formatMonography(monografia) {
+			if (!this.isValidMonographyStructure(monografia)) {
+				throw new Error('Estrutura da monografia inválida');
+			}
+
 			let formatted = `1. Introdução\n`;
 			formatted += `1.1 Contextualização\n${monografia.introducao.contextualizacao}\n\n`;
 			formatted += `1.2 Problematização\n${monografia.introducao.problematizacao}\n\n`;

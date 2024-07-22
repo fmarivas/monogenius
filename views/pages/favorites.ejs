@@ -133,26 +133,24 @@
 			});
 			const data = await response.json();
 			if (data.success) {
-				stopTimer()
-				overlay.classList.add('hidden')
 				showModal(true, 'Tema selecionado com sucesso!');
 				
 				window.location.href = data.redirectUrl;
 			} else {
-				stopTimer()
-				overlay.classList.add('hidden')
 				console.error('Failed to select theme:', data.message);
 				showModal(false, 'Falha ao selecionar o tema. Por favor, tente novamente.');
 				
 				setTimeout(hideModal,3000)
 			}
 		} catch (error) {
-			stopTimer()
-			overlay.classList.add('hidden')
 			console.error('Error selecting theme:', error);
 			showModal(false,'Erro ao selecionar o tema. Por favor, tente novamente.');
 
 			setTimeout(hideModal,3000)
+		}finally{
+			stopTimer()
+			overlay.classList.add('hidden')
+		
 		}
 	}	
 	
