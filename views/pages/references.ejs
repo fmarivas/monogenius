@@ -1,4 +1,26 @@
 <!DOCTYPE html>
+<div id="feedback-modal-references" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <h3 class="text-lg font-bold text-gray-900 mb-4" id="modal-title-references">Seu feedback</h3>
+        <p class="mb-4">Por que você <span id="feedback-type-references" class="font-semibold"></span> destas referências?</p>
+        <select id="feedback-reason-references" class="w-full p-2 mb-4 border rounded">
+            <option value="">Selecione uma razão</option>
+            <option value="relevancia">Relevância das referências</option>
+            <option value="qualidade">Qualidade das referências</option>
+            <option value="variedade">Variedade das referências</option>
+            <option value="adequacao">Adequação ao tema de pesquisa</option>
+            <option value="atualizacao">Atualização das referências</option>
+            <option value="outros">Outros</option>
+        </select>
+        <textarea id="feedback-other-references" class="w-full p-2 mb-4 border rounded hidden" placeholder="Por favor, explique..."></textarea>
+        <input type="hidden" id="functionality-references" value="reference_generator">
+        <div class="flex justify-end">
+            <button id="submit-feedback-references" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Enviar</button>
+            <button id="closeFeedback-modal-references" class="ml-2 px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400">Fechar</button>
+        </div>
+    </div>
+</div>
+
 <main class="container mx-auto px-4 py-8">
     <h1 class="text-3xl font-bold text-gray-800 mb-8 text-center">Gerador de Referências</h1>
     
@@ -30,19 +52,27 @@
             </button>
         </form>
         
-        <div id="results" class="mt-8 hidden">
-            <h2 class="text-xl font-semibold text-gray-800 mb-4">Referências Geradas</h2>
-            <!-- <div class="mb-4"> -->
-                <!-- <label for="sort" class="text-sm font-medium text-gray-700 mr-2">Ordenar por:</label> -->
-                <!-- <select id="sort" class="px-2 py-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"> -->
-                    <!-- <option value="relevance">Relevância</option> -->
-                    <!-- <option value="date">Data</option> -->
-                    <!-- <option value="author">Autor</option> -->
-                <!-- </select> -->
-            <!-- </div> -->
-            <div id="referenceOutput" class="p-4 bg-gray-50 rounded-md">
-                <!-- As referências geradas serão inseridas aqui -->
-            </div>
-        </div>
+		<div id="results" class="mt-8 hidden">
+			<h2 class="text-xl font-semibold text-gray-800 mb-4">Referências Geradas</h2>
+			<button id="favoriteReferences" class="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition-colors">
+				Favoritar Referências
+			</button>
+			<hr class="border-t border-gray-200 my-4 shadow-sm">
+			<div id="referenceOutput" class="p-4 bg-gray-50 rounded-md mb-4">
+				<!-- As referências geradas serão inseridas aqui -->
+			</div>
+			
+			
+			<div class="flex justify-between items-center mt-4">
+				<div>
+					<button id="like-btn-references" class="bg-green-500 text-white hover:bg-green-600 px-4 py-2 rounded-l">
+						<i class="fas fa-thumbs-up mr-2"></i>Gostei
+					</button>
+					<button id="dislike-btn-references" class="bg-red-500 text-white hover:bg-red-600 px-4 py-2 rounded-r">
+						<i class="fas fa-thumbs-down mr-2"></i>Não Gostei
+					</button>
+				</div>
+			</div>
+		</div>
     </div>
 </main>

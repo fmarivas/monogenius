@@ -85,6 +85,76 @@ document.addEventListener('DOMContentLoaded', ()=>{
 		sendGAEvent('References Generator', 'Input Focus', 'Initial Idea');
 	});	
 	
+	const favoriteReferencesBtn = document.getElementById('favoriteReferences');
+
+	function updateFavoriteButton(isFavorited) {
+		if (isFavorited) {
+			favoriteReferencesBtn.textContent = 'Desfavoritar Referências';
+			favoriteReferencesBtn.classList.remove('bg-yellow-500', 'hover:bg-yellow-600');
+			favoriteReferencesBtn.classList.add('bg-gray-500', 'hover:bg-gray-600');
+		} else {
+			favoriteReferencesBtn.textContent = 'Favoritar Referências';
+			favoriteReferencesBtn.classList.remove('bg-gray-500', 'hover:bg-gray-600');
+			favoriteReferencesBtn.classList.add('bg-yellow-500', 'hover:bg-yellow-600');
+		}
+	}
+
+	let isFavorited = false; // Variável global para rastrear o estado
+
+	async function toggleFavoriteReferences() {
+		const references = Array.from(document.querySelectorAll('#referenceOutput li')).map(li => li.textContent);
+		const researchTopic = document.getElementById('researchTopic').value;
+		
+		if (references.length === 0 || !researchTopic) {
+			showModal(false, "É necessário ter um tema de pesquisa e referências para favoritar/desfavoritar.");
+			return;
+		}
+		
+		overlay.classList.remove('hidden');
+		startTimer();
+		
+		try {
+			const action = isFavorited ? 'unfavorite' : 'favorite';
+			const response = await axios.post(`/api/references/${action}`, { researchTopic, references });
+			
+			if (response.data.success) {
+				isFavorited = !isFavorited; // Toggle o estado
+				updateFavoriteButton(isFavorited);
+				showModal(true, response.data.message);
+				sendGAEvent('References Generator', `References ${action}d`, researchTopic, references.length);
+			} else {
+				showModal(false, response.data.message);
+				sendGAEvent('References Generator', `References ${action} Failed`, researchTopic);
+			}
+		} catch (err) {
+			console.error(err);
+			showModal(false, `Erro ao ${isFavorited ? 'desfavoritar' : 'favoritar'} referências. Por favor, tente novamente.`);
+			sendGAEvent('References Generator', `References ${isFavorited ? 'Unfavorite' : 'Favorite'} Error`, researchTopic);
+		} finally {
+			overlay.classList.add('hidden');
+			stopTimer();
+			setTimeout(hideModal, 3000);
+		}
+	}
+
+	favoriteReferencesBtn.addEventListener('click', toggleFavoriteReferences);
+	
+	async function checkInitialFavoriteState() {
+		const researchTopic = document.getElementById('researchTopic').value;
+		if (!researchTopic) return;
+
+		try {
+			const response = await axios.get(`/api/references/checkFavorite?researchTopic=${encodeURIComponent(researchTopic)}`);
+			isFavorited = response.data.isFavorited;
+			updateFavoriteButton(isFavorited);
+		} catch (err) {
+			console.error('Erro ao verificar o estado inicial de favorito:', err);
+		}
+	}
+	checkInitialFavoriteState();
+	
+	
+	
 	referenceForm.addEventListener('submit', async function(e){
 		e.preventDefault()
 		
@@ -158,7 +228,63 @@ document.addEventListener('DOMContentLoaded', ()=>{
 	})
 	
 	
-	
+	// Feedback Functions
+	function showFeedbackModal(type) {
+		document.getElementById('feedback-modal-references').classList.remove('hidden');
+		document.getElementById('feedback-type-references').textContent = type;
+	}
+
+	async function submitFeedback() {
+		const feedbackType = document.getElementById('feedback-type-references').textContent;
+		const reason = document.getElementById('feedback-reason-references').value;
+		const otherReason = document.getElementById('feedback-other-references').value;
+		const functionality = document.getElementById('functionality-references').value;
+		
+		const formData = new FormData();
+		formData.append('functionality', functionality);
+		formData.append('feedback_type', feedbackType);
+		formData.append('reason', reason);
+		formData.append('description', otherReason);
+		
+		overlay.classList.remove('hidden');
+		startTimer();
+		
+		try {
+			const response = await axios.post('/api/feedback', formData);
+			
+			if(response.data.success){
+				showModal(response.data.success, response.data.message);
+				document.getElementById('feedback-modal-references').classList.add('hidden');
+				sendGAEvent('Reference Generator', 'Feedback Submitted', feedbackType);
+			} else {
+				showModal(response.data.success, response.data.message);
+				sendGAEvent('Reference Generator', 'Feedback Failed', feedbackType);
+			}
+			
+		} catch(err) {
+			console.error(err);
+			showModal(false, "Erro ao enviar feedback");
+		} finally {
+			stopTimer();
+			overlay.classList.add('hidden');
+			setTimeout(hideModal, 3000);
+		}
+	}
+
+	// Event Listeners
+	document.getElementById('like-btn-references').addEventListener('click', () => showFeedbackModal('gostou'));
+	document.getElementById('dislike-btn-references').addEventListener('click', () => showFeedbackModal('não gostou'));
+
+	document.getElementById('submit-feedback-references').addEventListener('click', submitFeedback);
+
+	document.getElementById('closeFeedback-modal-references').addEventListener('click', () => {
+		document.getElementById('feedback-modal-references').classList.add('hidden');
+	});
+
+	document.getElementById('feedback-reason-references').addEventListener('change', function() {
+		const otherTextarea = document.getElementById('feedback-other-references');
+		otherTextarea.classList.remove('hidden');
+	})
 	
 	
 	

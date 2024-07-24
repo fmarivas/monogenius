@@ -138,7 +138,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await axios.post('/api/themes/favoriteTheme', { theme });
 			
             if (response.data.success) {
-                console.log('Tema adicionado aos favoritos com sucesso');
                 showModal(true, response.data.message);
 
                 updateFavoriteButton(index, true);

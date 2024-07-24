@@ -17,8 +17,12 @@ const MonoCreator = require('../controllers/function/MonoCreatorComponent')
 const Plagiarism = require('../controllers/function/Plagiarism')
 const additionalFeatures = require('../controllers/function/additionalFeatures')
 const UserDetails = require('../controllers/function/userDetails')
-const themeHandler = require('../controllers/function/themeHandler')
 const FavoritesHandler = require('../controllers/function/userFavorites')
+
+const themeHandler = require('../controllers/function/themeHandler')
+const referenceHandler = require('../controllers/function/referenceHandler')
+
+const Support = require('../controllers/function/supportHandler')
 
 const fileReader = require('../controllers/function/fileFunction')
 const userRequest = require('../controllers/function/canMakeRequest')
@@ -27,6 +31,7 @@ const userRequest = require('../controllers/function/canMakeRequest')
 const isAuth = require('../controllers/function/middleware/auth')
 const checkSubscription = require('../controllers/function/middleware/checkSubscription')
 const checkUserHasDetails = require('../controllers/function/middleware/checkUserDetails')
+const checkRequestAvailability = require('../controllers/function/middleware/checkRequestAvailability')
 
 const pageResources = require('../controllers/config/pageResources')
 const preTextualElements = require('../controllers/config/preTextualElements')
@@ -282,9 +287,9 @@ router.post('/api/create', isAuth, checkSubscription, upload.array('manuais'), a
 		
 		const tier = await userRequest.tierDisplay(req.session.user)
 		
-		const canMakeRequest = await userRequest.canMakeRequest(req.session.user, 'createMono');
+		// const canMakeRequest = await userRequest.canMakeRequest(req.session.user, 'createMono');
 		  
-			if(canMakeRequest.success){
+			// if(canMakeRequest.success){
 			  const mono = await MonoCreator.createMono(tema, ideiaInicial, manuais, tier)
 			  
 			  if(mono.success){
@@ -297,9 +302,9 @@ router.post('/api/create', isAuth, checkSubscription, upload.array('manuais'), a
 			  }else{
 				  res.json({ success: false, message: 'Falha ao criar Monografia. Tente mais tarde!' });
 			  }
-			}else{
-				res.json({success: false, message: canMakeRequest.message})	
-			}
+			// }else{
+				// res.json({success: false, message: canMakeRequest.message})	
+			// }
 		}catch(err){
 			console.error(err)
 			res.json({success: false, message: 'Erro interno do servidor.Tente novamente mais tarde!'});
@@ -653,6 +658,7 @@ router.post('/api/keywordsGen', async (req, res) => {
     }
 });
 
+//Rota para adicionar temas aos favoritos
 router.post('/api/themes/:id', isAuth, async (req, res) => {
 	const id = req.params.id
 	const userId = req.session.user.id;
@@ -677,6 +683,57 @@ router.post('/api/themes/:id', isAuth, async (req, res) => {
 		}
     } catch (error) {
         console.error('Error in favoriteTheme route:', error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+//Rota para adicionar referencias bibliograficas aos favoritos
+router.post('/api/references/favorite', isAuth, async (req, res) => {
+    const userId = req.session.user.id;
+    const { researchTopic, references } = req.body;
+    try {
+        if (!researchTopic || !references || !Array.isArray(references) || references.length === 0) {
+            return res.status(400).json({ success: false, message: 'Research topic and references are required' });
+        }
+        const result = await referenceHandler.addFavoriteReferences(userId, researchTopic, references);
+        res.json({ 
+            success: result, 
+            message: result ? 'References favorited successfully' : 'Failed to favorite references'
+        });
+    } catch (error) {
+        console.error('Error in favoriteReferences route:', error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+//Rota para remover uma referencia dos favoritos
+router.post('/api/references/unfavorite', isAuth, async (req, res) => {
+    const userId = req.session.user.id;
+    const { researchTopic } = req.body;
+    try {
+        if (!researchTopic) {
+            return res.status(400).json({ success: false, message: 'Research topic is required' });
+        }
+        const result = await referenceHandler.removeFavoriteReferences(userId, researchTopic);
+        res.json({ 
+            success: result, 
+            message: result ? 'References unfavorited successfully' : 'Failed to unfavorite references'
+        });
+    } catch (error) {
+        console.error('Error in unfavoriteReferences route:', error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+//Rota para verificar o estado dos favoritos das referenncias
+router.get('/api/references/checkFavorite', isAuth, async (req, res) => {
+    const userId = req.session.user.id;
+    const { researchTopic } = req.query;
+    try {
+        const isFavorited = await referenceHandler.checkFavoriteReferences(userId, researchTopic);
+        res.json({ isFavorited });
+    } catch (error) {
+        console.error('Error in checkFavorite route:', error);
         res.status(500).json({ success: false, message: error.message });
     }
 });
@@ -724,27 +781,32 @@ router.post('/api/favorites/theme/select', isAuth, async (req, res) => {
     }
 });
 
-// Rota para obter os temas favoritos do usuário
-// router.get('/favoriteThemes', isAuth, async (req, res) => {
-    // try {
-        // const userId = req.session.user.id;
-        // const favorites = await themeHandler.getFavoriteThemes(userId);
-        // res.json({ success: true, favorites });
-    // } catch (error) {
-        // console.error('Error in getFavoriteThemes route:', error);
-        // res.status(500).json({ success: false, message: error.message });
-    // }
-// });
 
-// Rota para obter o tema selecionado do usuário
-// router.get('/selectedTheme', isAuth, async (req, res) => {
-    // try {
-        // const userId = req.session.user.id;
-        // const selectedTheme = await themeHandler.getSelectedTheme(userId);
-        // res.json({ success: true, selectedTheme });
-    // } catch (error) {
-        // console.error('Error in getSelectedTheme route:', error);
-        // res.status(500).json({ success: false, message: error.message });
-    // }
-// });
+router.post('/support/:id', async (req, res) => {
+    const { id } = req.params;
+    const userId = req.session.user.id; // Assumindo que você tem middleware de autenticação
+
+
+
+    try {
+		if (id === 'tickets') {
+			const { subject, description } = req.body;
+
+			if (!subject || !description) {
+				return res.json({ success: false, message: 'Subject and description are required.' });
+			}
+			
+			const success = await Support.addTicket(userId, subject, description);
+			if (success) {
+				res.json({ success: true, message: 'Ticket created successfully.' });
+			} else {
+				res.json({ success: false, message: 'Failed to create ticket.' });
+			}
+		}
+    } catch (error) {
+        console.error('Error in support route:', error);
+        res.json({ success: false, message: 'An error occurred while processing your request.' });
+    }
+});
+
 module.exports = router

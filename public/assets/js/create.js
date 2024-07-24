@@ -101,25 +101,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	function formatMonographyHTML(mono) {
 		let formattedHTML = '';
-
+		
 		// Introdução
 		formattedHTML += '<h1>1. Introdução</h1>';
-		formattedHTML += `<h2>1.1 Contextualização</h2>${mono.introducao.contextualizacao.replace(/\n/g, '<br>')}<br><br>`;
-		formattedHTML += `<h2>1.2 Problematização</h2>${mono.introducao.problematizacao.replace(/\n/g, '<br>')}<br><br>`;
-		formattedHTML += `<h2>1.3 Justificativa</h2>${mono.introducao.justificativa.replace(/\n/g, '<br>')}<br><br>`;
+		formattedHTML += `<h2>1.1 Contextualização</h2>${mono.contextualizacao.replace(/\n/g, '<br>')}<br><br>`;
+		formattedHTML += `<h2>1.2 Problematização</h2>${mono.problematizacao.replace(/\n/g, '<br>')}<br><br>`;
+		formattedHTML += `<h2>1.3 Justificativa</h2>${mono.justificativa.replace(/\n/g, '<br>')}<br><br>`;
 		formattedHTML += '<h2>1.4 Objetivos</h2>';
-		formattedHTML += `<h3>1.4.1 Objetivo Geral</h3>${mono.introducao.objetivo_geral.replace(/\n/g, '<br>')}<br><br>`;
+		formattedHTML += `<h3>1.4.1 Objetivo Geral</h3>${mono.objetivo_geral.replace(/\n/g, '<br>')}<br><br>`;
 		formattedHTML += '<h3>1.4.2 Objetivos Específicos</h3><ul>';
-		mono.introducao.objetivos_especificos.forEach(obj => {
-			formattedHTML += `<li>${obj.replace(/\n/g, '<br>')}</li>`;
+		mono.objetivos_especificos.forEach(obj => {
+			formattedHTML += `<li> =>${obj.replace(/\n/g, '<br>')}</li>`;
 		});
 		formattedHTML += '</ul><br>';
-		formattedHTML += `<h2>1.5 Delimitação da Pesquisa</h2>${mono.introducao.delimitacao_pesquisa.replace(/\n/g, '<br>')}<br><br>`;
-		formattedHTML += `<h2>1.6 Estrutura do Trabalho</h2>${mono.introducao.estrutura_trabalho.replace(/\n/g, '<br>')}<br><br>`;
+		formattedHTML += `<h2>1.5 Delimitação da Pesquisa</h2>${mono.delimitacao_pesquisa.replace(/\n/g, '<br>')}<br><br>`;
+		formattedHTML += `<h2>1.6 Estrutura do Trabalho</h2>${mono.estrutura_trabalho.replace(/\n/g, '<br>')}<br><br>`;
 
 		// Revisão Bibliográfica
-		formattedHTML += '<h1>2. Revisão Bibliográfica</h1>';
-		formattedHTML += `${mono.revisao_bibliografica.replace(/\n/g, '<br>')}<br><br>`;
+		// formattedHTML += '<h1>2. Revisão Bibliográfica</h1>';
+		// formattedHTML += `${mono.revisao_bibliografica.replace(/\n/g, '<br>')}<br><br>`;
 
 		return formattedHTML;
 	}
@@ -234,11 +234,13 @@ document.addEventListener('DOMContentLoaded', () => {
             window.location.href = response.data.redirect;
             return;
         }
-
+		
+		
         if (response.data.success) {
             referenciasContainer.classList.remove('hidden');
             sendGAEvent('Monograph Creator', 'Monograph Generated', 'Success');
             
+			console.log(response.data.mono)
             const formattedMono = formatMonographyHTML(response.data.mono);
             textField.innerHTML = formattedMono;
             

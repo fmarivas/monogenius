@@ -58,19 +58,43 @@
             </h2>
             <ul id="favorite-references" class="space-y-2">
 				<% if (userFavorites.refer.length === 0) { %>
-					<li class="text-gray-500 italic">Nenhuma referências favorita ainda.</li>
+					<p class="text-center text-gray-500">Nenhuma referência favorita ainda.</p>
 				<% } else { %>
-					<% userFavorites.refer.forEach(function(refer) { %>
-						<li class="flex justify-between items-center bg-white border border-gray-200 rounded-lg shadow-sm p-3 hover:shadow-md transition-shadow duration-200">
-							<span class="flex-grow truncate mr-2"><%= refer %></span>
-							<div class="flex items-center">
-								<div class="h-5 w-px bg-gray-300 mx-2"></div>
-								<button class="text-red-500 hover:text-red-700 transition-colors duration-200" onclick="removeFavorite('refer', '<%= refer %>')">
-									<i class="fas fa-trash-alt"></i>
-								</button>
+					<div id="favoriteReferencesOutput">
+						<% userFavorites.refer.forEach((favorite, index) => { %>
+							<div class="p-3 bg-white rounded shadow mb-4">
+								<h3 class="font-bold mb-2"><%= favorite.research_topic %></h3>
+								<div class="flex justify-between items-center">
+									<p class="flex-grow"><%= favorite.reference_set.length %> referências salvas</p>
+									<div class="flex space-x-2">
+										<button onclick="viewReferences('<%= JSON.stringify(favorite) %>')" class="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">
+											Ver Referências
+										</button>
+										<button onclick="removeFavoriteReferences('<%= favorite.research_topic %>')" class="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-colors">
+											<i class="fas fa-trash-alt"></i>
+										</button>
+									</div>
+								</div>
 							</div>
-						</li>
-					<% }); %>
+						<% }); %>
+					</div>
+
+					<!-- Modal para exibir as referências -->
+					<div id="referencesModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full">
+						<div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
+							<div class="mt-3 text-center">
+								<h3 class="text-lg leading-6 font-medium text-gray-900" id="modalTitle"></h3>
+								<div class="mt-2 px-7 py-3" id="modalContent">
+									<!-- As referências serão inseridas aqui -->
+								</div>
+								<div class="items-center px-4 py-3">
+									<button id="closeModalRefer" class="px-4 py-2 bg-gray-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-300">
+										Fechar
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
 				<% } %>
             </ul>
         </div>
@@ -78,6 +102,59 @@
 </main>
 
 <script>
+	//Modal Success and Fail
+	function showModal(success, message) {
+		const modal = document.getElementById('modal');
+		const modalTitle = document.getElementById('modal-title');
+		const modalMessage = document.getElementById('modal-message');
+		const modalIcon = document.getElementById('modal-icon');
+
+		if (success) {
+			modalTitle.textContent = 'Sucesso';
+			modalIcon.classList.remove('text-red-500');
+			modalIcon.classList.add('text-green-500');
+		} else {
+			modalTitle.textContent = 'Erro';
+			modalIcon.classList.remove('text-green-500');
+			modalIcon.classList.add('text-red-500');
+		}
+
+		modalMessage.textContent = message;
+		modal.classList.remove('invisible');
+	}
+
+
+	function hideModal() {
+		const modal = document.getElementById('modal');
+		modal.classList.add('invisible');
+	}
+
+	let timerInterval;
+	let startTime;
+
+	function startTimer() {
+		startTime = Date.now();
+		timerInterval = setInterval(updateTimer, 1000);
+	}
+
+	function stopTimer() {
+		clearInterval(timerInterval);
+	}
+
+	function updateTimer() {
+		const elapsedTime = Date.now() - startTime;
+		const seconds = Math.floor(elapsedTime / 1000);
+		const minutes = Math.floor(seconds / 60);
+		const formattedTime = `${minutes.toString().padStart(2, '0')}:${(seconds % 60).toString().padStart(2, '0')}`;
+		document.getElementById('timer').textContent = formattedTime;
+
+		// Aviso após 2 minutos (120 segundos)
+		if (seconds >= 120 && seconds % 30 === 0) { // Avisa a cada 30 segundos após 2 minutos
+			showModal(false, "A resposta está demorando mais que o esperado. Por favor, aguarde.");
+			sendGAEvent('Hypothesis Generator', 'Long Response Time', `${minutes}:${seconds % 60}`);
+		}
+	}
+	
 	const overlay = document.getElementById('overlay')
 	
 	async function removeFavorite(type, item) {
@@ -155,58 +232,57 @@
 	}	
 	
 	
-	//Modal Success and Fail
-	function showModal(success, message) {
-		const modal = document.getElementById('modal');
-		const modalTitle = document.getElementById('modal-title');
-		const modalMessage = document.getElementById('modal-message');
-		const modalIcon = document.getElementById('modal-icon');
+//Referencias
+	function viewReferences(favoriteJson) {
+		const favorite = JSON.parse(favoriteJson);
+		const modal = document.getElementById('referencesModal');
+		const modalTitle = document.getElementById('modalTitle');
+		const modalContent = document.getElementById('modalContent');
 
-		if (success) {
-			modalTitle.textContent = 'Sucesso';
-			modalIcon.classList.remove('text-red-500');
-			modalIcon.classList.add('text-green-500');
-		} else {
-			modalTitle.textContent = 'Erro';
-			modalIcon.classList.remove('text-green-500');
-			modalIcon.classList.add('text-red-500');
+		modalTitle.textContent = `Referências para: ${favorite.research_topic}`;
+		modalContent.innerHTML = favorite.reference_set.map(ref => `<p class="mb-2">${ref}</p>`).join('');
+
+		modal.classList.remove('hidden');
+	}
+
+	async function removeFavoriteReferences(researchTopic) {
+		const confirmed = confirm(`Deseja remover as referências favoritas para "${researchTopic}"?`);
+		
+		if (!confirmed) {
+			return;
 		}
-
-		modalMessage.textContent = message;
-		modal.classList.remove('invisible');
-	}
-
-
-	function hideModal() {
-		const modal = document.getElementById('modal');
-		modal.classList.add('invisible');
-	}
-
-	let timerInterval;
-	let startTime;
-
-	function startTimer() {
-		startTime = Date.now();
-		timerInterval = setInterval(updateTimer, 1000);
-	}
-
-	function stopTimer() {
-		clearInterval(timerInterval);
-	}
-
-	function updateTimer() {
-		const elapsedTime = Date.now() - startTime;
-		const seconds = Math.floor(elapsedTime / 1000);
-		const minutes = Math.floor(seconds / 60);
-		const formattedTime = `${minutes.toString().padStart(2, '0')}:${(seconds % 60).toString().padStart(2, '0')}`;
-		document.getElementById('timer').textContent = formattedTime;
-
-		// Aviso após 2 minutos (120 segundos)
-		if (seconds >= 120 && seconds % 30 === 0) { // Avisa a cada 30 segundos após 2 minutos
-			showModal(false, "A resposta está demorando mais que o esperado. Por favor, aguarde.");
-			sendGAEvent('Hypothesis Generator', 'Long Response Time', `${minutes}:${seconds % 60}`);
+		
+		overlay.classList.remove('hidden');
+		startTimer();
+		
+		try {
+			const response = await fetch(`/api/references/unfavorite`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({ researchTopic }),
+			});
+			const data = await response.json();
+			if (data.success) {
+				showModal(true, 'Referências removidas com sucesso!');
+				setTimeout(() => location.reload(), 3000);
+			} else {
+				console.error('Failed to remove favorite references:', data.message);
+				showModal(false, 'Falha ao remover as referências. Por favor, tente novamente.');
+			}
+		} catch (error) {
+			console.error('Error removing favorite references:', error);
+			showModal(false, 'Erro ao remover as referências. Por favor, tente novamente.');
+		} finally {
+			stopTimer();
+			overlay.classList.add('hidden');
 		}
 	}
+
+	document.getElementById('closeModalRefer').addEventListener('click', function() {
+		document.getElementById('referencesModal').classList.add('hidden');
+	});
 	
 	
 
