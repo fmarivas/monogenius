@@ -180,7 +180,14 @@ document.addEventListener('DOMContentLoaded', ()=>{
 		resultsContainer.classList.add('hidden');
 		
 		try{
-			const response = await axios.post('/additionalFeatures', data)
+			const response = await axios.post('/api/references', data)
+
+			if (response.data && response.data.redirect) {
+				setTimeout(()=>{
+					window.location.href = response.data.redirect
+				}, 1000)
+				return;
+			}
 			
 			if(response.data.success){
 				showModal(true, response.data.message);

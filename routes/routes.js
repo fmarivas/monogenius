@@ -2,12 +2,14 @@ require('dotenv').config()
 const express = require('express')
 const router = express.Router()
 const path = require('path')
+const fs = require('fs');
 
 const multer = require('multer');
 const upload = multer();
 const rateLimit = require('express-rate-limit');
 
 const platformData = require('../models/platformMetrics')
+const User = require('../models/user')
 const Transaction = require('../models/transaction')
 const feedbackController = require('../models/feedbackFunction')
 
@@ -26,16 +28,26 @@ const Support = require('../controllers/function/supportHandler')
 
 const fileReader = require('../controllers/function/fileFunction')
 const userRequest = require('../controllers/function/canMakeRequest')
+const aiProcessor = require('../controllers/function/aiProcessor')
 
 
 const isAuth = require('../controllers/function/middleware/auth')
-const checkSubscription = require('../controllers/function/middleware/checkSubscription')
+const checkFeatureAccess = require('../controllers/function/middleware/checkSubscription')
 const checkUserHasDetails = require('../controllers/function/middleware/checkUserDetails')
+const checkUserSource = require('../controllers/function/middleware/checkUserSource')
 const checkRequestAvailability = require('../controllers/function/middleware/checkRequestAvailability')
 
 const pageResources = require('../controllers/config/pageResources')
 const preTextualElements = require('../controllers/config/preTextualElements')
-const {getPricingPlansWithDiscount} = require('../controllers/config/pricingConfig')
+
+const {
+		getPricingPlansWithDiscount, 
+		tokenConsumption, 
+		checkAndConsumeTokens, 
+		updateUserTokens,
+		getUserTokens,
+	} = require('../controllers/config/pricingConfig')
+	
 const featuresConfig = require('../controllers/config/featuresConfig')
 const pageDetails = require('../controllers/config/sidebarConfig')
 
@@ -58,6 +70,11 @@ router.get('/', async (req,res) =>{
 		console.error(err)
 	}
 })
+
+//Contador de palavras
+function countWords(text) {
+  return text.trim().split(/\s+/).filter(Boolean).length;
+}
 
 const generalRoutes = {
 	'upload-files': async (req,res)=>{
@@ -179,9 +196,12 @@ router.get('/c/:id', isAuth, async (req, res, next) => {
 	let pricingPlans;
 	let userFavorites
 	let userSelectedMonoTheme = req.session.selectedTheme || ''
+	let updateUserTokens
 	
     try {
 		pricingPlans = await getPricingPlansWithDiscount(req.session.user.id)
+		
+		updateUserTokens = await User.usersTokens(req.session.user.id)
 		
 		userFavorites = await FavoritesHandler.getUserFavorites(req.session.user.id)
     } catch(err) {
@@ -200,9 +220,9 @@ router.get('/c/:id', isAuth, async (req, res, next) => {
         }
         return null;
     };
-
+	
     const pageDetail = findPage(pageDetails, id);
-
+	
     if (pageDetail) {
         res.render('layout', {
             title: pageDetail.name,
@@ -218,6 +238,7 @@ router.get('/c/:id', isAuth, async (req, res, next) => {
 			maxThemes: maxThemes,
 			userFavorites: userFavorites,
 			userSelectedMonoTheme: userSelectedMonoTheme,
+			tokens: updateUserTokens,
         });
     } else {
         let error = new Error("Page not found");
@@ -232,12 +253,16 @@ router.get('/survey/onboarding', isAuth, checkUserHasDetails, (req,res)=>{
 	res.render('onboarding',{user: req.session.user})
 })
 
+router.get('/survey/user-source', isAuth, checkUserSource, (req,res)=>{
+	res.render('user_source',{user: req.session.user})
+})
+
 
 router.post('/onboarding', isAuth, async (req, res) => {
   const { academicPhase, mainChallenges, expectedGraduation, researchArea, toolsUsed } = req.body;
 
   if (!academicPhase || !mainChallenges || !expectedGraduation || !researchArea) {
-    return res.render('survey/onboarding', { 
+    return res.render('onboarding', { 
       errorMessage: 'Por favor, preencha todos os campos obrigatórios!',
       user: req.session.user
     });
@@ -248,16 +273,16 @@ router.post('/onboarding', isAuth, async (req, res) => {
 
     if (result.success) {
       req.session.user.hasCompletedOnboarding = true; // Opcional: marcar que o usuário completou o onboarding
-      return res.redirect('/c/create');
+      return res.redirect('/survey/user-source');
     } else {
-      return res.render('survey/onboarding', { 
+      return res.render('onboarding', { 
         errorMessage: 'Erro ao configurar sua conta. Por favor, tente novamente.',
         user: req.session.user
       });
     }
   } catch (err) {
     console.error('Erro no servidor durante o onboarding:', err);
-    return res.render('survey/onboarding', { 
+    return res.render('onboarding', { 
       errorMessage: 'Ocorreu um erro no servidor. Por favor, tente novamente mais tarde.',
       user: req.session.user
     });
@@ -265,10 +290,38 @@ router.post('/onboarding', isAuth, async (req, res) => {
 });
 
 
+router.post('/survey/user-source', isAuth, async (req, res) => {
+	const { sourceOfKnowledge, otherSource, whatsappNumber } = req.body;
+
+	if (!sourceOfKnowledge) {
+		return res.render('user_source', { 
+		  errorMessage: 'Por favor, selecione como você conheceu o Monogenius.',
+		  user: req.session.user
+		});
+	}
+
+	try {
+		const result = await UserDetails.userSource(req.session.user.id, req.body);
+		if (result.success) {
+		  req.session.user.hasCompletedSourceSurvey = true; // Opcional: marcar que o usuário completou a pesquisa
+		  return res.redirect('/c/create');
+		} else {
+		  return res.render('user_source', { 
+			errorMessage: 'Erro ao salvar suas informações. Por favor, tente novamente.',
+			user: req.session.user
+		  });
+		}
+	} catch (err) {
+		console.error('Erro no servidor ao salvar fonte do usuário:', err);
+		return res.render('user_source', { 
+		  errorMessage: 'Ocorreu um erro no servidor. Por favor, tente novamente mais tarde.',
+		  user: req.session.user
+		})
+	}		
+});
 
 
-
-router.post('/api/create', isAuth, checkSubscription, upload.array('manuais'), async (req, res) => {
+router.post('/api/create', isAuth, checkFeatureAccess('create'), upload.array('manuais'), async (req, res) => {
 	const { tema, ideiaInicial } = req.body;
 	const files = req.files;
 	let manuais = []
@@ -333,35 +386,46 @@ router.post('/api/read-file', isAuth, upload.single('file'), async (req,res) =>{
 })
 
 
-router.post('/api/plagiarism', isAuth, checkSubscription, async (req,res)=> {
-	const textField = req.body.textInput
-	
-	
-	if(!textField){
-		return res.status(401).json({success: false, message: 'Preencha o campo do texto!'})
-	}
-	
-	try{
-		const canMakeRequest = await userRequest.canMakeRequest(req.session.user, 'plagiarism');
-		
-		if(canMakeRequest.success){
-			const plagiarismChecker = await Plagiarism.verifyPlagiarism(textField);
-			if(plagiarismChecker.success){
-				res.json({success: true, result: plagiarismChecker.result});
-			} else {
-				res.json({success: false, message: plagiarismChecker.message});
-			}
-		}else{
-			res.json({success: false, message: canMakeRequest.message})	
-		}
-		
-	}catch(err){
-		console.error(err)
-		res.json({success: false, message: 'Erro interno do servidor'});
-	}
-})
+router.post('/api/plagiarism', isAuth, checkFeatureAccess('plagiarism'), async (req, res) => {
+  const textField = req.body.textInput;
+  
+  if (!textField) {
+    return res.status(401).json({success: false, message: 'Preencha o campo do texto!'});
+  }
+  
+  try {
+    const wordCount = countWords(textField);
+    
+    if (wordCount > 500) {
+      return res.json({success: false, message: 'O texto excede o limite de 500 palavras'});
+    }
+    
+    const hasEnoughTokens = await checkAndConsumeTokens(req.session.user.id, 'plagiarism', wordCount);
+    
+    if (!hasEnoughTokens) {
+      return res.json({success: false, message: 'Tokens insuficientes para realizar a verificação de plágio'});
+    }
+    
+    const canMakeRequest = await userRequest.canMakeRequest(req.session.user, 'plagiarism');
+    
+    if (canMakeRequest.success) {
+      const plagiarismChecker = await Plagiarism.verifyPlagiarism(textField);
+      if (plagiarismChecker.success) {
+        res.json({success: true, result: plagiarismChecker.result});
+      } else {
+        res.json({success: false, message: plagiarismChecker.message});
+      }
+    } else {
+      res.json({success: false, message: canMakeRequest.message});
+    }
+    
+  } catch (err) {
+    console.error(err);
+    res.json({success: false, message: 'Erro interno do servidor'});
+  }
+});
 
-router.post('/template/download', isAuth, checkSubscription, upload.single('logo'), (req, res) => {
+router.post('/template/download', isAuth, checkFeatureAccess('template'), upload.single('logo'), (req, res) => {
     const { instituicao, tema, autor, supervisor, local, mes, ano } = req.body;
     const logoBuffer = req.file ? req.file.buffer : null;
 
@@ -393,6 +457,133 @@ router.get('/api/verify-updates', isAuth, async (req, res) => {
         res.status(500).json({ error: 'Erro interno do servidor' });
     }
 });
+
+
+//Preprdor de defesas
+router.post('/api/prepare-defense', checkFeatureAccess('prepareDefense'), isAuth, upload.single('file'), async (req, res) => {
+  const file = req.file;
+  
+  if (!file) {
+    return res.json({ success: false, message: 'Ocorreu um erro ao ler o arquivo.' });
+  }
+  
+  try {
+    // Lê o arquivo
+    const readResult = await fileReader.readFile(file);
+    
+    if (!readResult.success) {
+      return res.json({ success: false, message: readResult.message });
+    }
+    
+    // Processa o conteúdo com IA e gera perguntas
+    const aiResult = await aiProcessor.generateQuestions(readResult.content);
+    
+    if (aiResult.success) {
+		req.session.aiResult.question = aiResult.questions
+		req.session.thesisContent = readResult.content
+      return res.json({ 
+        success: true, 
+        questions: aiResult.questions,
+      });
+    } else {
+      return res.json({ success: false, message: aiResult.message });
+    }
+  } catch (err) {
+    console.error(err);
+    return res.json({ success: false, message: 'Erro interno do servidor.' });
+  }
+});
+
+//Resposta em audio 
+router.post('/api/submit-audio-response', checkFeatureAccess('submitAudioResponse'), isAuth, upload.single('audio'), async (req, res) => {
+    if (!req.file) {
+        return res.json({ success: false, message: 'Nenhum arquivo de áudio recebido.' });
+    }
+
+    const audioBuffer = req.file.buffer;
+
+    try {
+        // Transcreve o áudio
+        const transcriptionResult = await aiProcessor.transcribeAudio(audioBuffer, req.file.mimetype);
+        
+        if (!transcriptionResult.success) {
+            return res.json({ success: false, message: transcriptionResult.message });
+        }
+
+        // Recupera as perguntas da sessão
+        const questions = req.session.aiResult.questions || [];
+
+        // Analisa a resposta
+        const analysisResult = await aiProcessor.analyzeResponse(questions, transcriptionResult.transcription, req.session.thesisContent);
+        
+		if (!analysisResult.success) {
+            return res.json({ success: false, message: analysisResult.message });
+        }
+
+        // Armazena os resultados na sessão
+        if (!req.session.aiResult) {
+            req.session.aiResult = {};
+        }
+        
+        req.session.aiResult.audioResponse = {
+            size: audioBuffer.length,
+            mimetype: req.file.mimetype,
+            originalname: req.file.originalname,
+            timestamp: new Date().toISOString(),
+            transcription: transcriptionResult.transcription,
+            feedback: analysisResult.feedback,
+			audioFeedbackPath: analysisResult.audioFeedbackPath
+        };
+		
+		 // Ler o arquivo de áudio
+		 const audioFeedback = await fs.promises.readFile(analysisResult.audioFeedbackPath);
+
+		res.json({ 
+			success: true, 
+			message: 'Áudio recebido, transcrito e analisado com sucesso.',
+			transcription: transcriptionResult.transcription,
+			feedback: analysisResult.feedback,
+			audioFeedback: audioFeedback.toString('base64') // Convertemos para base64 para enviar via JSON
+		});
+		
+		// Remover o arquivo temporário após enviar a resposta
+		fs.unlink(analysisResult.audioFeedbackPath, (err) => {
+			if (err) console.error('Erro ao remover arquivo temporário:', err);
+		});
+		
+    } catch (error) {
+        console.error('Erro ao processar áudio:', error);
+        res.json({ success: false, message: 'Erro ao processar o áudio.' });
+    }
+});
+
+//resumo academico
+router.post('/api/generate-resume', isAuth, checkFeatureAccess('resume'), async (req, res) => {
+  try {
+    const { texto } = req.body;
+
+    if (!texto || texto.trim() === '') {
+      return res.status(400).json({ error: true, message: 'O texto não pode estar vazio.' });
+    }
+
+    const result = await additionalFeatures.resumo(texto);
+
+    if (result.success) {
+      res.json({
+        resumo: result.resumoPortugues,
+        abstract: result.abstractEnglish,
+        palavrasChave: result.palavrasChave.split(',').map(word => word.trim()),
+        keywords: result.keywords.split(',').map(word => word.trim())
+      });
+    } else {
+      res.status(500).json({ error: true, message: result.message });
+    }
+  } catch (error) {
+    console.error('Erro ao gerar resumo:', error);
+    res.status(500).json({ error: true, message: 'Erro interno do servidor ao gerar o resumo.' });
+  }
+});
+
 
 // marcar a notificação como vista
 router.post('/api/mark-notification-seen',isAuth, async (req,res)=>{
@@ -488,7 +679,10 @@ router.post('/process-payment', isAuth, async (req,res)=>{
 			}
 			
 			const transaction = await Transaction.transactionProcessing(transactionData)
-			
+            
+			const currentTokens = await getUserTokens(req.session.user.id);
+            await updateUserTokens(req.session.user.id, currentTokens + tokenAmount);
+            
 			res.json({
 				success: true, 
 				message: 'Pagamento efetuado com sucesso', 
@@ -521,6 +715,7 @@ router.post('/checkout', isAuth, async (req, res) => {
         
         if (selectedPlan) {
             amount = selectedPlan.price; // Use 'price' instead of 'basePrice' as it's already discounted if applicable
+			tokenAmount = selectedPlan.tokensPerMonth
         } else {
             throw new Error("Plan not found");
         }
@@ -528,11 +723,13 @@ router.post('/checkout', isAuth, async (req, res) => {
         // Armazenar informações na sessão
         req.session.tier = type;
         req.session.amount = amount;
-
+		req.session.tokenAmount = tokenAmount
+		
         // Renderizar a página de checkout
         res.render('pages/payment/checkout', {
             tier: type,
             amount: amount,
+			tokenAmount: tokenAmount,
         });
     } catch (err) {
         console.error("Error in checkout route:", err);
@@ -540,112 +737,146 @@ router.post('/checkout', isAuth, async (req, res) => {
     }
 });
 
-router.post('/additionalFeatures', isAuth, checkSubscription, upload.none(), async (req,res)=>{
-	const {typeOfFeature} = req.body
-	
-	try{
-		if(typeOfFeature === 'hypothesis'){
-			const {
-					researchTopic, 
-					generalObjective, 
-					specificObjectives, 
-					researchProblem, 
-					methodology
-				}= req.body
-						
-			if(!researchTopic || !generalObjective || !specificObjectives || !researchProblem){
-				return res.json({success: false, message: 'Preencha os campos obrigatorios'})
-			}
-			
-			const result = await additionalFeatures.hypothesisCreator(
-				researchTopic, 
-				generalObjective, 
-				specificObjectives, 
-				researchProblem, 
-				methodology, 
-				req.session.user.tier
-			)
-			
-			if(result){
-				res.json({
-						success: true, 
-						message: 'Hipoteses criadas com sucesso',
-						result: result
-					})
-			}else{
-				res.json({success: false, message: 'Erro de criacao. Tente novamente!'})
-			}
-		}else if(typeOfFeature === 'themeCreator'){
-			const {
-				studyArea,
-				specificInterest,
-				academicLevel,
-				themeCount,
-				keywords
-			} = req.body
-			
-			
-			if(!studyArea || !academicLevel || !themeCount){
-				return res.json({success: false, message: 'Preencha os campos obrigatorios'})
-			}
-			
-			const result = await additionalFeatures.themesCreator(
-				studyArea,
-				specificInterest,
-				academicLevel,
-				themeCount,
-				req.session.user.tier,
-				keywords
-			)
-			
-			if(result){
-				res.json({
-						success: true, 
-						message: 'Temas gerados com sucesso',
-						result: result
-					})
-			}else{
-				res.json({success: false, message: 'Erro de criacao. Tente novamente!'})
-			}
-		}else if(typeOfFeature === 'referencesCreator'){
-			const {
-				researchTopic,
-				initialIdea,
-				language
-			} = req.body
-			
-			if(!researchTopic || !initialIdea){
-				return res.json({success: false, message: 'Preencha os campos obrigatorios'})
-			}
-			
-			const result = await additionalFeatures.referencesCreator(
-				researchTopic,
-				initialIdea,
-				req.session.user.tier,
-				language,
-			)
-			
-			if(result){
-				res.json({
-						success: true, 
-						message: 'Referencias geradas com sucesso',
-						result: result
-					})
-			}else{
-				res.json({success: false, message: 'Erro de criacao. Tente novamente!'})
-			}
-		}else{
-			res.json({success: false, message: 'Infelizmente esse recurso esta indisponivel por agora!'})
-		}
-	}catch(err){
-		console.error(err)
-		return res.json({success: false, message: 'Error de servidor. Tente mais tarde!'})
-	}
-})
+// Para a recarga de tokens separada (sem mudar de plano)
+router.post('/recharge-tokens', isAuth, async (req, res) => {
+    const userId = req.session.user.id;
+    const { amount, tokenAmount } = req.body;
+    
+    if (!amount || !tokenAmount) {
+        return res.status(400).json({ error: "Amount and token amount are required" });
+    }
+    
+    try {
+        // Processo de pagamento (você pode reutilizar a lógica do paymentMpesa)
+        const paymentResult = await paymentMpesa(req.body.phoneNumber, amount);
+        
+        if (paymentResult.success) {
+            const currentTokens = await getUserTokens(userId);
+            await updateUserTokens(userId, currentTokens + parseInt(tokenAmount));
+            
+            // Registrar a transação
+            await Transaction.transactionProcessing({
+                user_id: userId,
+                type: 'token_recharge',
+                amount: amount,
+                transaction_date: new Date(),
+                token_amount: tokenAmount,
+                payment_method: req.body.payType,
+                status: 'Completed',
+                transaction_id: paymentResult.data.output_TransactionID,
+                conversation_id: paymentResult.data.output_ConversationID
+            });
+            
+            res.json({ success: true, message: 'Tokens recarregados com sucesso' });
+        } else {
+            res.json({ success: false, message: paymentResult.error.output_ResponseDesc });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Erro ao recarregar tokens' });
+    }
+});
 
+// Rota para o gerador de hipóteses
+router.post('/api/hypothesis', isAuth, checkFeatureAccess('hypothesis'), upload.none(), async (req, res) => {
+    const { researchTopic, generalObjective, specificObjectives, researchProblem, methodology } = req.body;
+    
+    if (!researchTopic || !generalObjective || !specificObjectives || !researchProblem) {
+        return res.json({ success: false, message: 'Preencha os campos obrigatórios' });
+    }
+    
+    try {
+        const result = await additionalFeatures.hypothesisCreator(
+            researchTopic, 
+            generalObjective, 
+            specificObjectives, 
+            researchProblem, 
+            methodology, 
+            req.session.user.tier
+        );
+        
+        if (result) {
+            res.json({
+                success: true, 
+                message: 'Hipóteses criadas com sucesso',
+                result: result
+            });
+        } else {
+            res.json({ success: false, message: 'Erro de criação. Tente novamente!' });
+        }
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Erro de servidor. Tente mais tarde!' });
+    }
+});
+
+// Rota para o gerador de temas
+router.post('/api/themes', isAuth, checkFeatureAccess('themes'), upload.none(), async (req, res) => {
+    const { studyArea, specificInterest, academicLevel, themeCount, keywords, areaFocal } = req.body;
+    
+    if (!studyArea || !academicLevel || !themeCount) {
+        return res.json({ success: false, message: 'Preencha os campos obrigatórios' });
+    }
+    
+    try {
+        const result = await additionalFeatures.themesCreator(
+            studyArea,
+            specificInterest,
+            academicLevel,
+            themeCount,
+            req.session.user.tier,
+            keywords,
+            areaFocal
+        );
+        
+        if (result) {
+            res.json({
+                success: true, 
+                message: 'Temas gerados com sucesso',
+                result: result
+            });
+        } else {
+            res.json({ success: false, message: 'Erro de criação. Tente novamente!' });
+        }
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Erro de servidor. Tente mais tarde!' });
+    }
+});
+
+// Rota para o gerador de referências
+router.post('/api/references', isAuth, checkFeatureAccess('references'), upload.none(), async (req, res) => {
+    const { researchTopic, initialIdea, language } = req.body;
+    
+    if (!researchTopic || !initialIdea) {
+        return res.json({ success: false, message: 'Preencha os campos obrigatórios' });
+    }
+    
+    try {
+        const result = await additionalFeatures.referencesCreator(
+            researchTopic,
+            initialIdea,
+            req.session.user.tier,
+            language
+        );
+        
+        if (result) {
+            res.json({
+                success: true, 
+                message: 'Referências geradas com sucesso',
+                result: result
+            });
+        } else {
+            res.json({ success: false, message: 'Erro de criação. Tente novamente!' });
+        }
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Erro de servidor. Tente mais tarde!' });
+    }
+});
 
 // Rota para adicionar, deletar e tudo relacionar a um tema aos favoritos
-router.post('/api/keywordsGen', async (req, res) => {
+router.post('/api/keywordsGen', isAuth, checkFeatureAccess('themes'), async (req, res) => {
     try {
         const { studyArea, specificInterest } = req.body;
         const data = `${studyArea} ${specificInterest}`.trim();

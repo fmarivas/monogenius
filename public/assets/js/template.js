@@ -8,25 +8,57 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 
   // Controle de visibilidade das páginas e elementos
-  document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-    checkbox.addEventListener('change', function() {
-      if (this.id.endsWith('Check')) {
-        const pageName = this.id.replace('Check', 'Page');
-        const isVisible = this.checked;
-		document.getElementById(pageName).style.display = isVisible ? 'block' : 'none';
-		sendGAEvent('Page Visibility', isVisible ? 'Shown' : 'Hidden', pageName);
-      } else {
-        const [pageName, elementName] = this.id.split('_');
-        const element = document.querySelector(`#${pageName}Page [data-element="${elementName}"]`);
-        if (element) {
+	document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+	  checkbox.addEventListener('change', function() {
+		if (this.id.endsWith('Check')) {
+		  const pageName = this.id.replace('Check', '');
+		  const isVisible = this.checked;
+		  const pageElement = document.getElementById(pageName + 'Page');
+		  if (pageElement) {
+			pageElement.style.display = isVisible ? 'block' : 'none';
+		  }
+		  
+		  // Desabilitar/habilitar e desmarcar/marcar os checkboxes de conteúdo
+		  const contentCheckboxes = document.querySelectorAll(`input[type="checkbox"][id^="${pageName}_"]`);
+		  contentCheckboxes.forEach(contentCheckbox => {
+			contentCheckbox.disabled = !isVisible;
+			if (!isVisible) {
+			  contentCheckbox.checked = false;
+			  // Ocultar o elemento correspondente
+			  const [_, elementName] = contentCheckbox.id.split('_');
+			  const element = document.querySelector(`#${pageName}Page [data-element="${elementName}"]`);
+			  if (element) {
+				element.style.display = 'none';
+			  }
+			} else {
+			  contentCheckbox.checked = true;
+			  // Mostrar o elemento correspondente
+			  const [_, elementName] = contentCheckbox.id.split('_');
+			  const element = document.querySelector(`#${pageName}Page [data-element="${elementName}"]`);
+			  if (element) {
+				element.style.display = 'block';
+			  }
+			}
+		  });
+
+		  sendGAEvent('Page Visibility', isVisible ? 'Shown' : 'Hidden', pageName);
+		} else {
+		  const [pageName, elementName] = this.id.split('_');
+		  let element;
+		  if (elementName === 'local' || elementName === 'ano') {
+			element = document.querySelector(`#${pageName}Page [data-element="localAno"]`);
+		  } else {
+			element = document.querySelector(`#${pageName}Page [data-element="${elementName}"]`);
+		  }
+		  if (element) {
 			const isVisible = this.checked;
 			element.style.display = isVisible ? 'block' : 'none';
 			sendGAEvent('Element Visibility', isVisible ? 'Shown' : 'Hidden', `${pageName}_${elementName}`);
-        }
-      }
-    });
-  });
-
+		  }
+		}
+	  });
+	});
+	
   // Placeholder text para elementos editáveis
   document.querySelectorAll('[contenteditable]').forEach(element => {
     element.addEventListener('focus', function() {

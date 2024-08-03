@@ -31,6 +31,9 @@
 							<% } else { %>
 								<span class="text-3xl font-extrabold text-gray-800">Preço Customizado</span>
 							<% } %>
+							<div class="mt-2">
+								<span class="text-sm font-medium text-blue-600"><%= plan.tokensPerMonth %> tokens/mês</span>
+							</div>
 						</div>
 						<ul role="list" class="mb-8 space-y-4 text-left">
 							<% plan.features.forEach(function(feature) { %>
@@ -41,7 +44,7 @@
 							<% }); %>
 						</ul>
 						<% if (plan.price) { %>
-							<form action="/checkout" method="post">
+							<form action="/checkout" method="post" class="mt-auto">
 								<input type="hidden" value="<%= planKey %>" name="type">
 								<button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded transition-colors duration-300">
 									Assinar Agora

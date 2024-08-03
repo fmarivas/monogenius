@@ -12,7 +12,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const studyArea = document.getElementById('studyArea');
     const specificInterest = document.getElementById('specificInterest');
     const academicLevel = document.getElementById('academicLevel');
+    const areaFocal = document.getElementById('areaFocal');
     const themeCount = document.getElementById('themeCount');
+    const keywords = document.getElementById('keywords');
 
     const resultsContainer = document.getElementById('results');
     const themeOutput = document.getElementById('themeOutput');
@@ -175,8 +177,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const data = {
             studyArea: studyArea.value,
             specificInterest: specificInterest.value,
+            areaFocal: areaFocal.value,
             academicLevel: academicLevel.value,
             themeCount: themeCount.value,
+            keywords: keywords.value,
             typeOfFeature: 'themeCreator',
         };
         
@@ -187,8 +191,15 @@ document.addEventListener('DOMContentLoaded', () => {
         resultsContainer.classList.add('hidden');
         
         try {
-            const response = await axios.post('/additionalFeatures', data);
+            const response = await axios.post('/api/themes', data);
             
+			if (response.data && response.data.redirect) {
+				setTimeout(()=>{
+					window.location.href = response.data.redirect
+				}, 1000)
+				return;
+			}
+			
             if (response.data.success) {
                 showModal(true, response.data.message);
 

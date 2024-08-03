@@ -12,8 +12,8 @@
           <div class="mt-2 pl-4">
             <% Object.keys(element.content).forEach(key => { %>
               <div class="mb-2">
-                <input type="checkbox" id="<%= `${element.name}_${key}Check` %>" checked>
-                <label for="<%= `${element.name}_${key}Check` %>" title="Mostra/oculta <%= key %>"><%= key %></label>
+                <input type="checkbox" id="<%= `${element.name}_${key}` %>" checked>
+                <label for="<%= `${element.name}_${key}` %>" title="Mostra/oculta <%= key %>"><%= key %></label>
               </div>
             <% }); %>
           </div>

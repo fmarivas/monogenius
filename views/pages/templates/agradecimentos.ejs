@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<div class="flex flex-col h-full justify-between p-8">
+  <div id="tituloAgradecimentosContainer" class="text-center font-bold text-xl mb-8 border-2 border-dashed border-gray-300 p-2" contenteditable="true" data-placeholder="Título dos Agradecimentos" data-element="titulo">
+    <%= content.titulo %>
+  </div>
+  
+  <div id="textoAgradecimentosContainer" class="mb-8 border-2 border-dashed border-gray-300 p-2 flex-grow" contenteditable="true" data-placeholder="Texto dos Agradecimentos" data-element="texto" style="white-space: pre-wrap;">
+    <%= content.texto %>
+  </div>
+  
+</div>

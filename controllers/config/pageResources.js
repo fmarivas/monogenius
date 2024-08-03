@@ -67,6 +67,12 @@ const pageResources = {
 	},
 	favorites:{
 		js: ['/static/assets/js/favorites.js'],
+	},
+	defense:{
+		js: ['/static/assets/js/defense.js']
+	},
+	resume:{
+		js: ['/static/assets/js/resume.js']
 	}
 };
 

@@ -92,10 +92,16 @@ document.addEventListener('DOMContentLoaded', ()=>{
 		overlay.classList.remove('hidden')
 		startTimer()
 		try{
-			const response = await axios.post('/additionalFeatures', data)
+			const response = await axios.post('/api/hypothesis', data)
 
+			if (response.data && response.data.redirect) {
+				setTimeout(()=>{
+					window.location.href = response.data.redirect
+				}, 1000)
+				return;
+			}
+			
 			if(response.data.success){
-				sendGAEvent('Hypothesis Generator', 'Hypotheses Generated', 'Success', result.hipoteses.principais.length + result.hipoteses.alternativas.length + 1);
 				
 				resultsContainer.classList.remove('hidden')
 				hypothesisList.innerHTML = ''; //limpa o quadro de resultados
@@ -103,6 +109,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
 				
 				const result = response.data.result;
 				
+				sendGAEvent('Hypothesis Generator', 'Hypotheses Generated', 'Success', result.hipoteses.principais.length + result.hipoteses.alternativas.length + 1);
 				// Função auxiliar para criar elementos de hipótese
 				function createHypothesisElement(hypothesis, type) {
 					const div = document.createElement('div');

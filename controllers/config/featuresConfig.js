@@ -11,6 +11,12 @@ const dashboardFeatures = {
     icon: 'fas fa-pen-fancy',
     link: '/c/create'
   },
+  defense: {
+    name: 'Preparador de Defesas',
+    description: 'Prepare-se para a defesa de sua monografia com perguntas desafiadoras.',
+    icon: 'fas fa-shield-alt',
+    link: '/c/defense'
+  },
   references: {
     name: 'Gerador de Referências',
     description: 'Crie referências bibliográficas automaticamente.',
@@ -28,6 +34,12 @@ const dashboardFeatures = {
     description: 'Verifique o nível de originalidade do seu texto.',
     icon: 'fas fa-search',
     link: '/c/plagiarism'
+  },
+  resume: {
+    name: 'Gerador de Resumo',
+    description: 'Crie resumos acadêmicos automaticamente para seu trabalho.',
+    icon: 'fas fa-file-alt',
+    link: '/c/resume'
   },
   template: {
     name: 'Templates',

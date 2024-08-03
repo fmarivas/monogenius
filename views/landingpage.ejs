@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
-    <title>Monogenius - Poupe Tempo, Evite Plágio</title>
+    <title>Monogenius - Automatize Sua Monografia</title>
     <style>
         :root {
             --navy: #0B2459;
@@ -31,75 +31,280 @@
 <body class="bg-[--white] dark:bg-gray-800">
 
     <!-- HERO Section -->
-<div class="flex flex-wrap h-screen overflow-hidden">
-    <div class="w-full md:w-2/3 p-8 flex flex-col justify-center overflow-y-auto">
-        <div class="text-4xl font-bold text-[--navy] mb-4">
-            Monogenius
-        </div>
-        <h1 class="text-4xl md:text-6xl font-bold text-[--navy] mb-6">Crie Monografias Perfeitas em Minutos</h1>
-        <p class="text-xl mb-8 text-[--dark-gray]">
-            Esqueça as noites mal dormidas e o medo do plágio. O Monogenius automatiza sua monografia, permitindo que você foque no que realmente importa: sua pesquisa.
-        </p>
-        <div class="mb-8">
-            <div class="bg-transparent dark:border-gray-700 focus-within:border-[--light-blue] focus-within:ring focus-within:ring-[--light-blue] dark:focus-within:border-[--light-blue] focus-within:ring-opacity-40">
-                <form action="/c/dashboard" class="flex flex-col md:flex-row">
-                    <button type="submit" class="h-12 px-6 py-2 m-1 text-[--white] text-lg font-bold transition-colors duration-200 transform bg-[--navy] rounded-md hover:bg-[--light-blue] focus:outline-none focus:bg-[--light-blue]">
-                        ACESSAR APP
-                    </button>
-                </form>
+    <div class="flex flex-wrap h-screen overflow-hidden">
+        <div class="w-full md:w-2/3 p-8 flex flex-col justify-center overflow-y-auto">
+            <div class="text-4xl font-bold text-[--navy] mb-4">
+                Monogenius
             </div>
-            <p class="text-sm text-[--dark-gray] mt-4">
-                <span class="font-bold">40+ estudantes</span> já estão economizando tempo e evitando plágio. Junte-se a eles!
+            <h1 class="text-4xl md:text-6xl font-bold text-[--navy] mb-6">Transforme Horas de Trabalho em Minutos com Nossa Ferramenta Completa</h1>
+            <p class="text-xl mb-8 text-[--dark-gray]">
+                Diga adeus ao estresse da monografia. Com o Monogenius, você automatiza todo o processo de escrita, garantindo originalidade e qualidade, enquanto foca na sua pesquisa.
             </p>
+            <div class="mb-8 mt-auto">
+                <div class="bg-transparent dark:border-gray-700 focus-within:border-[--light-blue] focus-within:ring focus-within:ring-[--light-blue] dark:focus-within:border-[--light-blue] focus-within:ring-opacity-40">
+                    <form action="/c/dashboard" class="flex flex-col md:flex-row">
+                        <button type="submit" class="h-12 px-6 py-2 m-1 text-[--white] text-lg font-bold transition-colors duration-200 transform bg-[--navy] rounded-md hover:bg-[--light-blue] focus:outline-none focus:bg-[--light-blue]">
+                            Teste Gratuitamente
+                        </button>
+                    </form>
+                </div>
+                <p class="text-sm text-[--dark-gray] mt-4">
+                    <span class="font-bold">40+ estudantes</span> já estão economizando tempo e evitando plágio. Junte-se a eles!
+                </p>
+            </div>
+        </div>
+        <div class="hidden lg:block lg:w-1/3 h-screen">
+            <img src="/static/assets/img/banner.webp" alt="Estudante feliz usando Monogenius" class="w-full h-full object-cover">
         </div>
     </div>
-    <div class="hidden lg:block lg:w-1/3 h-screen">
-        <img src="/static/assets/img/banner.webp" alt="Estudante feliz usando Monogenius" class="w-full h-full object-cover">
-    </div>
-</div>
     <!-- End HERO Section -->
 
+   <!-- Seção de Depoimentos -->
+	<section class="bg-[--navy] py-16">
+	  <div class="container mx-auto px-4 text-[--white]">
+		<h2 class="text-3xl font-bold text-center mb-12">O que nossos usuários dizem</h2>
+		<div class="flex flex-col md:flex-row justify-center items-center gap-6">
+		  <div class="bg-[--light-blue] p-8 rounded-lg shadow-lg w-full md:w-1/3">
+			<p class="text-lg mb-4">"Acho bem simples e prático"</p>
+			<p class="text-sm text-gray-300 font-semibold">- Maria S.</p>
+		  </div>
+		  <div class="bg-[--light-blue] p-8 rounded-lg shadow-lg w-full md:w-1/3">
+			<p class="text-lg mb-4">"O resultado do conteúdo apresentado é relevante para o meu tema, vai de encontro com as minhas expectativas."</p>
+			<p class="text-sm text-gray-300 font-semibold">- Edmilson de Jesus Veloso</p>
+		  </div>
+		  <div class="bg-[--light-blue] p-8 rounded-lg shadow-lg w-full md:w-1/3">
+			<p class="text-lg mb-4">"Superou as minhas expectativas, trouxe conteúdos interessantes que me vão ajudar bastante na elaboração do projeto."</p>
+			<p class="text-sm text-gray-300 font-semibold">- Agbany Munguambe</p>
+		  </div>
+		</div>
+	  </div>
+	</section>
+
+
+    <!-- Fim da Seção de Depoimentos -->
+
+
     <!-- Seção de Benefícios -->
-    <section class="bg-[--light-yellow] py-16">
-        <div class="container mx-auto px-4">
-            <h2 class="text-3xl font-bold text-[--navy] text-center mb-12">Por que escolher o Monogenius?</h2>
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <!-- Benefício 1 -->
-                <div class="bg-[--white] rounded-lg shadow-lg p-6">
-                    <div class="h-48 bg-[--light-blue] rounded-t-lg mb-4">
-                        <!-- Espaço para imagem -->
-                        <img src="/static/assets/img/benef-1.jpg" alt="Monografia em tempo recorde" class="w-full h-full object-cover rounded-t-lg">
+	<section class="bg-[--light-yellow] py-16">
+		<div class="container mx-auto px-4">
+			<h2 class="text-3xl font-bold text-[--navy] text-center mb-12">Por que escolher o Monogenius?</h2>
+			
+			<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+				<!-- Benefício 1 -->
+				<div class="bg-[--white] rounded-lg shadow-lg p-6">
+					<div class="h-48 bg-[--light-blue] rounded-t-lg mb-4">
+						<img src="/static/assets/img/benef-1.jpg" alt="Monografia em tempo recorde" class="w-full h-full object-cover rounded-t-lg">
+					</div>
+					<h3 class="text-xl font-bold text-[--navy] mb-2">Crie sua monografia 70% mais rápido</h3>
+					<p class="text-[--dark-gray]">Do tema à conclusão, nossa plataforma te guia em cada passo. Economize semanas de trabalho e entregue sua monografia mais rápido do que imagina.</p>
+                    <!-- Video explicativo -->
+                    <div class="mt-4">
+						<iframe class="w-full rounded-lg" src="https://www.youtube.com/embed/JbCP8koxWw4?si=nInBPWakBXZE7-So" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
                     </div>
-                    <h3 class="text-xl font-bold text-[--navy] mb-2">Crie sua monografia em tempo recorde</h3>
-                    <p class="text-[--dark-gray]">Do tema à conclusão, nossa plataforma te guia em cada passo. Economize semanas de trabalho e entregue sua monografia mais rápido do que imagina.</p>
-                </div>
+				</div>
 
-                <!-- Benefício 2 -->
-                <div class="bg-[--white] rounded-lg shadow-lg p-6">
-                    <div class="h-48 bg-[--moss-green] rounded-t-lg mb-4">
-                        <!-- Espaço para imagem -->
-                        <img src="/static/assets/img/benef-2.jpg" alt="Foco no essencial" class="w-full h-full object-cover rounded-t-lg">
+				<!-- Benefício 2 -->
+				<div class="bg-[--white] rounded-lg shadow-lg p-6">
+					<div class="h-48 bg-[--moss-green] rounded-t-lg mb-4">
+						<img src="/static/assets/img/benef-2.jpg" alt="Foco no essencial" class="w-full h-full object-cover rounded-t-lg">
+					</div>
+					<h3 class="text-xl font-bold text-[--navy] mb-2">Foque no que realmente importa com 80% menos esforço</h3>
+					<p class="text-[--dark-gray]">Esqueça a formatação e as regras técnicas. Nós cuidamos disso para você. Dedique seu tempo ao que é essencial: sua pesquisa e análise de dados.</p>
+                    <!-- Video explicativo -->
+                    <div class="mt-4">
+						<iframe class="w-full rounded-lg" src="https://www.youtube.com/embed/uCt2ZNXKhpQ?si=bB9XWVaPCqe21F64" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
                     </div>
-                    <h3 class="text-xl font-bold text-[--navy] mb-2">Foque no que realmente importa</h3>
-                    <p class="text-[--dark-gray]">Esqueça a formatação e as regras técnicas. Nós cuidamos disso para você. Dedique seu tempo ao que é essencial: sua pesquisa e análise de dados.</p>
-                </div>
+				</div>
 
-                <!-- Benefício 3 -->
-                <div class="bg-[--white] rounded-lg shadow-lg p-6">
-                    <div class="h-48 bg-[--dark-orange] rounded-t-lg mb-4">
-                        <!-- Espaço para imagem -->
-                        <img src="/static/assets/img/benef-3.webp" alt="Evite plágio" class="w-full h-full object-cover rounded-t-lg">
+				<!-- Benefício 3 -->
+				<div class="bg-[--white] rounded-lg shadow-lg p-6">
+					<div class="h-48 bg-[--dark-orange] rounded-t-lg mb-4">
+						<img src="/static/assets/img/benef-3.webp" alt="Evite plágio" class="w-full h-full object-cover rounded-t-lg">
+					</div>
+					<h3 class="text-xl font-bold text-[--navy] mb-2">Reduza o risco de plágio em 90%</h3>
+					<p class="text-[--dark-gray]">Nossas ferramentas inteligentes garantem a originalidade do seu trabalho. Cite fontes corretamente e evite plágio acidental com facilidade.</p>
+                    <!-- Video explicativo -->
+                    <div class="mt-6">
+						<iframe class="w-full rounded-lg" src="https://www.youtube.com/embed/fhN51F9y0xs?si=hVwdZ4LAo7gnD-Kd" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
                     </div>
-                    <h3 class="text-xl font-bold text-[--navy] mb-2">Diga adeus ao medo do plágio</h3>
-                    <p class="text-[--dark-gray]">Nossas ferramentas inteligentes garantem a originalidade do seu trabalho. Cite fontes corretamente e evite plágio acidental com facilidade.</p>
+				</div>
+			</div>
+		</div>
+	</section>
+    <!-- Fim da Seção de Benefícios -->
+
+    <!-- Seção Plano Básico Gratuito -->
+    <section class="bg-[--navy] py-16">
+        <div class="container mx-auto px-4 text-[--white]">
+            <h2 class="text-3xl font-bold text-center mb-12">Experimente nosso Plano Básico Gratuito</h2>
+            <div class="flex flex-col md:flex-row justify-center items-center">
+                <div class="bg-[--light-blue] p-8 rounded-lg shadow-lg w-full md:w-1/3">
+                    <h3 class="text-2xl font-bold mb-4">Plano Básico Gratuito</h3>
+                    <ul class="text-lg mb-6">
+                        <li class="mb-2">✔️ Geração de temas para monografia</li>
+                        <li class="mb-2">✔️ Acesso a templates</li>
+                        <li class="mb-2">✔️ Suporte básico por e-mail</li>
+                    </ul>
+                    <button class="bg-[--dark-orange] text-[--white] text-lg font-bold py-3 px-6 rounded-md hover:bg-[--light-yellow]" onclick="window.location = '/c/dashboard'">
+                        Testar Agora
+                    </button>
                 </div>
             </div>
         </div>
     </section>
-    <!-- Fim da Seção de Benefícios -->
 
-    <!--Footer-->    
+    <!-- Preços e Planos -->
+    <section class="p-4 md:p-8">
+        <div class="py-8 max-w-screen-xl lg:py-16">
+            <div class="mx-auto max-w-3xl text-center pb-12 md:pb-20">
+                <h2 class="text-3xl font-bold sm:text-4xl mb-4 text-gray-800">Planos e Preços</h2>
+                <p class="text-xl text-gray-600">Escolha o plano que melhor atende às suas necessidades acadêmicas.</p>
+            </div>
+            <div class="space-y-8 lg:grid lg:grid-cols-3 sm:gap-6 xl:gap-10 lg:space-y-0">
+                <div class="flex flex-col p-6 mx-auto max-w-md text-center rounded-lg shadow-xl xl:p-8 bg-white border border-gray-200 transition hover:border-indigo-300 hover:shadow-indigo-100">
+                    <h3 class="mb-4 text-2xl font-semibold text-gray-800">Basic</h3>
+                    <p class="font-light text-gray-500 sm:text-lg mb-4">Impulsione sua produção acadêmica</p>
+                    <div class="flex flex-col items-center my-8">
+                        <div class="mb-2">
+                            <span class="text-xl font-bold text-gray-400 line-through">MZN 3500</span>
+                        </div>
+                        <div class="flex items-baseline">
+                            <span class="text-3xl font-extrabold text-gray-800">MZN 1750</span>
+                            <span class="text-lg text-gray-500 ml-2">/mês</span>
+                        </div>
+                        <div class="mt-2">
+                            <span class="text-sm font-medium text-green-600">Economize MZN 1750</span>
+                        </div>
+                    </div>
+                    <ul role="list" class="mb-8 space-y-4 text-left">
+                        <li class="flex items-center space-x-3">
+                            <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                            <span class="text-gray-600">Verificador de Plágio</span>
+                        </li>
+                        <li class="flex items-center space-x-3">
+                            <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                            <span class="text-gray-600">Gerador de Templates</span>
+                        </li>
+                        <li class="flex items-center space-x-3">
+                            <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                            <span class="text-gray-600">Gerador de Referências Bibliográficas</span>
+                        </li>
+                        <li class="flex items-center space-x-3">
+                            <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                            <span class="text-gray-600">Suporte por e-mail</span>
+                        </li>
+                    </ul>
+                    <button class="mt-auto w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded transition-colors duration-300"  onclick="window.location = '/c/dashboard'">
+                        Assinar Agora
+                    </button>
+                </div>
+                <div class="flex flex-col p-6 mx-auto max-w-md text-center rounded-lg shadow-xl xl:p-8 bg-white border border-gray-200 transition hover:border-indigo-300 hover:shadow-indigo-100">
+                    <h3 class="mb-4 text-2xl font-semibold text-gray-800">Premium</h3>
+                    <p class="font-light text-gray-500 sm:text-lg mb-4">Impulsione sua produção acadêmica</p>
+                    <div class="flex flex-col items-center my-8">
+                        <div class="mb-2">
+                            <span class="text-xl font-bold text-gray-400 line-through">MZN 10000</span>
+                        </div>
+                        <div class="flex items-baseline">
+                            <span class="text-3xl font-extrabold text-gray-800">MZN 5000</span>
+                            <span class="text-lg text-gray-500 ml-2">/mês</span>
+                        </div>
+                        <div class="mt-2">
+                            <span class="text-sm font-medium text-green-600">Economize MZN 5000</span>
+                        </div>
+                    </div>
+                    <ul role="list" class="mb-8 space-y-4 text-left">
+                        <li class="flex items-center space-x-3">
+                            <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                            <span class="text-gray-600">Tudo do pacote Basic</span>
+                        </li>
+                        <li class="flex items-center space-x-3">
+                            <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                            <span class="text-gray-600">Criador de Monografia</span>
+                        </li>
+                        <li class="flex items-center space-x-3">
+                            <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                            <span class="text-gray-600">Gerador de Temas Inovadores</span>
+                        </li>
+                        <li class="flex items-center space-x-3">
+                            <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                            <span class="text-gray-600">Gerador de Hipóteses</span>
+                        </li>
+                        <li class="flex items-center space-x-3">
+                            <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                            <span class="text-gray-600">Suporte por chat</span>
+                        </li>
+                    </ul>
+                    <button class="mt-auto w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded transition-colors duration-300"  onclick="window.location = '/c/dashboard'">
+                        Assinar Agora
+                    </button>
+                </div>
+                <div class="flex flex-col p-6 mx-auto max-w-md text-center rounded-lg shadow-xl xl:p-8 bg-white border border-gray-200 transition hover:border-indigo-300 hover:shadow-indigo-100">
+                    <h3 class="mb-4 text-2xl font-semibold text-gray-800">Supreme</h3>
+                    <p class="font-light text-gray-500 sm:text-lg mb-4">Impulsione sua produção acadêmica</p>
+                    <div class="flex flex-col items-center my-8">
+                        <span class="text-3xl font-extrabold text-gray-800">Preço Customizado</span>
+                    </div>
+                    <ul role="list" class="mb-8 space-y-4 text-left">
+                        <li class="flex items-center space-x-3">
+                            <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                            <span class="text-gray-600">Tudo do pacote Premium</span>
+                        </li>
+                        <li class="flex items-center space-x-3">
+                            <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                            <span class="text-gray-600">Avaliador de Temas (brevemente)</span>
+                        </li>
+                        <li class="flex items-center space-x-3">
+                            <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                            <span class="text-gray-600">Consultoria Acadêmica Personalizada</span>
+                        </li>
+                        <li class="flex items-center space-x-3">
+                            <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                            <span class="text-gray-600">Suporte prioritário 24/7</span>
+                        </li>
+                        <li class="flex items-center space-x-3">
+                            <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                            <span class="text-gray-600">Acesso antecipado a novas funcionalidades</span>
+                        </li>
+                    </ul>
+                    <a href="/contact" class="mt-auto w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded transition-colors duration-300 inline-block">
+                        Contacte-nos
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Fim da Seção Plano Básico Gratuito -->
+
+	<!-- Neswletter -->
+	<section id="email-signup" class="bg-gray-100 py-16">
+	  <div class="container mx-auto text-center px-6">
+		<h2 class="text-2xl font-bold mb-4">Receba Dicas Exclusivas e Atualizações!</h2>
+		<form action="/cadastrar-email" method="post" class="flex flex-col justify-center items-center">
+		  <input type="email" name="email" placeholder="Seu email" required class="p-3 w-full lg:w-96 border border-gray-300 rounded-md mb-4">
+		  
+		  <div class="flex flex-col justify-center items-center">
+			<label for="user-purpose" class="text-lg mb-2">Como você está gerenciando sua monografia atualmente?</label>
+			<select name="user-purpose" id="user-purpose" required class="p-3 w-full lg:w-96 border border-gray-300 rounded-md mb-4">
+			  <option value="" disabled selected>Selecione uma opção</option>
+			  <option value="tema">Tenho dificuldade de escolher um bom tema</option>
+			  <option value="organizacao">Tenho dificuldade para organizar e escrever o trabalho de forma eficiente</option>
+			  <option value="qualidade">É difícil manter a qualidade do trabalho enquanto tento ser rápido</option>
+			  <option value="formatacao">Gasto muito tempo com a formatação do trabalho.</option>
+			</select>
+		  </div>
+		  
+		  <button type="submit" class="bg-blue-500 text-white py-3 px-6 rounded-md hover:bg-blue-600">Inscreva-se Agora</button>
+		</form>
+	  </div>
+	</section>
+
+
+
+
+	<!-- Neswletter -->
+    
+	<!-- FOOTER -->
     <footer class="bg-[--navy] text-[--white] flex flex-col items-center justify-center p-6">
         <div class="flex flex-col md:flex-row items-center justify-center mb-4">
             <a href="/terms" class="text-sm font-normal hover:underline mx-2 md:mx-4">Termos de Serviço</a>
@@ -107,9 +312,9 @@
             <a href="/about" class="text-sm font-normal hover:underline mx-2 md:mx-4">Sobre Nós</a>
         </div>
         <div class="text-sm text-center text-[--light-blue]">
-            &copy; 2024 Monogenius. Todos os direitos reservados.
+            &copy; 2023 Monogenius. Todos os direitos reservados.
         </div>
     </footer>
-    <!--Fim do Footer-->    
+    <!-- End FOOTER -->
 </body>
 </html>

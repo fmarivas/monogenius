@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Como você conheceu o Monogenius?</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/assets/img/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/assets/img/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/assets/img/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/static/assets/img/favicon/site.webmanifest">  		
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .bg-custom-gradient {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="min-h-screen flex items-center justify-center">
+        <div class="bg-white shadow-xl rounded-lg p-8 max-w-2xl w-full">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold text-gray-800">Olá, <%= user.fname %>!</h1>
+                <p class="text-gray-600 mt-2">Gostaríamos de saber mais sobre como você chegou até o <span class="font-semibold">Monogenius</span>:</p>
+            </div>
+            
+            <form action="/survey/user-source" method="POST" class="space-y-6">
+                <div>
+                    <label for="sourceOfKnowledge" class="block text-sm font-medium text-gray-700 mb-1">Como você conheceu o Monogenius?</label>
+                    <select name="sourceOfKnowledge" id="sourceOfKnowledge" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                        <option value="">Selecione uma opção</option>
+                        <option value="WhatsApp">WhatsApp</option>
+                        <option value="Recomendação de amigo">Recomendação de amigo</option>
+                        <option value="Facebook">Facebook</option>
+                        <option value="Instagram">Instagram</option>
+                        <option value="Google">Pesquisa no Google</option>
+                        <option value="Email">Email</option>
+                        <option value="Outro">Outro</option>
+                    </select>
+                </div>
+
+                <div id="otherSourceDiv" style="display: none;">
+                    <label for="otherSource" class="block text-sm font-medium text-gray-700 mb-1">Por favor, especifique:</label>
+                    <input type="text" name="otherSource" id="otherSource" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+
+                <div>
+                    <label for="whatsappNumber" class="block text-sm font-medium text-gray-700 mb-1">Número de WhatsApp (opcional)</label>
+                    <input type="tel" name="whatsappNumber" id="whatsappNumber" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" placeholder="Ex: +258 841234567">
+                    <p class="text-xs text-gray-500 mt-1">Fornecendo seu número, você concorda em receber atualizações e ofertas especiais por WhatsApp.</p>
+                </div>
+
+                <button type="submit" class="w-full bg-custom-gradient text-white font-bold py-3 px-4 rounded-md hover:opacity-90 transition-opacity duration-300 flex items-center justify-center">
+                    <span>Enviar</span>
+                    <i class="fas fa-paper-plane ml-2"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('sourceOfKnowledge').addEventListener('change', function() {
+            var otherSourceDiv = document.getElementById('otherSourceDiv');
+            if (this.value === 'Outro') {
+                otherSourceDiv.style.display = 'block';
+            } else {
+                otherSourceDiv.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

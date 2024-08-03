@@ -23,8 +23,27 @@ const preTextualElements = [
 	  local: 'Local',
 	  ano: 'Ano'
 	}
+  },
+  {
+    name: 'Declaracao',
+    template: 'declaracao',
+    content: {
+      titulo: 'DECLARAÇÃO',
+      nomeCompleto: '[Nome Completo]',
+      textoDeclaracao: 'Eu, [Nome Completo], declaro por minha honra que este trabalho é da minha autoria e nunca foi apresentado em nenhuma outra instituição para obter qualquer grau acadêmico. As obras usadas neste trabalho foram devidamente citadas e listadas na lista de referências bibliográficas.',
+      local: '[LOCAL]',
+      data: '_____ de ______________ de [ANO]',
+      assinatura: '(NOME COMPLETO)'
+    },
+  },
+  {
+    name: 'Agradecimentos',
+    template: 'agradecimentos',
+    content: {
+      titulo: 'AGRADECIMENTOS',
+      texto: 'Gostaria de expressar minha sincera gratidão a todos que contribuíram para a realização deste trabalho:\n\nAos meus pais, pelo apoio incondicional...\n\nAo meu orientador, Prof. Dr. [Nome], pela orientação...\n\nAos meus colegas e amigos, pelo companheirismo...\n\nÀ [Instituição], por proporcionar...',
+    }
   }
-  // Adicione outros elementos pré-textuais aqui
 ];
 
 module.exports = preTextualElements

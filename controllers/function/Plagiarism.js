@@ -1,15 +1,19 @@
 const {conn} = require('../../models/db')
 const axios = require('axios');
 
+function countWords(text) {
+  return text.trim().split(/\s+/).filter(Boolean).length;
+}
+
 class plagiarism {
 	static async verifyPlagiarism(textInput){
-		const words = textInput.trim().split(/\s+/).filter(Boolean).length;
+		const words = countWords(textInput);
 		
-		if(words > 500){
-			return {
-				success: false,
-				message: 'O texto excede o limite de 500 palavras'
-			};
+		if (words > 500) {
+		  return {
+			success: false,
+			message: 'O texto excede o limite de 500 palavras'
+		  };
 		}
 		
 		const options = {

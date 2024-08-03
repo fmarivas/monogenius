@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<div class="flex flex-col h-full justify-between p-8">
+  <div id="tituloContainer" class="text-center font-bold text-xl mb-2 border-2 border-dashed border-gray-300 p-2" contenteditable="true" data-placeholder="Título da Declaração" data-element="titulo">
+    <%= content.titulo %>
+  </div>
+  
+  <div id="textoDeclaracaoContainer" class="mb-8 border-2 border-dashed border-gray-300 p-2" contenteditable="true" data-placeholder="Texto da Declaração" data-element="textoDeclaracao">
+    <%= content.textoDeclaracao.replace('[Nome Completo]', content.nomeCompleto) %>
+  </div>
+  
+  <div class="flex flex-col items-center">
+    <div id="localDataContainer" class="text-center mb-16 border-2 border-dashed border-gray-300 p-2" contenteditable="true" data-placeholder="Local e Data" data-element="localData">
+      <%= content.local %>, aos <%= content.data %>
+    </div>
+    
+    <div class="w-64 border-t border-black"></div>
+    
+    <div id="assinaturaContainer" class="text-center mt-2 border-2 border-dashed border-gray-300 p-2" contenteditable="true" data-placeholder="Assinatura" data-element="assinatura">
+      <%= content.assinatura %>
+    </div>
+  </div>
+</div>

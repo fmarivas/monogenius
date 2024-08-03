@@ -15,7 +15,11 @@ const MySQLStore = require('express-mysql-session')(session);
 const passport = require('passport');
 
 app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+
+app.use(express.json({limit: '50mb'}));
+app.use(express.urlencoded({limit: '50mb', extended: true}));
+
+
 app.use(cors())
 // Guardar as sessões
 const sessionStore = new MySQLStore({
