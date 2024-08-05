@@ -10,9 +10,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('formCreator');
     const temaInput = document.getElementById('tema');
     const ideiaInicialInput = document.getElementById('ideia-inicial');
-    const manuaisInput = document.getElementById('manuais');
+    
     const referenciasContainer = document.getElementById('referencias-container');
 
+    const fileInput = document.getElementById('manuais');
+    const selectedFilesDiv = document.getElementById('selected-files');
+    const fileInfo = document.getElementById('file-info');
 
     // Event Listeners
     boldBtn.addEventListener('click', () => formatText('bold'));
@@ -124,7 +127,27 @@ document.addEventListener('DOMContentLoaded', () => {
 		return formattedHTML;
 	}
 	
+    fileInput.addEventListener('change', function(e) {
+        selectedFilesDiv.innerHTML = ''; // Limpa a lista anterior
+        const files = Array.from(e.target.files);
 
+        if (files.length > 0) {
+            files.forEach(file => {
+                const fileElement = document.createElement('div');
+                fileElement.className = 'flex items-center space-x-2';
+                fileElement.innerHTML = `
+                    <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                    </svg>
+                    <span class="text-sm text-gray-600">${file.name}</span>
+                `;
+                selectedFilesDiv.appendChild(fileElement);
+            });
+        } else {
+            fileInfo.textContent = 'Você pode fazer upload de manuais de apoio para ajudar na geração de referências bibliográficas.';
+        }
+    });
+	
     function copyToClipboard() {
         navigator.clipboard.writeText(textField.textContent)
             .then(() => {
@@ -184,8 +207,10 @@ document.addEventListener('DOMContentLoaded', () => {
         } finally {
             overlay.classList.add('hidden');
             stopTimer();
+			setTimeout(hideModal,3000)
         }
     }
+	
     async function submitFeedback() {
         const feedbackData = {
             functionality: document.getElementById('functionality-create').value,

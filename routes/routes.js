@@ -479,8 +479,15 @@ router.post('/api/prepare-defense', checkFeatureAccess('prepareDefense'), isAuth
     const aiResult = await aiProcessor.generateQuestions(readResult.content);
     
     if (aiResult.success) {
+		// Armazena os resultados na sessão
+        if (!req.session.aiResult) {
+            req.session.aiResult = {};
+        }
+        
+		// Armazena as perguntas e o conteúdo da tese na sessão
 		req.session.aiResult.question = aiResult.questions
 		req.session.thesisContent = readResult.content
+
       return res.json({ 
         success: true, 
         questions: aiResult.questions,
@@ -520,10 +527,6 @@ router.post('/api/submit-audio-response', checkFeatureAccess('submitAudioRespons
             return res.json({ success: false, message: analysisResult.message });
         }
 
-        // Armazena os resultados na sessão
-        if (!req.session.aiResult) {
-            req.session.aiResult = {};
-        }
         
         req.session.aiResult.audioResponse = {
             size: audioBuffer.length,
