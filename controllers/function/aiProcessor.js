@@ -131,28 +131,41 @@ class AIProcessor {
 
       const feedbackText = response.choices[0].message.content;
 
-      // Gerar áudio do feedback
-      const mp3 = await openai.audio.speech.create({
-        model: "tts-1",
-        voice: "echo",
-        input: feedbackText,
-      });
+    // Dividir o feedback em chunks
+		const chunkSize = 4000;
+		const feedbackChunks = [];
+		
+		for (let i = 0; i < feedbackText.length; i += chunkSize) {
+		  feedbackChunks.push(feedbackText.slice(i, i + chunkSize));
+		}
 
-      // Converter o áudio para um buffer
-      const audioBuffer = Buffer.from(await mp3.arrayBuffer());
+		const audioBuffers = [];
+		for (const chunk of feedbackChunks) {
+		  const mp3 = await openai.audio.speech.create({
+			model: "tts-1",
+			voice: "echo",
+			input: chunk,
+		  });
+		  
+		  audioBuffers.push(Buffer.from(await mp3.arrayBuffer()));
+		}
+		
 
-      // Criar um arquivo temporário para o áudio
-      const tempDir = os.tmpdir();
-      const tempFilePath = path.join(tempDir, `feedback_audio_${Date.now()}.mp3`);
+		// Combinar os buffers de áudio
+		const combinedAudioBuffer = Buffer.concat(audioBuffers);
 
-      // Escrever o buffer para o arquivo temporário
-      await fs.promises.writeFile(tempFilePath, audioBuffer);
+		// Criar um arquivo temporário para o áudio combinado
+		const tempDir = os.tmpdir();
+		const tempFilePath = path.join(tempDir, `feedback_audio_${Date.now()}.mp3`);
 
-      return {
-        success: true,
-        feedback: feedbackText,
-        audioFeedbackPath: tempFilePath
-      };
+		// Escrever o buffer combinado para o arquivo temporário
+		await fs.promises.writeFile(tempFilePath, combinedAudioBuffer);
+
+		return {
+		  success: true,
+		  feedback: feedbackText,
+		  audioFeedbackPath: tempFilePath
+		};
     } catch (error) {
       console.error('Erro ao analisar resposta ou gerar áudio:', error);
       return {
