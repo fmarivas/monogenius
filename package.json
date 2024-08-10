@@ -14,7 +14,7 @@
     "@analytics/google-tag-manager": "^0.5.5",
     "analytics": "^0.8.13",
     "axios": "^1.7.2",
-    "bull": "^4.15.1",
+    "bull": "^4.16.0",
     "cloudinary": "^2.2.0",
     "constants": "^0.0.2",
     "cors": "^2.8.5",
@@ -41,6 +41,7 @@
     "passport-google-oauth20": "^2.0.0",
     "path": "^0.12.7",
     "pdf-parse": "^1.1.1",
+    "redis": "^4.7.0",
     "shepherd.js": "^13.0.1",
     "util": "^0.12.5",
     "word-extractor": "^1.0.4"

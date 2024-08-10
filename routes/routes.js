@@ -40,6 +40,9 @@ const checkRequestAvailability = require('../controllers/function/middleware/che
 const pageResources = require('../controllers/config/pageResources')
 const preTextualElements = require('../controllers/config/preTextualElements')
 
+//Filas
+const queues = require('../queues');
+
 const {
 		getPricingPlansWithDiscount, 
 		tokenConsumption, 
@@ -326,8 +329,7 @@ router.post('/api/create', isAuth, checkFeatureAccess('create'), upload.array('m
 	const files = req.files;
 	let manuais = []
   
-	try{
-		
+	  try {
 		if (files && files.length > 0) {
 		  for (const file of files) {
 			const readFile = await fileReader.readFile(file);
@@ -336,32 +338,30 @@ router.post('/api/create', isAuth, checkFeatureAccess('create'), upload.array('m
 			}
 		  }
 		}
-		
-		
-		const tier = await userRequest.tierDisplay(req.session.user)
-		
+
+		const tier = await userRequest.tierDisplay(req.session.user);
 		// const canMakeRequest = await userRequest.canMakeRequest(req.session.user, 'createMono');
+
+		// if (canMakeRequest.success) {
+		  const job = await queues.monoQueue.add({
+			tema,
+			ideiaInicial,
+			manuais,
+			tier,
+		  });
 		  
-			// if(canMakeRequest.success){
-			  const mono = await MonoCreator.createMono(tema, ideiaInicial, manuais, tier)
-			  
-			  if(mono.success){
-				  res.json({
-					  success: true, 
-					  mono: mono.monografia, 
-					  refer: mono.refer, 
-					  message: 'Monografia criada com sucesso!',
-				});
-			  }else{
-				  res.json({ success: false, message: 'Falha ao criar Monografia. Tente mais tarde!' });
-			  }
-			// }else{
-				// res.json({success: false, message: canMakeRequest.message})	
-			// }
-		}catch(err){
-			console.error(err)
-			res.json({success: false, message: 'Erro interno do servidor.Tente novamente mais tarde!'});
-		}
+		  res.json({
+			success: true,
+			message: 'Monografia em processamento. Aguarde...',
+			jobId: job.id,
+		  });
+		// } else {
+		  // res.json({ success: false, message: canMakeRequest.message });
+		// }
+	  } catch (err) {
+		console.error(err);
+		res.json({ success: false, message: 'Erro interno do servidor. Tente novamente mais tarde!' });
+	  }
 });
 
 router.post('/api/read-file', isAuth, upload.single('file'), async (req,res) =>{
@@ -501,14 +501,11 @@ router.post('/api/prepare-defense', checkFeatureAccess('prepareDefense'), isAuth
   }
 });
 
-//Resposta em audio 
 router.post('/api/submit-audio-response', checkFeatureAccess('submitAudioResponse'), isAuth, upload.single('audio'), async (req, res) => {
     if (!req.file) {
         return res.json({ success: false, message: 'Nenhum arquivo de áudio recebido.' });
     }
-
     const audioBuffer = req.file.buffer;
-
     try {
         // Transcreve o áudio
         const transcriptionResult = await aiProcessor.transcribeAudio(audioBuffer, req.file.mimetype);
@@ -516,48 +513,92 @@ router.post('/api/submit-audio-response', checkFeatureAccess('submitAudioRespons
         if (!transcriptionResult.success) {
             return res.json({ success: false, message: transcriptionResult.message });
         }
-
         // Recupera as perguntas da sessão
         const questions = req.session.aiResult.questions || [];
-
-        // Analisa a resposta
-        const analysisResult = await aiProcessor.analyzeResponse(questions, transcriptionResult.transcription, req.session.thesisContent);
         
-		if (!analysisResult.success) {
-            return res.json({ success: false, message: analysisResult.message });
-        }
+        // Adiciona o job à fila
+        const job = await queues.feedbackQueue.add(
+			{
+				questions,
+				transcription: transcriptionResult.transcription,
+				thesisContent: req.session.thesisContent,
+			},
+			{
+				timeout: 300000 
+			}
+		);
+		
+        res.json({ 
+            success: true, 
+            message: 'Áudio recebido e transcrito. A análise foi iniciada.',
+            jobId: job.id,
+            transcription: transcriptionResult.transcription
+        });
 
-        
-        req.session.aiResult.audioResponse = {
-            size: audioBuffer.length,
-            mimetype: req.file.mimetype,
-            originalname: req.file.originalname,
-            timestamp: new Date().toISOString(),
-            transcription: transcriptionResult.transcription,
-            feedback: analysisResult.feedback,
-			audioFeedbackPath: analysisResult.audioFeedbackPath
-        };
-		
-		 // Ler o arquivo de áudio
-		 const audioFeedback = await fs.promises.readFile(analysisResult.audioFeedbackPath);
-
-		res.json({ 
-			success: true, 
-			message: 'Áudio recebido, transcrito e analisado com sucesso.',
-			transcription: transcriptionResult.transcription,
-			feedback: analysisResult.feedback,
-			audioFeedback: audioFeedback.toString('base64') // Convertemos para base64 para enviar via JSON
-		});
-		
-		// Remover o arquivo temporário após enviar a resposta
-		fs.unlink(analysisResult.audioFeedbackPath, (err) => {
-			if (err) console.error('Erro ao remover arquivo temporário:', err);
-		});
-		
     } catch (error) {
         console.error('Erro ao processar áudio:', error);
         res.json({ success: false, message: 'Erro ao processar o áudio.' });
     }
+});
+
+router.get('/api/job-status/:queueName/:jobId', async (req, res) => {
+  const { queueName, jobId } = req.params;
+
+  try {
+    const queue = queues[queueName];
+	
+    if (!queue) {
+      return res.status(404).json({ message: 'Queue not found' });
+    }
+
+    const job = await queue.getJob(jobId);
+	
+    if (!job) {
+      return res.status(404).json({ message: 'Job not found' });
+    }
+
+    const state = await job.getState();
+	
+    if (state === 'failed') {
+      console.error(`Job ${jobId} failed. Error:`, job.failedReason);
+      return res.json({ state, error: 'Job processing failed' });
+    }
+
+    if (state === 'completed' && job.returnvalue) {
+      const result = job.returnvalue;
+      if (queueName === 'feedbackQueue') {
+        const { feedback, audioFeedbackPath } = result;
+        try {
+          const audioFeedback = await fs.promises.readFile(audioFeedbackPath);
+          res.json({
+            state,
+            feedback,
+            audioFeedback: audioFeedback.toString('base64'),
+          });
+          fs.unlink(audioFeedbackPath, (err) => {
+            if (err) console.error('Erro ao remover arquivo temporário:', err);
+          });
+        } catch (error) {
+          console.error('Erro ao ler arquivo de áudio:', error);
+          res.json({ state, error: 'Erro ao ler arquivo de áudio' });
+        }
+      } else if (queueName === 'monoQueue') {
+        const { mono, refer } = result;
+        res.json({
+          state,
+          mono,
+          refer,
+        });
+      } else {
+        // Lógica para outras filas
+      }
+    } else {
+      res.json({ state });
+    }
+  } catch (error) {
+    console.error('Erro ao processar requisição de status do job:', error);
+    return res.status(500).json({ error: 'Erro interno do servidor' });
+  }
 });
 
 //resumo academico

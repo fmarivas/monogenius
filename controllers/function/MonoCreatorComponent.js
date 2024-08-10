@@ -86,7 +86,7 @@ class Monography {
 		}
 		
 		static async generateIntroduction(tema, ideiaInicial, manuais, referencias, tier) {
-		  let aiModel = tier === "free" ? 'gpt-3.5-turbo' : 'gpt-4o-mini';
+		  let aiModel = tier === "free" ? 'gpt-4o-mini' : 'gpt-4o';
 
 		  const citationInstructions = `
 			Ao citar as referências no texto, use o estilo APA:
@@ -146,11 +146,7 @@ class Monography {
 		  `;
 
 		  try {
-			  const timeoutPromise = new Promise((_, reject) =>
-				setTimeout(() => reject(new Error('Timeout após 25 segundos')), 27000)
-			  );
-			  
-			const completionPromise = await openai.chat.completions.create({
+			const completion = await openai.chat.completions.create({
 			  model: aiModel,
 			  messages: [
 				{ role: "system", content: "Você é um assistente especializado em redação acadêmica, capaz de criar introduções de monografias bem estruturadas e fundamentadas." },
@@ -159,8 +155,6 @@ class Monography {
 			  tools: tools,
 			  tool_choice: "auto"
 			});
-			
-			const completion = await Promise.race([completionPromise, timeoutPromise]);
 			
 			const responseMessage = completion.choices[0].message;
 			

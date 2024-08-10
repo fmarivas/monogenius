@@ -203,7 +203,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
 			}
 			
 			if (result.success) {
-				showModal(true, 'Resposta de áudio enviada e processada com sucesso!');
+				showModal(true, 'Resposta de áudio enviada. Processamento iniciado.');
 				
 				// Exibir a transcrição
 				// displayTranscription(result.transcription);
@@ -212,9 +212,12 @@ document.addEventListener('DOMContentLoaded', ()=>{
 				// displayFeedback(result.feedback);
 				
 				// Exibir o feedback em áudio
-				if (result.audioFeedback) {
-					displayAudioFeedback(result.audioFeedback);
-				}
+				// if (result.audioFeedback) {
+					// displayAudioFeedback(result.audioFeedback);
+				// }
+                // Start polling for job status
+				
+                pollJobStatus(result.jobId);
 			} else {
 				showModal(false, result.message || 'Erro ao processar a resposta de áudio.');
 			}
@@ -228,7 +231,39 @@ document.addEventListener('DOMContentLoaded', ()=>{
 			stopTimer();
 		}
 	}
-
+	
+	async function pollJobStatus(jobId) {
+		const processingIndicator = document.getElementById('processing-indicator');
+		processingIndicator.classList.remove('hidden');
+		
+		const pollInterval = setInterval(async () => {
+			try {
+				const response = await fetch(`/api/job-status/feedbackQueue/${jobId}`);
+				const result = await response.json();
+				
+				if (result.state === 'completed') {
+					clearInterval(pollInterval);
+					displayFeedback(result.feedback);
+					if (result.audioFeedback) {
+						displayAudioFeedback(result.audioFeedback);
+					}
+					showModal(true, 'Processamento concluído!');
+					processingIndicator.classList.add('hidden');
+				} else if (result.state === 'failed') {
+					clearInterval(pollInterval);
+					showModal(false, 'Ocorreu um erro durante o processamento.');
+					processingIndicator.classList.add('hidden');
+				}
+				// For 'active' or 'waiting' states, continue polling
+			} catch (error) {
+				console.error('Erro ao verificar status do job:', error);
+				clearInterval(pollInterval);
+				showModal(false, 'Erro ao verificar o status do processamento.');
+				processingIndicator.classList.add('hidden');
+			}
+		}, 5000); // Poll every 5 seconds
+	}
+	
     function displayTranscription(transcription) {
         const transcriptionSection = document.getElementById('transcription-section');
         const transcriptionContent = document.getElementById('transcription-content');

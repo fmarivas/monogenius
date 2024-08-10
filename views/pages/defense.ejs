@@ -26,20 +26,25 @@
         </div>
     </div>
 
-    <div id="audio-recording" class="bg-white shadow-md rounded-lg p-6 mb-6 hidden">
-        <h2 class="text-xl font-semibold mb-4">Gravação de Resposta</h2>
-        <div class="flex items-center justify-center space-x-4">
-            <button id="start-recording" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">
-                Iniciar Gravação
-            </button>
-            <button id="stop-recording" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded hidden">
-                Parar Gravação
-            </button>
-        </div>
-        <div id="audio-player" class="mt-4 hidden">
-            <audio controls class="w-full"></audio>
-        </div>
-    </div>
+	<div id="audio-recording" class="bg-white shadow-md rounded-lg p-6 mb-6 hidden">
+		<h2 class="text-xl font-semibold mb-4">Gravação de Resposta</h2>
+		<div class="flex items-center justify-center space-x-4">
+			<button id="start-recording" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">
+				Iniciar Gravação
+			</button>
+			<button id="stop-recording" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded hidden">
+				Parar Gravação
+			</button>
+		</div>
+		<div id="audio-player" class="mt-4 hidden">
+			<audio controls class="w-full"></audio>
+		</div>
+		<!-- Adicione o novo indicador de processamento aqui -->
+		<div id="processing-indicator" class="hidden mt-4 text-center">
+			<p>Processando sua resposta...</p>
+			<div class="loader"></div>
+		</div>
+	</div>
 
 	<div id="feedback-section" class="bg-white shadow-md rounded-lg p-6 mb-6 hidden">
 		<h2 class="text-xl font-semibold mb-4">Feedback</h2>
@@ -61,10 +66,3 @@
 	</div>
 </div>
 
-<style>
-#waveform {
-  width: 100%;
-  height: 100px;
-  background: #f0f0f0;
-}
-</style>

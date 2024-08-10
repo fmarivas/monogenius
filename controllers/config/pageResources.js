@@ -27,7 +27,7 @@ const pageResources = {
 		],
 		js: [
 			'/static/assets/js/create.js',
-			'/static/assets/js/simple-editor.js'
+			'/static/assets/js/simple-editor.js',
 		],
 		inlineStyles: `
 			#modal {
@@ -44,6 +44,21 @@ const pageResources = {
 			}
 			#modal-icon.text-red-500 {
 			  color: #ef4444;
+			}
+			
+			.loader {
+				border: 5px solid #f3f3f3;
+				border-top: 5px solid #3498db;
+				border-radius: 50%;
+				width: 50px;
+				height: 50px;
+				animation: spin 1s linear infinite;
+				margin: 20px auto;
+			}
+
+			@keyframes spin {
+				0% { transform: rotate(0deg); }
+				100% { transform: rotate(360deg); }
 			}
 		`
 	},
@@ -69,10 +84,32 @@ const pageResources = {
 		js: ['/static/assets/js/favorites.js'],
 	},
 	defense:{
-		js: ['/static/assets/js/defense.js']
+		js: ['/static/assets/js/defense.js'],
+		inlineStyles: `
+			.loader {
+				border: 5px solid #f3f3f3;
+				border-top: 5px solid #3498db;
+				border-radius: 50%;
+				width: 50px;
+				height: 50px;
+				animation: spin 1s linear infinite;
+				margin: 20px auto;
+			}
+
+			@keyframes spin {
+				0% { transform: rotate(0deg); }
+				100% { transform: rotate(360deg); }
+			}
+			
+			#waveform {
+			  width: 100%;
+			  height: 100px;
+			  background: #f0f0f0;
+			}
+		`
 	},
 	resume:{
-		js: ['/static/assets/js/resume.js']
+		js: ['/static/assets/js/resume.js'],
 	}
 };
 

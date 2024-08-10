@@ -14,6 +14,10 @@ const session = require('express-session');
 const MySQLStore = require('express-mysql-session')(session); 
 const passport = require('passport');
 
+// filas
+require('./queueProcessors/queueProcessor');
+require('./queueProcessors/monoProcessor');
+
 app.use(express.urlencoded({ extended: true }));
 
 app.use(express.json({limit: '50mb'}));

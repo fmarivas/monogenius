@@ -5,6 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const openai = new OpenAI(process.env.OPENAI_API_KEY);
 
+
 class AIProcessor {
   static async generateQuestions(content) {
 	const message = `
@@ -86,7 +87,7 @@ class AIProcessor {
     }
   }
 
-  static async analyzeResponse(questions, transcription, thesisContent) {
+	static async generateFeedback(questions, transcription, thesisContent) {
 	  const message = `
 		Você é um examinador experiente de teses acadêmicas. Sua tarefa é analisar a resposta do candidato às perguntas previamente geradas, considerando o contexto completo da tese.
 
@@ -118,62 +119,77 @@ class AIProcessor {
 		Estruture seu feedback em parágrafos claros, abordando cada ponto de análise separadamente.
 	  `;
 
-    try {
-      const response = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
-        messages: [
-          { role: "system", content: "Você é um examinador experiente de teses acadêmicas" },
-          { role: "user", content: message }
-        ],
-        temperature: 0.7,
-        max_tokens: 1000
-      });
-
-      const feedbackText = response.choices[0].message.content;
-
-    // Dividir o feedback em chunks
-		const chunkSize = 4000;
-		const feedbackChunks = [];
-		
-		for (let i = 0; i < feedbackText.length; i += chunkSize) {
-		  feedbackChunks.push(feedbackText.slice(i, i + chunkSize));
-		}
-
-		const audioBuffers = [];
-		for (const chunk of feedbackChunks) {
-		  const mp3 = await openai.audio.speech.create({
-			model: "tts-1",
-			voice: "echo",
-			input: chunk,
-		  });
-		  
-		  audioBuffers.push(Buffer.from(await mp3.arrayBuffer()));
-		}
-		
-
-		// Combinar os buffers de áudio
-		const combinedAudioBuffer = Buffer.concat(audioBuffers);
-
-		// Criar um arquivo temporário para o áudio combinado
-		const tempDir = os.tmpdir();
-		const tempFilePath = path.join(tempDir, `feedback_audio_${Date.now()}.mp3`);
-
-		// Escrever o buffer combinado para o arquivo temporário
-		await fs.promises.writeFile(tempFilePath, combinedAudioBuffer);
+	  try {
+		const response = await openai.chat.completions.create({
+		  model: "gpt-4o-mini",
+		  messages: [
+			{ role: "system", content: "Você é um examinador experiente de teses acadêmicas" },
+			{ role: "user", content: message }
+		  ],
+		  temperature: 0.7,
+		  max_tokens: 1000
+		});
 
 		return {
 		  success: true,
-		  feedback: feedbackText,
+		  feedback: response.choices[0].message.content
+		};
+	  } catch (error) {
+		console.error('Erro ao gerar feedback:', error);
+		return {
+		  success: false,
+		  message: 'Falha ao gerar o feedback. Por favor, tente novamente.'
+		};
+	  }
+	}
+
+	static async generateAudioFeedback(feedbackText) {
+	  try {
+		const mp3 = await openai.audio.speech.create({
+		  model: "tts-1",
+		  voice: "echo",
+		  input: feedbackText,
+		});
+
+		const audioBuffer = Buffer.from(await mp3.arrayBuffer());
+		const tempDir = os.tmpdir();
+		const tempFilePath = path.join(tempDir, `feedback_audio_${Date.now()}.mp3`);
+
+		await fs.promises.writeFile(tempFilePath, audioBuffer);
+
+		return {
+		  success: true,
 		  audioFeedbackPath: tempFilePath
 		};
-    } catch (error) {
-      console.error('Erro ao analisar resposta ou gerar áudio:', error);
-      return {
-        success: false,
-        message: 'Falha ao analisar a resposta ou gerar áudio. Por favor, tente novamente.'
-      };
-    }
-  }
+	  } catch (error) {
+		console.error('Erro ao gerar áudio do feedback:', error);
+		return {
+		  success: false,
+		  message: 'Falha ao gerar o áudio do feedback. Por favor, tente novamente.'
+		};
+	  }
+	}
+	
+	static async analyzeResponse(questions, transcription, thesisContent) {
+	  const feedbackResult = await this.generateFeedback(questions, transcription, thesisContent);
+	  
+	  if (!feedbackResult.success) {
+		return feedbackResult;
+	  }
+
+	  const audioResult = await this.generateAudioFeedback(feedbackResult.feedback);
+
+	  if (!audioResult.success) {
+		return audioResult;
+	  }
+
+	  return {
+		success: true,
+		feedback: feedbackResult.feedback,
+		audioFeedbackPath: audioResult.audioFeedbackPath
+	  };
+	}
+
   
   
   

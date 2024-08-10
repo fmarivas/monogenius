@@ -59,6 +59,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+	// function showProcessingIndicator() {
+		// document.getElementById('processing-indicator').classList.remove('hidden');
+	// }
+
+	// function hideProcessingIndicator() {
+		// document.getElementById('processing-indicator').classList.add('hidden');
+	// }
     function formatText(command) {
         document.execCommand(command, false, null);
         sendGAEvent('Monograph Creator', 'Formatting Used', command);
@@ -196,10 +203,13 @@ document.addEventListener('DOMContentLoaded', () => {
         overlay.classList.remove('hidden');
         startTimer();
         referenciasContainer.classList.add('hidden');
-
+		document.getElementById('processing-indicator').classList.remove('hidden');
+		
         try {
             const response = await axios.post('/api/create', formData);
-            handleApiResponse(response);
+
+			
+			handleApiResponse(response);
         } catch (error) {
             console.error('Erro ao enviar dados:', error);
             showModal(false, error.response?.data?.message || 'Falha ao criar Monografia. Tente mais tarde!');
@@ -262,23 +272,65 @@ document.addEventListener('DOMContentLoaded', () => {
 		
 		
         if (response.data.success) {
-            referenciasContainer.classList.remove('hidden');
-            sendGAEvent('Monograph Creator', 'Monograph Generated', 'Success');
-            
-			console.log(response.data.mono)
-            const formattedMono = formatMonographyHTML(response.data.mono);
-            textField.innerHTML = formattedMono;
-            
-            updateReferences(response.data.refer);
             showModal(true, response.data.message);
-            saveContent();
+
+			pollJobStatus(response.data.jobId);
         } else {
-            showModal(false, response.data.message);
+            showModal(false, response.data.message || 'Erro ao processar a sua monografia. Tente mais tarde!');
         }
 
         setTimeout(hideModal, 3000);
     }
+	
+let pollInterval = null;
 
+async function pollJobStatus(jobId) {
+  const processingIndicator = document.getElementById('processing-indicator');
+  processingIndicator.classList.remove('hidden');
+
+  const maxPolls = 60; // 5 minutos (60 * 5 segundos)
+  let pollCount = 0;
+
+  pollInterval = setInterval(async () => {
+    if (pollCount >= maxPolls) {
+      clearInterval(pollInterval);
+      showModal(false, 'O processamento demorou mais do que o esperado. Por favor, tente novamente mais tarde.');
+      processingIndicator.classList.add('hidden');
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/job-status/monoQueue/${jobId}`);
+      const result = await response.json();
+	  
+      if (result.state === 'completed') {
+        clearInterval(pollInterval);
+        referenciasContainer.classList.remove('hidden');
+        sendGAEvent('Monograph Creator', 'Monograph Generated', 'Success');
+
+        const formattedMono = formatMonographyHTML(result.mono);
+        textField.innerHTML = formattedMono;
+
+        updateReferences(result.refer);
+        saveContent();
+        showModal(true, 'Processamento concluído!');
+        processingIndicator.classList.add('hidden');
+      } else if (result.state === 'failed') {
+        clearInterval(pollInterval);
+        showModal(false, 'Ocorreu um erro durante o processamento.');
+        processingIndicator.classList.add('hidden');
+      }
+      // For 'active' or 'waiting' states, continue polling
+    } catch (error) {
+      console.error('Erro ao verificar status do job:', error);
+      clearInterval(pollInterval);
+      showModal(false, 'Erro ao verificar o status do processamento.');
+      processingIndicator.classList.add('hidden');
+    }
+    pollCount++;
+  }, 5000); // Poll every 5 seconds
+}
+	
     function updateReferences(references) {
         const referenciasList = document.getElementById('referencias-lista');
         if (referenciasList) {
@@ -316,9 +368,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // Autosave
-    setInterval(saveContent, 30000);
-    window.addEventListener('beforeunload', saveContent);
+    setInterval(saveContent, 15000);
 
+	window.addEventListener('beforeunload', () => {
+		saveContent();
+		
+		if (pollInterval) {
+			clearInterval(pollInterval);
+			// Aqui você pode adicionar uma chamada para cancelar o job no servidor, se necessário
+		}
+	});
     // Load saved content on page load
     loadSavedContent();
 
