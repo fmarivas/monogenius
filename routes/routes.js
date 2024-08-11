@@ -19,8 +19,9 @@ const MonoCreator = require('../controllers/function/MonoCreatorComponent')
 const Plagiarism = require('../controllers/function/Plagiarism')
 const additionalFeatures = require('../controllers/function/additionalFeatures')
 const UserDetails = require('../controllers/function/userDetails')
-const FavoritesHandler = require('../controllers/function/userFavorites')
+const DailyTips = require('../controllers/function/tips')
 
+const FavoritesHandler = require('../controllers/function/userFavorites')
 const themeHandler = require('../controllers/function/themeHandler')
 const referenceHandler = require('../controllers/function/referenceHandler')
 
@@ -250,6 +251,25 @@ router.get('/c/:id', isAuth, async (req, res, next) => {
     }
 });
 
+router.get('/api/daily-tip', async (req, res) => {
+    try {
+        const user = req.session.user; // Assumindo que você tem middleware de autenticação
+        const language = req.query.language || 'pt';
+       
+        
+        const tip = await DailyTips.getUserDailyTip(user, language);
+        console.log('Dica retornada:', tip);
+        
+        if (tip) {
+            res.json({ tip: tip.content, tipId: tip.id });
+        } else {
+            res.json({ tip: null });
+        }
+    } catch (error) {
+        console.error('Erro ao buscar dica diária:', error);
+        res.status(500).json({ error: 'Erro ao buscar dica diária' });
+    }
+});
 
 //Rota de inicio de pesquisa
 router.get('/survey/onboarding', isAuth, checkUserHasDetails, (req,res)=>{
@@ -294,33 +314,34 @@ router.post('/onboarding', isAuth, async (req, res) => {
 
 
 router.post('/survey/user-source', isAuth, async (req, res) => {
-	const { sourceOfKnowledge, otherSource, whatsappNumber } = req.body;
+    const { sourceOfKnowledge, otherSource, whatsappNumber } = req.body;
 
-	if (!sourceOfKnowledge) {
-		return res.render('user_source', { 
-		  errorMessage: 'Por favor, selecione como você conheceu o Monogenius.',
-		  user: req.session.user
-		});
-	}
+    if (!sourceOfKnowledge) {
+        return res.render('user_source', { 
+            errorMessage: 'Por favor, selecione como você conheceu o Monogenius.',
+            user: req.session.user
+        });
+    }
 
-	try {
-		const result = await UserDetails.userSource(req.session.user.id, req.body);
-		if (result.success) {
-		  req.session.user.hasCompletedSourceSurvey = true; // Opcional: marcar que o usuário completou a pesquisa
-		  return res.redirect('/c/create');
-		} else {
-		  return res.render('user_source', { 
-			errorMessage: 'Erro ao salvar suas informações. Por favor, tente novamente.',
-			user: req.session.user
-		  });
-		}
-	} catch (err) {
-		console.error('Erro no servidor ao salvar fonte do usuário:', err);
-		return res.render('user_source', { 
-		  errorMessage: 'Ocorreu um erro no servidor. Por favor, tente novamente mais tarde.',
-		  user: req.session.user
-		})
-	}		
+    try {
+        const result = await UserDetails.userSource(req.session.user.id, req.body);
+
+        if (result.success) {
+            req.session.user.hasCompletedSourceSurvey = true; // Opcional: marcar que o usuário completou a pesquisa
+            return res.redirect(result.redirectUrl); // Usar a URL de redirecionamento fornecida
+        } else {
+            return res.render('user_source', { 
+                errorMessage: 'Erro ao salvar suas informações. Por favor, tente novamente.',
+                user: req.session.user
+            });
+        }
+    } catch (err) {
+        console.error('Erro no servidor ao salvar fonte do usuário:', err);
+        return res.render('user_source', { 
+            errorMessage: 'Ocorreu um erro no servidor. Por favor, tente novamente mais tarde.',
+            user: req.session.user
+        });
+    }       
 });
 
 

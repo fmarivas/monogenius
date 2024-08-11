@@ -51,18 +51,28 @@ class Authorization {
         });
     }
 
-    static async checkUserDetails(user_id_info) {
-        const selectQuery = 'SELECT * FROM user_details WHERE user_id_info = ?';
-        return new Promise((resolve, reject) => {
-            conn.query(selectQuery, [user_id_info], (err, result) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(result.length > 0);
-                }
-            });
-        });
-    }
+	static async checkUserDetails(user_id_info) {
+		const selectQuery = 'SELECT * FROM user_details WHERE user_id = ?';
+		return new Promise((resolve, reject) => {
+			conn.query(selectQuery, [user_id_info], (err, result) => {
+				if (err) {
+					reject(err);
+				} else {
+					if (result.length > 0) {
+						resolve({
+							exists: true,
+							academicPhase: result[0].academic_phase
+						});
+					} else {
+						resolve({
+							exists: false,
+							academicPhase: null
+						});
+					}
+				}
+			});
+		});
+	}
 	
 	static async checkHowKnew(userId){
 		const query = "SELECT * FROM onboarding_data WHERE user_id=?"
