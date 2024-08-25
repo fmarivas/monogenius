@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const overlay = document.getElementById('overlay');
     const form = document.getElementById('formCreator');
     const temaInput = document.getElementById('tema');
-    const ideiaInicialInput = document.getElementById('ideia-inicial');
+    const ideiaInicialInput = document.getElementById('pergunta-partida');
     
     const referenciasContainer = document.getElementById('referencias-container');
 

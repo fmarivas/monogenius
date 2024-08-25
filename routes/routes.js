@@ -258,7 +258,6 @@ router.get('/api/daily-tip', async (req, res) => {
        
         
         const tip = await DailyTips.getUserDailyTip(user, language);
-        console.log('Dica retornada:', tip);
         
         if (tip) {
             res.json({ tip: tip.content, tipId: tip.id });
@@ -417,9 +416,9 @@ router.post('/api/plagiarism', isAuth, checkFeatureAccess('plagiarism'), async (
   try {
     const wordCount = countWords(textField);
     
-    if (wordCount > 500) {
-      return res.json({success: false, message: 'O texto excede o limite de 500 palavras'});
-    }
+    // if (wordCount > 500) {
+      // return res.json({success: false, message: 'O texto excede o limite de 500 palavras'});
+    // }
     
     const hasEnoughTokens = await checkAndConsumeTokens(req.session.user.id, 'plagiarism', wordCount);
     
@@ -432,6 +431,8 @@ router.post('/api/plagiarism', isAuth, checkFeatureAccess('plagiarism'), async (
     if (canMakeRequest.success) {
       const plagiarismChecker = await Plagiarism.verifyPlagiarism(textField);
       if (plagiarismChecker.success) {
+		  console.log(plagiarismChecker.result)
+		  console.log(plagiarismChecker.result.sources[0].matches)
         res.json({success: true, result: plagiarismChecker.result});
       } else {
         res.json({success: false, message: plagiarismChecker.message});
@@ -446,6 +447,27 @@ router.post('/api/plagiarism', isAuth, checkFeatureAccess('plagiarism'), async (
   }
 });
 
+//Rota para parafrasear
+router.post('/api/paraphrase', isAuth, async (req, res) => {
+  const { text } = req.body;
+  
+  if (!text) {
+    return res.status(400).json({ success: false, message: 'Preencha o texto antes de enviar!' });
+  }
+  
+  try {
+    const results = await Plagiarism.paraphrase(text);
+    
+    if (results.success) {
+      res.json({ success: true, paraphrased: results.paraphrased });
+    } else {
+      res.status(500).json({ success: false, message: results.message });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: 'Erro interno do servidor' });
+  }
+});
 router.post('/template/download', isAuth, checkFeatureAccess('template'), upload.single('logo'), (req, res) => {
     const { instituicao, tema, autor, supervisor, local, mes, ano } = req.body;
     const logoBuffer = req.file ? req.file.buffer : null;
@@ -909,6 +931,8 @@ router.post('/api/themes', isAuth, checkFeatureAccess('themes'), upload.none(), 
     }
 });
 
+
+
 // Rota para o gerador de referências
 router.post('/api/references', isAuth, checkFeatureAccess('references'), upload.none(), async (req, res) => {
     const { researchTopic, initialIdea, language } = req.body;
@@ -980,6 +1004,37 @@ router.post('/api/themes/:id', isAuth, async (req, res) => {
     } catch (error) {
         console.error('Error in favoriteTheme route:', error);
         res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+//Rota para gerador de subtemas
+router.post('/api/subtopics', isAuth, checkFeatureAccess('themes'), upload.none(), async (req, res) => {
+    const { theme } = req.body;
+    
+    if (!theme) {
+        return res.status(400).json({ success: false, message: 'Theme is required' });
+    }
+    
+    try {
+        const subTopicResult = await additionalFeatures.subTopicGen(theme);
+        
+        if (subTopicResult.success) {
+            res.json({
+                success: true,
+                subtopics: subTopicResult.subtopics
+            });
+        } else {
+            res.status(500).json({
+                success: false,
+                message: subTopicResult.message || 'Failed to generate subtopics'
+            });
+        }
+    } catch (err) {
+        console.error('Error generating subtopics:', err);
+        res.status(500).json({
+            success: false,
+            message: 'An error occurred while generating subtopics'
+        });
     }
 });
 

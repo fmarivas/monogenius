@@ -150,44 +150,53 @@ class additionalFeatures {
 		}
 
 		const message = `
-		Crie ${themeCount} temas para trabalhos acadêmicos na área de ${studyArea}, com foco em ${specificInterest}, adequados para o nível de ${academicLevel}${areaFocal ? ` em ${areaFocal}` : ''}. ${keywordsPrompt}
+			Crie ${themeCount} temas para trabalhos acadêmicos na área de ${studyArea}, com foco em ${specificInterest}, adequados para o nível de ${academicLevel}${areaFocal ? ` em ${areaFocal}` : ''}. ${keywordsPrompt}
 
-		Os temas devem ser:
-		1. Relevantes${areaFocal ? ` para o contexto de ${areaFocal}` : ''}, abordando questões contemporâneas importantes e contribuindo significativamente para o desenvolvimento${areaFocal ? ' do país' : ''}.
-		2. Originais, oferecendo novas perspectivas ou explorando áreas ainda não investigadas extensivamente${areaFocal ? ` em ${areaFocal}` : ''}.
-		3. Viáveis, considerando a disponibilidade de fontes e recursos necessários para a pesquisa no contexto${areaFocal ? ' local' : ''}.
-		4. Claros e delimitados, com escopo bem definido para permitir uma investigação aprofundada e específica.
-		5. De interesse pessoal e social, potencialmente motivando o estudante e beneficiando a comunidade.
-		6. Com contribuição prática, sempre que possível, oferecendo soluções ou insights aplicáveis${areaFocal ? ` à realidade de ${areaFocal}` : ''}.
-		7. Interdisciplinares, quando apropriado, integrando conhecimentos de diferentes áreas para uma abordagem mais abrangente.
-		8. Alinhados com os Objectivos de Desenvolvimento Sustentável (ODS) da ONU, quando aplicável.
-		9. Considerando aspectos culturais, históricos ou socioeconómicos${areaFocal ? ` específicos de ${areaFocal}` : ''}.
-		10. Potencialmente inovadores, explorando tecnologias ou metodologias emergentes no contexto${areaFocal ? ' local' : ''}.
+			Os temas devem ser:
+			1. Relevantes${areaFocal ? ` para o contexto de ${areaFocal}` : ''}, abordando questões contemporâneas importantes e contribuindo significativamente para o desenvolvimento${areaFocal ? ' do país' : ''}.
+			2. Originais, oferecendo novas perspectivas ou explorando áreas ainda não investigadas extensivamente${areaFocal ? ` em ${areaFocal}` : ''}.
+			3. Viáveis, considerando a disponibilidade de fontes e recursos necessários para a pesquisa no contexto${areaFocal ? ' local' : ''}.
+			4. Claros e delimitados, com escopo bem definido para permitir uma investigação aprofundada e específica.
+			5. De interesse pessoal e social, potencialmente motivando o estudante e beneficiando a comunidade.
+			6. Com contribuição prática, sempre que possível, oferecendo soluções ou insights aplicáveis${areaFocal ? ` à realidade de ${areaFocal}` : ''}.
+			7. Interdisciplinares, quando apropriado, integrando conhecimentos de diferentes áreas para uma abordagem mais abrangente.
+			8. Alinhados com os Objectivos de Desenvolvimento Sustentável (ODS) da ONU, quando aplicável.
+			9. Considerando aspectos culturais, históricos ou socioeconómicos${areaFocal ? ` específicos de ${areaFocal}` : ''}.
+			10. Potencialmente inovadores, explorando tecnologias ou metodologias emergentes no contexto${areaFocal ? ' local' : ''}.
 
-		Baseie-se nos seguintes exemplos de temas reais de trabalhos acadêmicos${areaFocal ? ` em ${areaFocal}` : ''}, adaptando-os para a área de ${studyArea} e foco em ${specificInterest}:
+			Baseie-se nos seguintes exemplos de temas reais de trabalhos acadêmicos${areaFocal ? ` em ${areaFocal}` : ''}, adaptando-os para a área de ${studyArea} e foco em ${specificInterest}:
 
-		Optimização de [processo específico] em [indústria/setor]: O caso de [empresa/instituição] em [localidade${areaFocal ? ` de ${areaFocal}` : ''}]
-		Proposta de implementação de [sistema/plano] para [objetivo específico] em [empresa/instituição] de [localidade${areaFocal ? ` de ${areaFocal}` : ''}]
-		Análise da situação de [aspecto social/político/econômico]${areaFocal ? ` em ${areaFocal}` : ''}: O caso de [instituição/região específica]
-		Impacto de [fator socioeconômico] em [área de desenvolvimento] em [região/grupo específico]: Estudo de caso em [instituição/localidade], [período]
-		Projeto de [infraestrutura/sistema] para [instituição/empresa] em [localidade${areaFocal ? ` de ${areaFocal}` : ''}]: [objetivo específico]
-		[Aspecto social/político] nas [tipo de evento/processo]${areaFocal ? ` em ${areaFocal}` : ''}: Um estudo de caso em [localidades específicas] em [ano]
-		Fatores que influenciam [resultado específico] em [contexto educacional/social]: Caso da [instituição específica] em [localidade], [período]
-		Políticas de [área de desenvolvimento]${areaFocal ? ` em ${areaFocal}` : ''}: Uma análise sobre [aspecto específico] no [nível educacional/setor] - Estudo de caso do [instituição governamental], [período]
-		Avaliação do processo de [atividade industrial/agrícola] na [empresa/indústria]: Estudo de caso em [localidade]${areaFocal ? ', província de [nome da província]' : ''}
-		Desempenho [tipo de desempenho] de [objeto de estudo] sob diferentes [variáveis]: Um estudo comparativo${areaFocal ? ` em [contexto de ${areaFocal}]` : ''}
-		[Aspecto humano/social] em [instituições específicas]: Um estudo de caso no [nome do centro/instituição] na Cidade de [localidade]
-		Proposta de [solução tecnológica] para [problema específico]${areaFocal ? ` em ${areaFocal}` : ''}
-		Ocorrência de [fenômeno específico] no processo de [atividade industrial]: Estudo de caso na [empresa]${areaFocal ? ` em ${areaFocal}` : ''}
-		Análise do impacto de [política econômica] em [indicador econômico]${areaFocal ? ` em ${areaFocal}` : ''}: Período [ano inicial - ano final]
-		Estratégias de [área de intervenção] em [setor]: Uma análise comparativa entre [cidade${areaFocal ? ` de ${areaFocal}` : ''}] e [cidade estrangeira]
-		Efeitos das [fenômeno ambiental] na [recurso natural/econômico] em [região geográfica${areaFocal ? ` de ${areaFocal}` : ''}]
-		Análise da [infraestrutura/serviço público] da cidade de [localidade${areaFocal ? ` de ${areaFocal}` : ''}]
-		Papel do [instituição governamental] no processo de [transformação tecnológica/social]${areaFocal ? ` em ${areaFocal}` : ''}
-		[Aspecto organizacional] face a [desafio específico]: Caso da [instituição educacional] em [localidade], [período]
-		Participação da [grupo social] na [processo político/econômico] no setor de [indústria específica]${areaFocal ? ` em ${areaFocal}` : ''}: [período]
+			1. Análise de aspectos socioeconômicos da ${specificInterest} na ${studyArea}${areaFocal ? ` em ${areaFocal}` : ''}: Um estudo de ${academicLevel}
 
-		Apresente cada tema em uma linha separada, garantindo que sejam específicos, relevantes${areaFocal ? ` e adaptados ao contexto de ${areaFocal}` : ''}.
+			2. Influência da aplicação de ${specificInterest} no processo de ${studyArea}: Estudo de caso em ${areaFocal}
+
+			3. Incorporação de ${keywords[0]} para a otimização de ${keywords[1]} na ${studyArea}${areaFocal ? ` em ${areaFocal}` : ''}
+
+			4. Avaliação do grau de satisfação dos usuários de ${specificInterest} na ${studyArea}${areaFocal ? ` em ${areaFocal}` : ''}
+
+			5. Perfil sócio-econômico e grau de satisfação dos estudantes de ${academicLevel} em ${studyArea}${areaFocal ? ` em ${areaFocal}` : ''}
+
+			6. Impacto da ${specificInterest} na ${studyArea}${areaFocal ? ` em ${areaFocal}` : ''}: Uma análise de ${academicLevel}
+
+			7. A dependência de ${keywords[0]} e o desenvolvimento de ${keywords[1]} na ${studyArea}: Perspectivas para ${academicLevel}
+
+			8. Avaliação da produtividade de ${specificInterest} na ${studyArea} face às mudanças climáticas${areaFocal ? ` em ${areaFocal}` : ''}
+
+			9. ${keywords[0]}: Plataforma inteligente para ${keywords[1]} em ${studyArea} de ${academicLevel}
+
+			10. Estudo da ${specificInterest} promovido por ${keywords[0]} na ${studyArea}${areaFocal ? ` em ${areaFocal}` : ''}
+
+			11. Elaboração e caracterização de ${specificInterest} na ${studyArea}: Uma abordagem de ${academicLevel}
+
+			12. Análise da viabilidade do uso de ${specificInterest} como forma de otimizar ${keywords[0]} em ${studyArea}
+
+			13. Desafios e barreiras à adoção de ${specificInterest} na ${studyArea}${areaFocal ? ` em ${areaFocal}` : ''}
+
+			14. ${keywords[0]} na ${keywords[1]}: Fatores que influenciam ${specificInterest} na ${studyArea}
+
+			15. Avaliação da cobertura de ${specificInterest} no controle de ${keywords[0]} em ${studyArea}${areaFocal ? ` em ${areaFocal}` : ''}
+
+			Apresente cada tema em uma linha separada, garantindo que sejam específicos, relevantes${areaFocal ? ` e adaptados ao contexto de ${areaFocal}` : ''}.
 		`;
 		
 		try{
@@ -219,6 +228,43 @@ class additionalFeatures {
 			throw err;
 		}
 		
+	}
+	
+	static async subTopicGen(theme) {
+		const message = `
+			Gerar 4 subtópicos relacionados ao tema '${theme}' que possam ser explorados em uma monografia acadêmica. 
+			Os subtópicos devem abordar diferentes aspectos do tema, como implicações éticas, impactos tecnológicos, questões sociais, oportunidades de pesquisa, e quaisquer desafios emergentes. 
+			As sugestões devem ser claras e relevantes para o contexto acadêmico e direcionadas a estudantes que estão desenvolvendo uma monografia sobre esse tema. 
+			Apresente apenas os subtópicos, sem numeração, explicações ou conteúdo adicional.
+		`;
+		
+		try {
+			const completion = await openai.chat.completions.create({
+				model: "gpt-4o",
+				messages: [
+					{ role: "system", content: "Você é um assistente especializado em pesquisa acadêmica e geração de tópicos para monografias." },
+					{ role: "user", content: message }
+				],
+				max_tokens: 150
+			});
+
+			const response = completion.choices[0].message.content;
+
+			// Dividir a resposta em linhas e remover linhas vazias
+			const subtopics = response.split('\n').filter(line => line.trim() !== '');
+
+			return {
+				success: true,
+				subtopics: subtopics
+			};
+
+		} catch (err) {
+			console.error("Erro ao gerar subtópicos:", err);
+			return {
+				success: false,
+				message: "Ocorreu um erro ao gerar os subtópicos. Por favor, tente novamente."
+			};
+		}
 	}
 	
 	static async referencesCreator(tema, ideiaInicial, tier, language){

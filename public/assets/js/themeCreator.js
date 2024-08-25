@@ -206,35 +206,35 @@ document.addEventListener('DOMContentLoaded', () => {
                 sendGAEvent('Theme Generator', 'Themes Generated', studyArea.value, response.data.result.themes.length);
                 
                 themeOutput.innerHTML = '';
-                response.data.result.themes.forEach((theme, index) => {
-                    const themeContainer = document.createElement('div');
-                    themeContainer.className = 'p-3 bg-white rounded shadow mb-4 flex justify-between items-center';
-                    
-                    const themeText = document.createElement('p');
-                    themeText.textContent = theme;
-                    themeText.className = 'flex-grow';
-                    
-                    const buttonContainer = document.createElement('div');
-                    buttonContainer.className = 'flex space-x-2';
-                    
-                    const selectButton = document.createElement('button');
-                    selectButton.textContent = 'Selecionar';
-                    selectButton.className = 'px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors';
-                    selectButton.onclick = () => selectTheme(index, theme);
-                    
-                    const favoriteButton = document.createElement('button');
-                    favoriteButton.textContent = 'Favoritar';
-                    favoriteButton.className = 'favorite-button px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition-colors';
-                    favoriteButton.onclick = () => favoriteTheme(index, theme);
-                    
-                    // buttonContainer.appendChild(selectButton);
-                    buttonContainer.appendChild(favoriteButton);
-                    
-                    themeContainer.appendChild(themeText);
-                    themeContainer.appendChild(buttonContainer);
-                    
-                    themeOutput.appendChild(themeContainer);
-                });
+				response.data.result.themes.forEach((theme, index) => {
+					const themeContainer = document.createElement('div');
+					themeContainer.className = 'p-3 bg-white rounded shadow mb-4 flex justify-between items-center';
+					
+					const themeText = document.createElement('p');
+					themeText.textContent = theme;
+					themeText.className = 'flex-grow';
+					
+					const buttonContainer = document.createElement('div');
+					buttonContainer.className = 'flex space-x-2';
+					
+					const generateSubtopicsButton = document.createElement('button');
+					generateSubtopicsButton.textContent = 'Gerar Subtópicos';
+					generateSubtopicsButton.className = 'px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 transition-colors';
+					generateSubtopicsButton.onclick = () => generateSubtopics(index, theme);
+					
+					const favoriteButton = document.createElement('button');
+					favoriteButton.textContent = 'Favoritar';
+					favoriteButton.className = 'favorite-button px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition-colors';
+					favoriteButton.onclick = () => favoriteTheme(index, theme);
+					
+					buttonContainer.appendChild(generateSubtopicsButton);
+					buttonContainer.appendChild(favoriteButton);
+					
+					themeContainer.appendChild(themeText);
+					themeContainer.appendChild(buttonContainer);
+					
+					themeOutput.appendChild(themeContainer);
+				});
                 
                 resultsContainer.classList.remove('hidden');
             } else {
@@ -255,6 +255,52 @@ document.addEventListener('DOMContentLoaded', () => {
 		}
     });
 
+	async function generateSubtopics(index, theme) {
+		sendGAEvent('Theme Generator', 'Generate Subtopics', theme);
+		overlay.classList.remove('hidden');
+		startTimer();
+		try {
+			const response = await axios.post('/api/subtopics', { theme });
+			if (response.data.success) {
+				showModal(true, 'Subtópicos gerados com sucesso!');
+				// Criar o modal
+				const subtopicsModal = document.createElement('div');
+				subtopicsModal.className = 'fixed z-10 inset-0 overflow-y-auto flex items-center justify-center';
+				subtopicsModal.style.display = 'none';
+				const subtopicsModalContent = document.createElement('div');
+				subtopicsModalContent.className = 'bg-white shadow-lg rounded-lg max-w-md w-full p-6 relative';
+				const subtopicsContainer = document.createElement('div');
+				subtopicsContainer.className = 'space-y-4';
+				response.data.subtopics.forEach(subtopic => {
+					const subtopicElement = document.createElement('div');
+					subtopicElement.className = 'bg-white shadow-md rounded-lg p-4';
+					subtopicElement.textContent = `${subtopic}`;
+					subtopicsContainer.appendChild(subtopicElement);
+				});
+				const closeButton = document.createElement('button');
+				closeButton.className = 'text-gray-500 hover:text-gray-700 absolute top-4 right-4';
+				closeButton.innerHTML = '&times;';
+				closeButton.addEventListener('click', () => {
+					subtopicsModal.style.display = 'none';
+				});
+				subtopicsModalContent.appendChild(subtopicsContainer);
+				subtopicsModalContent.appendChild(closeButton);
+				subtopicsModal.appendChild(subtopicsModalContent);
+				document.body.appendChild(subtopicsModal);
+				// Mostrar o modal
+				subtopicsModal.style.display = 'flex';
+			} else {
+				showModal(false, response.data.message);
+			}
+		} catch (error) {
+			console.error('Erro ao gerar subtópicos:', error);
+			showModal(false, 'Ocorreu um erro ao gerar subtópicos. Por favor, tente novamente.');
+		} finally {
+			overlay.classList.add('hidden');
+			stopTimer();
+			setTimeout(hideModal, 3000);
+		}
+	}
 
 	const showAdvancedOptionsBtn = document.getElementById('showAdvancedOptions');
 	const advancedOptionsSection = document.getElementById('advancedOptions');

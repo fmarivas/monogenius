@@ -5,6 +5,12 @@ const dashboardFeatures = {
     icon: 'fas fa-lightbulb',
     link: '/c/themes'
   },	
+  references: {
+    name: 'Gerador de Referências',
+    description: 'Crie referências bibliográficas automaticamente.',
+    icon: 'fas fa-book',
+    link: '/c/references'
+  },
   create: {
     name: 'Criar Monografia',
     description: 'Inicie o processo de criação de sua nova monografia.',
@@ -17,18 +23,18 @@ const dashboardFeatures = {
     icon: 'fas fa-shield-alt',
     link: '/c/defense'
   },
-  references: {
-    name: 'Gerador de Referências',
-    description: 'Crie referências bibliográficas automaticamente.',
-    icon: 'fas fa-book',
-    link: '/c/references'
+  paraphrase: {
+    name: 'Parafrasear',
+    description: 'Parafrase o seu texto de forma assistida.',
+    icon: 'fas fa-language',
+    link: '/c/paraphrase'
   },
-  hypothesis: {
-    name: 'Gerador de Hipóteses',
-    description: 'Formule hipóteses para sua pesquisa de forma assistida.',
-    icon: 'fas fa-flask',
-    link: '/c/hypothesis'
-  },  
+  // hypothesis: {
+    // name: 'Gerador de Hipóteses',
+    // description: 'Formule hipóteses para sua pesquisa de forma assistida.',
+    // icon: 'fas fa-flask',
+    // link: '/c/hypothesis'
+  // },  
   plagiarism: {
     name: 'Verificador de Plágio',
     description: 'Verifique o nível de originalidade do seu texto.',

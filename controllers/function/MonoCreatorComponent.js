@@ -129,22 +129,67 @@ class Monography {
 			}
 		  ];
 
-		 const message = `
-			  Escreva a introdução detalhada de uma monografia acadêmica sobre o tema "${tema}" com a ideia inicial "${ideiaInicial}". 
-			  É crucial que cada seção seja desenvolvida com profundidade, fornecendo explicações detalhadas e análises abrangentes.
+		 // const message = `
+			  // Escreva a introdução detalhada de uma monografia acadêmica sobre o tema "${tema}" com a ideia inicial "${ideiaInicial}". 
+			  // É crucial que cada seção seja desenvolvida com profundidade, fornecendo explicações detalhadas e análises abrangentes.
 
-			  Requisitos específicos de extensão:
-			  - Contextualização, Problematização, Justificativa e Delimitação da Pesquisa: mínimo de 2000 palavras cada.
+			  // Requisitos específicos de extensão:
+			  // - Contextualização, Problematização, Justificativa e Delimitação da Pesquisa: mínimo de 2000 palavras cada.
 
-			  Incorpore as seguintes referências bibliográficas em seu texto, usando citações apropriadas:
-			  ${referencias.join('\n')}
-			  ${citationInstructions}
+			  // Incorpore as seguintes referências bibliográficas em seu texto, usando citações apropriadas:
+			  // ${referencias.join('\n')}
+			  // ${citationInstructions}
 
-			  ${manuais ? `Considere os seguintes manuais ou diretrizes ao escrever: ${manuais}.` : ''}
+			  // ${manuais ? `Considere os seguintes manuais ou diretrizes ao escrever: ${manuais}.` : ''}
 
-			  Use a função fornecida para gerar a estrutura da introdução da monografia. Lembre-se de respeitar os requisitos mínimos de extensão para cada seção e incorporar as citações de forma adequada.
-		  `;
+			  // Use a função fornecida para gerar a estrutura da introdução da monografia. Lembre-se de respeitar os requisitos mínimos de extensão para cada seção e incorporar as citações de forma adequada.
+		  // `;
+		const message = `
+		  Gere um template detalhado para a introdução de uma monografia acadêmica sobre o tema "${tema}" com a ideia inicial "${ideiaInicial}".
+		  O template deve seguir as normas APA e incluir espaços para preenchimento marcados com colchetes [].
 
+		  Estrutura do template:
+
+		  1. Introdução
+
+		  1.1 Contextualização
+		  [Insira aqui uma contextualização detalhada do tema, com no mínimo 2000 palavras. Aborde o cenário geral em que o tema se insere, sua relevância histórica e atual. Utilize pelo menos 3 citações de autores relevantes.]
+
+		  1.2 Problematização
+		  [Descreva o problema de pesquisa de forma clara e específica, com no mínimo 2000 palavras. Explique por que este problema merece ser estudado e quais as lacunas existentes no conhecimento atual. Inclua pelo menos 2 citações que corroborem a existência deste problema.]
+		  
+		  Pergunta de Partida: ${ideiaInicial}
+		  [Formule a pergunta de partida ao final da problematização, sintetizando o que o estudo busca responder. Por exemplo: "Como o uso de tecnologias educacionais afeta a aprendizagem de alunos do ensino superior em Moçambique?"]
+
+		  1.3 Justificativa
+		  [Apresente argumentos que justifiquem a importância deste estudo, em no mínimo 2000 palavras. Discuta a relevância acadêmica, social e/ou econômica da pesquisa. Utilize pelo menos 3 citações para apoiar seus argumentos.]
+
+		  1.4 Objetivos
+		  1.4.1 Objetivo Geral
+		  [Insira aqui o objetivo geral da pesquisa em uma frase clara e concisa]
+
+		  1.4.2 Objetivos Específicos
+		  - [Objetivo específico 1]
+		  - [Objetivo específico 2]
+		  - [Objetivo específico 3]
+		  - [Objetivo específico 4]
+
+		  1.5 Delimitação da Pesquisa
+		  [Defina os limites da sua pesquisa em termos de escopo, tempo e espaço, em no mínimo 2000 palavras. Explique o que será e o que não será abordado no estudo. Inclua pelo menos 2 citações que apoiem suas escolhas de delimitação.]
+
+		  1.6 Estrutura do Trabalho
+		  [Descreva brevemente como o restante do trabalho será organizado, mencionando os principais capítulos e seu conteúdo]
+
+		  Instruções adicionais:
+		  - Utilize o estilo de citação APA: (Sobrenome, Ano) para citações indiretas e (Sobrenome, Ano, p. X) para citações diretas.
+		  - Integre as citações de forma fluida no texto.
+		  - Considere as seguintes referências ao preencher o template:
+		  ${referencias.join('\n')}
+		  
+		  ${manuais ? `Considere os seguintes manuais ou diretrizes ao preencher o template: ${manuais}.` : ''}
+
+		  Lembre-se de respeitar os requisitos mínimos de extensão para cada seção e incorporar as citações de forma adequada.
+		`;
 		  try {
 			const completion = await openai.chat.completions.create({
 			  model: aiModel,

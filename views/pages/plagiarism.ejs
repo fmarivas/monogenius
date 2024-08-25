@@ -1,4 +1,15 @@
 <!DOCTYPE html>
+<div id="match-div" class="hidden bg-white rounded-lg shadow-lg p-6 max-w-3xl w-full">
+  <div class="flex items-start justify-between mb-4">
+    <h3 class="text-lg font-medium text-gray-900">Matches Encontrados</h3>
+    <button id="close-modal-matches" type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg p-1.5 ml-auto inline-flex items-center">
+      <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+      </svg>
+    </button>
+  </div>
+  <div id="modal-content" class="text-gray-700 space-y-2"></div>
+</div>
 	<div id="feedback-modal-plagiarism" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
 		<div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
 			<h3 class="text-lg font-bold text-gray-900 mb-4" id="modal-title-plagiarism">Seu feedback</h3>
@@ -54,7 +65,8 @@
                     </label>
                     <textarea class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="text-input" rows="5" placeholder="Cole ou digite o texto aqui"></textarea>
 					<div class="font-semibold text-right text-gray-600 text-sm">
-						<span id="word-count">Limit: 0 / 500 palavras</span> -
+						<!-- <span id="word-count">Limit: 0 / 500 palavras</span> - -->
+						<span id="word-count">0 palavras</span> -
 						<span id="char-count">Total Caracteres: 0</span>
 					</div>					
                 </div>
@@ -86,8 +98,16 @@
 				</div>
 			</div>
 			<div class="mb-4">
-				<h3 class="text-lg font-semibold text-gray-800 mb-2">Correspondências na Web</h3>
-				<div id="matches" class="text-gray-700"></div>
+			  <h3 class="text-lg font-semibold text-gray-800 mb-2">Correspondências na Web</h3>
+			  <div id="matches" class="text-gray-700"></div>
+			  <div class="flex justify-between items-center">
+				<button id="reopen-modal" class="mt-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
+				  Exibir Matches
+				</button>
+				<a href="/c/paraphrase" class="mt-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">
+				  Parafrasear
+				</a>
+			  </div>
 			</div>
 			<div>
 				<h3 class="text-lg font-semibold text-gray-800 mb-2">Fontes</h3>

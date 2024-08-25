@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const words = textInput.trim().split(/\s+/).filter(Boolean).length;
         const chars = textInput.length;
 
-        document.getElementById('word-count').textContent = `Limit: ${words} / 500 palavras`;
+        document.getElementById('word-count').textContent = `${words === 1 ? '1 palavra' : `${words} palavras`}`;
         document.getElementById('char-count').textContent = `Total Caracteres: ${chars}`;
     }
 
@@ -104,6 +104,11 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(hideModal, 3000);
         }
     }
+
+	// Adicionar event listener para reabrir o modal
+	document.getElementById('reopen-modal').addEventListener('click', () => {
+	  modal.classList.remove('hidden');
+	});
 
     // Plagiarism Check Function
     async function verificarPlagio() {
@@ -172,18 +177,59 @@ document.addEventListener('DOMContentLoaded', () => {
     function exibirResultado(resultado) {
         const resultadoDiv = document.getElementById('resultado');
         
-        document.getElementById('percentPlagiarism').textContent = `${resultado.percentPlagiarism}%`;
+		const percentPlagiarismElement = document.getElementById('percentPlagiarism');
+		if (percentPlagiarismElement) {
+		  percentPlagiarismElement.textContent = `${resultado.percentPlagiarism}%`;
+		}
         document.getElementById('sourceCount').textContent = resultado.sources.length;
 
         const matchesDiv = document.getElementById('matches');
         matchesDiv.innerHTML = '';
-        resultado.sources.forEach(source => {
-            source.matches.forEach(match => {
-                const matchElement = document.createElement('p');
-                matchElement.innerHTML = `<span class="font-semibold">${match.matchText}</span> - Score: ${match.score}`;
-                matchesDiv.appendChild(matchElement);
-            });
-        });
+				
+		// Armazenar os matchTexts encontrados
+		const matchTexts = [];
+
+		// Iterar sobre os matches encontrados
+		resultado.sources.forEach(source => {
+			source.matches.forEach(match => {
+			  matchTexts.push(match.matchText);
+			});
+		});
+
+		// Obter o texto do campo de entrada do usuário
+		const textInput = document.getElementById('text-input').value.trim().split(/\s+/);
+
+		// Criar o conteúdo do modal
+		const modalContent = document.getElementById('modal-content');
+		modalContent.innerHTML = '';
+
+		matchTexts.forEach(matchText => {
+		const matchWords = matchText.trim().split(/\s+/);
+		const matchStartIndex = textInput.findIndex(word => word === matchWords[0]);
+		const matchEndIndex = matchStartIndex + matchWords.length - 1;
+
+		const matchElement = document.createElement('p');
+		matchElement.innerHTML = textInput
+		  .map((word, index) => {
+			if (index >= matchStartIndex && index <= matchEndIndex) {
+			  return `<span class="bg-red-200 text-red-800 font-semibold px-1">${word}</span>`;
+			} else {
+			  return word;
+			}
+		  })
+		  .join(' ');
+		modalContent.appendChild(matchElement);
+		});
+
+		// Exibir o modal
+		const modal = document.getElementById('match-div')
+		modal.classList.remove('hidden');
+
+		// Adicionar event listener para fechar o modal
+		document.getElementById('close-modal-matches').addEventListener('click', () => {
+			modal.classList.add('hidden');
+		});
+
 
         const sourcesUl = document.getElementById('sources');
         sourcesUl.innerHTML = '';
@@ -197,7 +243,7 @@ document.addEventListener('DOMContentLoaded', () => {
         citationsUl.innerHTML = '';
         resultado.citations.forEach(citation => {
             const li = document.createElement('li');
-            li.innerHTML = `${citation.title} - Score: ${citation.score}`;
+            li.innerHTML = `${citation.title}`;
             citationsUl.appendChild(li);
         });
 

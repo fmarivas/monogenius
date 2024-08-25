@@ -110,7 +110,10 @@ const pageResources = {
 	},
 	resume:{
 		js: ['/static/assets/js/resume.js'],
-	}
+	},
+	paraphrase:{
+		js: ['/static/assets/js/paraphrase.js'],
+	},
 };
 
 module.exports = pageResources;
