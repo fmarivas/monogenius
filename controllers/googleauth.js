@@ -1,3 +1,4 @@
+require('dotenv').config()
 const GoogleStrategy = require('passport-google-oauth20').Strategy
 const express =require('express')
 const router = express.Router()
@@ -5,7 +6,6 @@ const path = require('path')
 const passport = require('passport')
 const Authorization = require('../controllers/function/authorization')
 
-require('dotenv').config()
 let userProfile
 
 passport.use(new GoogleStrategy({
@@ -28,35 +28,34 @@ router.get('/login', (req, res) =>{
 router.get('/google',  passport.authenticate('google', { scope: ['email', 'profile'] }));
 
 router.get('/google/callback',
-  passport.authenticate('google', { failureRedirect: '/error' }),
-  function(req, res) {
-    // Successful authentication, redirect home.
-    res.redirect('/auth/success');
-  });
-
-router.get("/success", async (req, res, next) => {
+  passport.authenticate('google', { failureRedirect: '/auth/error' }),
+  async (req, res) => {
     try {
-		const user = await Authorization.handUserGoogleLogin(req.user);
-		
-		if(user){
-			req.session.user = user
-			
-			res.redirect('/survey/onboarding')
-		}else{
-			res.redirect('/error')
-		}
+      const user = await Authorization.handUserGoogleLogin(req.user);
+      
+      if (user) {
+        req.session.user = user;
+        res.redirect('/survey/onboarding');
+      } else {
+        throw new Error('user_not_found');
+      }
     } catch (err) {
-        console.error(err);
-		let error = new Error("Erro interno do servidor");
-		error.status = 500;
-		next(error);
+      console.error('Authentication error:', err);
+      let errorType = 'unknown';
+      if (err.message === 'user_not_found') {
+        errorType = 'user_not_found';
+      } else if (err.code === 'ER_BAD_NULL_ERROR') {
+        errorType = 'missing_info';
+      }
+      res.redirect(`/auth/error?type=${errorType}`);
     }
+  }
+);
+
+router.get('/error', (req, res) => {
+  const errorType = req.query.type || 'unknown';
+  res.render('error', { errorType });
 });
-
-router.get('/error', (req, res) =>{
-	res.sendFile(path.join(__dirname, 'public', 'error', 'googleError.html'));
-})
-
 
 
 module.exports = router

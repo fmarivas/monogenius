@@ -9,7 +9,7 @@ monoQueue.process(async (job) => {
   if (!mono.success) {
     throw new Error(mono.message);
   }
-console.log(mono)
+
   return {
     mono: mono.monografia,
     refer: mono.refer,

@@ -114,6 +114,9 @@ const pageResources = {
 	paraphrase:{
 		js: ['/static/assets/js/paraphrase.js'],
 	},
+	progress:{
+		js: ['/static/assets/js/progress.js'],
+	},
 };
 
 module.exports = pageResources;

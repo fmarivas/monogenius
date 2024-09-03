@@ -85,65 +85,51 @@ class Monography {
 			}
 		}
 		
-		static async generateIntroduction(tema, ideiaInicial, manuais, referencias, tier) {
-		  let aiModel = tier === "free" ? 'gpt-4o-mini' : 'gpt-4o';
+		 static async generateIntroduction(tema, ideiaInicial, manuais, referencias, tier) {
+			let aiModel = tier === "free" ? 'gpt-4o-mini' : 'gpt-4o';
 
-		  const citationInstructions = `
-			Ao citar as referências no texto, use o estilo APA:
-			- Para citações diretas: (Sobrenome, Ano, p. X)
-			- Para citações indiretas: (Sobrenome, Ano)
-			- Para múltiplos autores, use '&' para dois autores e 'et al.' para três ou mais
-			Integre as citações de forma fluida no texto, evitando concentrá-las em um único parágrafo.
-		  `;
-		  
-		  const tools = [
-			{
-			  type: "function",
-			  function: {
-				name: "generate_introduction",
-				description: "Gera a estrutura da introdução de uma monografia com base nos parâmetros fornecidos",
-				parameters: {
-				  type: "object",
-				  properties: {
-					introducao: {
-					  type: "object",
-					  properties: {
-						contextualizacao: { type: "string", description: "Contextualização do tema (texto extenso de no mínimo 1000 palavras)" },
-						problematizacao: { type: "string", description: "Problematização do tema (texto extenso de no mínimo 1000 palavras)" },
-						justificativa: { type: "string", description: "Justificativa do trabalho (texto extenso de no mínimo 1000 palavras)" },
-						objetivo_geral: { type: "string", description: "Objetivo geral do trabalho (breve e direto)" },
-						objetivos_especificos: { 
-						  type: "array", 
-						  items: { type: "string" }, 
-						  description: "Lista de objetivos específicos (máximo de 4, breves e diretos)" 
+console.log(ideiaInicial)
+			const citationInstructions = `
+			  Ao citar as referências no texto, use o estilo APA:
+			  - Para citações diretas: (Sobrenome, Ano, p. X)
+			  - Para citações indiretas: (Sobrenome, Ano)
+			  - Para múltiplos autores, use '&' para dois autores e 'et al.' para três ou mais
+			  Integre as citações de forma fluida no texto, evitando concentrá-las em um único parágrafo.
+			`;
+			
+			const tools = [
+			  {
+				type: "function",
+				function: {
+				  name: "generate_introduction_template",
+				  description: "Gera um template detalhado para a introdução de uma monografia acadêmica",
+				  parameters: {
+					type: "object",
+					properties: {
+					  introducao: {
+						type: "object",
+						properties: {
+						  contextualizacao: { type: "string", description: "Template para a contextualização do tema" },
+						  problematizacao: { type: "string", description: "Template para a problematização do tema" },
+						  justificativa: { type: "string", description: "Template para a justificativa do trabalho" },
+						  objetivo_geral: { type: "string", description: "Template para o objetivo geral" },
+						  objetivos_especificos: { 
+							type: "array", 
+							items: { type: "string" }, 
+							description: "Lista de templates para objetivos específicos" 
+						  },
+						  delimitacao_pesquisa: { type: "string", description: "Template para a delimitação da pesquisa" },
+						  estrutura_trabalho: { type: "string", description: "Template para a estrutura do trabalho" },
 						},
-						delimitacao_pesquisa: { type: "string", description: "Delimitação da pesquisa (texto extenso de no mínimo 1000 palavras)" },
-						estrutura_trabalho: { type: "string", description: "Breve descrição da estrutura do trabalho" },
-					  },
-					  required: ["contextualizacao", "problematizacao", "justificativa", "objetivo_geral", "objetivos_especificos", "delimitacao_pesquisa", "estrutura_trabalho"]
-					}
-				  },
-				  required: ["introducao"]
+						required: ["contextualizacao", "problematizacao", "justificativa", "objetivo_geral", "objetivos_especificos", "delimitacao_pesquisa", "estrutura_trabalho"]
+					  }
+					},
+					required: ["introducao"]
+				  }
 				}
 			  }
-			}
-		  ];
+			];
 
-		 // const message = `
-			  // Escreva a introdução detalhada de uma monografia acadêmica sobre o tema "${tema}" com a ideia inicial "${ideiaInicial}". 
-			  // É crucial que cada seção seja desenvolvida com profundidade, fornecendo explicações detalhadas e análises abrangentes.
-
-			  // Requisitos específicos de extensão:
-			  // - Contextualização, Problematização, Justificativa e Delimitação da Pesquisa: mínimo de 2000 palavras cada.
-
-			  // Incorpore as seguintes referências bibliográficas em seu texto, usando citações apropriadas:
-			  // ${referencias.join('\n')}
-			  // ${citationInstructions}
-
-			  // ${manuais ? `Considere os seguintes manuais ou diretrizes ao escrever: ${manuais}.` : ''}
-
-			  // Use a função fornecida para gerar a estrutura da introdução da monografia. Lembre-se de respeitar os requisitos mínimos de extensão para cada seção e incorporar as citações de forma adequada.
-		  // `;
 		const message = `
 		  Gere um template detalhado para a introdução de uma monografia acadêmica sobre o tema "${tema}" com a ideia inicial "${ideiaInicial}".
 		  O template deve seguir as normas APA e incluir espaços para preenchimento marcados com colchetes [].
@@ -152,74 +138,117 @@ class Monography {
 
 		  1. Introdução
 
-		  1.1 Contextualização
-		  [Insira aqui uma contextualização detalhada do tema, com no mínimo 2000 palavras. Aborde o cenário geral em que o tema se insere, sua relevância histórica e atual. Utilize pelo menos 3 citações de autores relevantes.]
+		  1.1 Contextualização (mínimo 2000 palavras)
+		  [Insira aqui uma contextualização detalhada do tema. Aborde os seguintes pontos:
+		  - Definição e explicação do tema central: [Defina e explique o conceito principal do seu tema]
+		  - Contexto histórico: [Discuta brevemente a evolução histórica do tema]
+		  - Relevância atual: [Explique por que o tema é importante no contexto atual]
+		  - Tendências e debates atuais: [Mencione as principais tendências e debates relacionados ao tema]
+		  - Impacto social/econômico/tecnológico: [Descreva o impacto do tema na sociedade, economia ou tecnologia]
+		  Lembre-se de utilizar pelo menos 3 citações de autores relevantes para apoiar suas afirmações. Exemplos de citações que poderiam ser usadas:
+		  - "A evolução das tecnologias de processamento de dados tem revolucionado a forma como gerenciamos informações em diversos setores" (Johnson, 2022, p. 45).
+		  - "A segurança da informação tornou-se uma preocupação primordial na era digital, especialmente no que tange ao manuseio de documentos sensíveis" (Garcia, 2023, p. 112).
+		  - "O uso de bibliotecas especializadas para análise de documentos não apenas melhora a eficiência, mas também reduz significativamente a margem de erro no processamento de dados" (Smith, 2021, p. 78).]
 
-		  1.2 Problematização
-		  [Descreva o problema de pesquisa de forma clara e específica, com no mínimo 2000 palavras. Explique por que este problema merece ser estudado e quais as lacunas existentes no conhecimento atual. Inclua pelo menos 2 citações que corroborem a existência deste problema.]
-		  
+		  1.2 Problematização (mínimo 2000 palavras)
+		  [Descreva o problema de pesquisa de forma clara e específica. Inclua os seguintes elementos:
+		  - Identificação do problema: [Apresente claramente o problema que será abordado na pesquisa]
+		  - Contextualização do problema: [Explique em que contexto o problema ocorre e por que é relevante]
+		  - Lacunas no conhecimento: [Identifique quais aspectos do problema ainda não foram completamente estudados ou compreendidos]
+		  - Consequências do problema: [Discuta as implicações do problema se não for abordado]
+		  - Justificativa da pesquisa: [Explique por que este problema merece ser estudado]
+		  Inclua pelo menos 2 citações que corroborem a existência e importância deste problema. Exemplos:
+		  - "A falta de padronização no processamento de diferentes formatos de arquivo continua sendo um desafio significativo para muitas organizações" (Brown, 2020, p. 67).
+		  - "Apesar dos avanços tecnológicos, a extração precisa de informações de documentos complexos ainda apresenta obstáculos consideráveis" (Lee & Kim, 2022, p. 23).]
+
 		  Pergunta de Partida: ${ideiaInicial}
-		  [Formule a pergunta de partida ao final da problematização, sintetizando o que o estudo busca responder. Por exemplo: "Como o uso de tecnologias educacionais afeta a aprendizagem de alunos do ensino superior em Moçambique?"]
+		  [Reformule a pergunta de partida, se necessário, para sintetizar o que o estudo busca responder. A pergunta deve ser clara, concisa e diretamente relacionada ao problema de pesquisa apresentado.]
 
-		  1.3 Justificativa
-		  [Apresente argumentos que justifiquem a importância deste estudo, em no mínimo 2000 palavras. Discuta a relevância acadêmica, social e/ou econômica da pesquisa. Utilize pelo menos 3 citações para apoiar seus argumentos.]
+		  1.3 Justificativa (mínimo 2000 palavras)
+		  [Apresente argumentos que justifiquem a importância deste estudo. Aborde os seguintes aspectos:
+		  - Relevância acadêmica: [Explique como o estudo contribuirá para o conhecimento na área]
+		  - Relevância social: [Discuta os potenciais benefícios sociais da pesquisa]
+		  - Relevância econômica ou prática: [Se aplicável, explique as implicações econômicas ou práticas do estudo]
+		  - Originalidade: [Destaque os aspectos originais ou inovadores da sua pesquisa]
+		  - Viabilidade: [Justifique brevemente por que o estudo é viável]
+		  Utilize pelo menos 3 citações para apoiar seus argumentos. Exemplos:
+		  - "A otimização do processamento de documentos pode resultar em economias significativas de tempo e recursos para organizações de todos os tamanhos" (Wilson et al., 2021, p. 89).
+		  - "Estudos sobre tecnologias de extração de dados de documentos têm implicações diretas para a melhoria da tomada de decisões baseadas em evidências" (Chen, 2023, p. 134).
+		  - "A integração de técnicas avançadas de processamento de linguagem natural na análise de documentos representa uma fronteira promissora na gestão da informação" (Patel, 2022, p. 56).]
 
 		  1.4 Objetivos
 		  1.4.1 Objetivo Geral
-		  [Insira aqui o objetivo geral da pesquisa em uma frase clara e concisa]
+		  [Insira aqui o objetivo geral da pesquisa em uma frase clara e concisa. O objetivo deve estar diretamente relacionado à pergunta de partida e ao problema de pesquisa.]
 
 		  1.4.2 Objetivos Específicos
-		  - [Objetivo específico 1]
-		  - [Objetivo específico 2]
-		  - [Objetivo específico 3]
-		  - [Objetivo específico 4]
+		  [Liste de 3 a 5 objetivos específicos que, quando alcançados, levarão ao cumprimento do objetivo geral. Cada objetivo deve ser claro, mensurável e iniciado com um verbo no infinitivo. Por exemplo:]
+		  - [Analisar...]
+		  - [Identificar...]
+		  - [Comparar...]
+		  - [Avaliar...]
+		  - [Propor...]
 
-		  1.5 Delimitação da Pesquisa
-		  [Defina os limites da sua pesquisa em termos de escopo, tempo e espaço, em no mínimo 2000 palavras. Explique o que será e o que não será abordado no estudo. Inclua pelo menos 2 citações que apoiem suas escolhas de delimitação.]
+		  1.5 Delimitação da Pesquisa (mínimo 2000 palavras)
+		  [Defina os limites da sua pesquisa. Aborde os seguintes pontos:
+		  - Escopo temático: [Especifique exatamente quais aspectos do tema serão abordados e quais não serão]
+		  - Delimitação temporal: [Defina o período de tempo que será considerado na pesquisa]
+		  - Delimitação espacial: [Especifique a área geográfica ou contexto organizacional da pesquisa, se aplicável]
+		  - Delimitação populacional: [Descreva a população ou amostra que será estudada, se aplicável]
+		  - Limitações metodológicas: [Mencione quaisquer limitações metodológicas previstas]
+		  Inclua pelo menos 2 citações que apoiem suas escolhas de delimitação. Exemplos:
+		  - "A delimitação precisa do escopo de pesquisa em estudos sobre tecnologias de processamento de documentos é crucial para garantir resultados significativos e aplicáveis" (Thompson & Roberts, 2022, p. 45).
+		  - "Ao estudar sistemas de gerenciamento de documentos, é importante considerar as rápidas mudanças tecnológicas e limitar o período de análise para garantir a relevância dos resultados" (Yamamoto & Singh, 2023, p. 78).]
 
 		  1.6 Estrutura do Trabalho
-		  [Descreva brevemente como o restante do trabalho será organizado, mencionando os principais capítulos e seu conteúdo]
+		  [Descreva brevemente como o restante do trabalho será organizado. Por exemplo:]
+		  [Este trabalho está estruturado em X capítulos:
+		  - Capítulo 1 (Introdução): Apresenta o tema, problema, justificativa, objetivos e delimitação da pesquisa.
+		  - Capítulo 2 (Revisão da Literatura): Aborda... [complete com o conteúdo previsto]
+		  - Capítulo 3 (Metodologia): Descreve... [complete com o conteúdo previsto]
+		  - Capítulo 4 (Resultados e Discussão): Apresenta... [complete com o conteúdo previsto]
+		  - Capítulo 5 (Conclusão): Sintetiza os principais achados e contribuições da pesquisa.]
 
 		  Instruções adicionais:
-		  - Utilize o estilo de citação APA: (Sobrenome, Ano) para citações indiretas e (Sobrenome, Ano, p. X) para citações diretas.
-		  - Integre as citações de forma fluida no texto.
+		  - Utilize o estilo de citação APA: ${citationInstructions}
+		  - Integre as citações de forma fluida no texto, evitando agrupá-las em um único parágrafo.
 		  - Considere as seguintes referências ao preencher o template:
 		  ${referencias.join('\n')}
 		  
 		  ${manuais ? `Considere os seguintes manuais ou diretrizes ao preencher o template: ${manuais}.` : ''}
 
-		  Lembre-se de respeitar os requisitos mínimos de extensão para cada seção e incorporar as citações de forma adequada.
+		  Use a função fornecida para gerar o template da introdução da monografia. Lembre-se de incluir os espaços para preenchimento marcados com colchetes [] em cada seção, mantendo as instruções detalhadas dentro dos colchetes para orientar o usuário no preenchimento.
 		`;
-		  try {
-			const completion = await openai.chat.completions.create({
-			  model: aiModel,
-			  messages: [
-				{ role: "system", content: "Você é um assistente especializado em redação acadêmica, capaz de criar introduções de monografias bem estruturadas e fundamentadas." },
-				{ role: "user", content: message }
-			  ],
-			  tools: tools,
-			  tool_choice: "auto"
-			});
-			
-			const responseMessage = completion.choices[0].message;
-			
-			if (responseMessage.tool_calls) {
-			  const functionCall = responseMessage.tool_calls[0];
-			  const functionArguments = JSON.parse(functionCall.function.arguments);
+
+			try {
+			  const completion = await openai.chat.completions.create({
+				model: aiModel,
+				messages: [
+				  { role: "system", content: "Você é um assistente especializado em redação acadêmica, capaz de criar templates de introduções de monografias bem estruturadas." },
+				  { role: "user", content: message }
+				],
+				tools: tools,
+				tool_choice: "auto"
+			  });
 			  
-			  if (this.isValidIntroductionStructure(functionArguments.introducao)) {
-				return functionArguments.introducao;
+			  const responseMessage = completion.choices[0].message;
+			  
+			  if (responseMessage.tool_calls) {
+				const functionCall = responseMessage.tool_calls[0];
+				const functionArguments = JSON.parse(functionCall.function.arguments);
+				
+				if (this.isValidIntroductionStructure(functionArguments.introducao)) {
+				  return functionArguments.introducao;
+				} else {
+				  throw new Error('A estrutura do template da introdução retornada é inválida');
+				}     
 			  } else {
-				throw new Error('A estrutura da introdução retornada é inválida');
-			  }     
-			} else {
-			  throw new Error('Falha ao gerar a estrutura da introdução');
+				throw new Error('Falha ao gerar o template da introdução');
+			  }
+			} catch (error) {
+			  console.error('Erro:', error);
+			  throw new Error('Falha ao gerar o template da introdução da monografia');
 			}
-		  } catch (error) {
-			console.error('Erro:', error);
-			throw new Error('Falha ao gerar a introdução da monografia');
 		  }
-		}
 
 		static isValidIntroductionStructure(introducao) {
 		  return introducao &&

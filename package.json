@@ -43,6 +43,7 @@
     "pdf-parse": "^1.1.1",
     "redis": "^4.7.0",
     "shepherd.js": "^13.0.1",
+    "tippy.js": "^6.3.7",
     "util": "^0.12.5",
     "word-extractor": "^1.0.4"
   }

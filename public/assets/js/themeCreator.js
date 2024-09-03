@@ -159,11 +159,11 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateFavoriteButton(index, isFavorited) {
         const button = document.querySelectorAll('.favorite-button')[index];
         if (isFavorited) {
-            button.textContent = 'Desfavoritar';
+            button.textContent = 'Remover';
             button.classList.remove('bg-yellow-500', 'hover:bg-yellow-600');
             button.classList.add('bg-gray-500', 'hover:bg-gray-600');
         } else {
-            button.textContent = 'Favoritar';
+            button.textContent = 'Guardar';
             button.classList.remove('bg-gray-500', 'hover:bg-gray-600');
             button.classList.add('bg-yellow-500', 'hover:bg-yellow-600');
         }
@@ -218,12 +218,12 @@ document.addEventListener('DOMContentLoaded', () => {
 					buttonContainer.className = 'flex space-x-2';
 					
 					const generateSubtopicsButton = document.createElement('button');
-					generateSubtopicsButton.textContent = 'Gerar Subtópicos';
+					generateSubtopicsButton.textContent = 'Detalhes';
 					generateSubtopicsButton.className = 'px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 transition-colors';
 					generateSubtopicsButton.onclick = () => generateSubtopics(index, theme);
 					
 					const favoriteButton = document.createElement('button');
-					favoriteButton.textContent = 'Favoritar';
+					favoriteButton.textContent = 'Guardar';
 					favoriteButton.className = 'favorite-button px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition-colors';
 					favoriteButton.onclick = () => favoriteTheme(index, theme);
 					
@@ -255,53 +255,152 @@ document.addEventListener('DOMContentLoaded', () => {
 		}
     });
 
-	async function generateSubtopics(index, theme) {
-		sendGAEvent('Theme Generator', 'Generate Subtopics', theme);
-		overlay.classList.remove('hidden');
-		startTimer();
-		try {
-			const response = await axios.post('/api/subtopics', { theme });
-			if (response.data.success) {
-				showModal(true, 'Subtópicos gerados com sucesso!');
-				// Criar o modal
-				const subtopicsModal = document.createElement('div');
-				subtopicsModal.className = 'fixed z-10 inset-0 overflow-y-auto flex items-center justify-center';
-				subtopicsModal.style.display = 'none';
-				const subtopicsModalContent = document.createElement('div');
-				subtopicsModalContent.className = 'bg-white shadow-lg rounded-lg max-w-md w-full p-6 relative';
-				const subtopicsContainer = document.createElement('div');
-				subtopicsContainer.className = 'space-y-4';
-				response.data.subtopics.forEach(subtopic => {
-					const subtopicElement = document.createElement('div');
-					subtopicElement.className = 'bg-white shadow-md rounded-lg p-4';
-					subtopicElement.textContent = `${subtopic}`;
-					subtopicsContainer.appendChild(subtopicElement);
-				});
-				const closeButton = document.createElement('button');
-				closeButton.className = 'text-gray-500 hover:text-gray-700 absolute top-4 right-4';
-				closeButton.innerHTML = '&times;';
-				closeButton.addEventListener('click', () => {
-					subtopicsModal.style.display = 'none';
-				});
-				subtopicsModalContent.appendChild(subtopicsContainer);
-				subtopicsModalContent.appendChild(closeButton);
-				subtopicsModal.appendChild(subtopicsModalContent);
-				document.body.appendChild(subtopicsModal);
-				// Mostrar o modal
-				subtopicsModal.style.display = 'flex';
-			} else {
-				showModal(false, response.data.message);
-			}
-		} catch (error) {
-			console.error('Erro ao gerar subtópicos:', error);
-			showModal(false, 'Ocorreu um erro ao gerar subtópicos. Por favor, tente novamente.');
-		} finally {
-			overlay.classList.add('hidden');
-			stopTimer();
-			setTimeout(hideModal, 3000);
-		}
-	}
+async function generateSubtopics(index, theme) {
+    sendGAEvent('Theme Generator', 'Generate Subtopics', theme);
+    overlay.classList.remove('hidden');
+    startTimer();
+    try {
+        const response = await axios.post('/api/subtopics', { theme });
+        
+        if (response.data.success) {
+            showModal(true, 'Detalhes do tema gerados com sucesso!');
+            
+            // Criar o modal
+            const subtopicsModal = document.createElement('div');
+            subtopicsModal.className = 'fixed z-50 inset-0 overflow-y-auto flex items-center justify-center bg-black bg-opacity-50';
+            subtopicsModal.style.display = 'none';
+            
+            const subtopicsModalContent = document.createElement('div');
+            subtopicsModalContent.className = 'bg-white shadow-xl rounded-lg max-w-4xl w-full p-6 relative max-h-[90vh] overflow-y-auto';
+            
+            const subtopicsContainer = document.createElement('div');
+            subtopicsContainer.className = 'space-y-8';
+            
+            const details = response.data.subtopics;
+            
+            // Título
+            const titleElement = document.createElement('h3');
+            titleElement.className = 'text-3xl font-bold text-indigo-600 mb-6';
+            titleElement.textContent = details.title;
+            subtopicsContainer.appendChild(titleElement);
+            
+            // Descrição
+            const descriptionElement = document.createElement('p');
+            descriptionElement.className = 'text-gray-700 mb-6';
+            descriptionElement.textContent = details.description;
+            subtopicsContainer.appendChild(descriptionElement);
+            
+            // Perguntas de Partida
+            const questionsElement = document.createElement('div');
+            questionsElement.className = 'space-y-2 mb-6';
+            const questionsTitle = document.createElement('h3');
+            questionsTitle.className = 'text-2xl font-semibold text-indigo-500';
+            questionsTitle.textContent = 'Perguntas de Partida:';
+            questionsElement.appendChild(questionsTitle);
+            details.questions.forEach(question => {
+                const questionItem = document.createElement('p');
+                questionItem.className = 'ml-4 text-gray-600';
+                questionItem.textContent = question;
+                questionsElement.appendChild(questionItem);
+            });
+            subtopicsContainer.appendChild(questionsElement);
+            
+            // Abordagens Possíveis
+            const approachesElement = document.createElement('div');
+            approachesElement.className = 'space-y-2 mb-6';
+            const approachesTitle = document.createElement('h3');
+            approachesTitle.className = 'text-2xl font-semibold text-indigo-500';
+            approachesTitle.textContent = 'Abordagens Possíveis:';
+            approachesElement.appendChild(approachesTitle);
+            details.approaches.forEach(approach => {
+                const approachItem = document.createElement('p');
+                approachItem.className = 'ml-4 text-gray-600';
+                approachItem.textContent = approach;
+                approachesElement.appendChild(approachItem);
+            });
+            subtopicsContainer.appendChild(approachesElement);
+            
+            // Subproblemas Relacionados
+            const subproblemsElement = document.createElement('div');
+            subproblemsElement.className = 'space-y-2 mb-6';
+            const subproblemsTitle = document.createElement('h3');
+            subproblemsTitle.className = 'text-2xl font-semibold text-indigo-500';
+            subproblemsTitle.textContent = 'Subproblemas Relacionados:';
+            subproblemsElement.appendChild(subproblemsTitle);
+            details.subproblems.forEach(subproblem => {
+                const subproblemItem = document.createElement('p');
+                subproblemItem.className = 'ml-4 text-gray-600';
+                subproblemItem.textContent = subproblem;
+                subproblemsElement.appendChild(subproblemItem);
+            });
+            subtopicsContainer.appendChild(subproblemsElement);
+            
+			// Delimitação do Problema
+			const delimitationElement = document.createElement('div');
+			delimitationElement.className = 'space-y-2 mb-6';
+			const delimitationTitle = document.createElement('h3');
+			delimitationTitle.className = 'text-2xl font-semibold text-indigo-500';
+			delimitationTitle.textContent = 'Delimitação do Problema:';
+			delimitationElement.appendChild(delimitationTitle);
 
+			const delimitationSuggestion = document.createElement('p');
+			delimitationSuggestion.className = 'ml-4 text-gray-600 font-semibold';
+			delimitationSuggestion.textContent = details.delimitation.suggestion;
+			delimitationElement.appendChild(delimitationSuggestion);
+
+			const delimitationRationale = document.createElement('p');
+			delimitationRationale.className = 'ml-4 text-gray-600';
+			delimitationRationale.textContent = details.delimitation.rationale;
+			delimitationElement.appendChild(delimitationRationale);
+
+			subtopicsContainer.appendChild(delimitationElement);
+
+			// Definição da Amostra
+			const sampleElement = document.createElement('div');
+			sampleElement.className = 'space-y-2 mb-6';
+			const sampleTitle = document.createElement('h3');
+			sampleTitle.className = 'text-2xl font-semibold text-indigo-500';
+			sampleTitle.textContent = 'Definição da Amostra:';
+			sampleElement.appendChild(sampleTitle);
+
+			const sampleSuggestion = document.createElement('p');
+			sampleSuggestion.className = 'ml-4 text-gray-600 font-semibold';
+			sampleSuggestion.textContent = details.sample.suggestion;
+			sampleElement.appendChild(sampleSuggestion);
+
+			const sampleRationale = document.createElement('p');
+			sampleRationale.className = 'ml-4 text-gray-600';
+			sampleRationale.textContent = details.sample.rationale;
+			sampleElement.appendChild(sampleRationale);
+
+			subtopicsContainer.appendChild(sampleElement);
+            const closeButton = document.createElement('button');
+            closeButton.className = 'absolute top-4 right-4 text-gray-500 hover:text-gray-700';
+            closeButton.innerHTML = '&times;';
+            closeButton.addEventListener('click', () => {
+                subtopicsModal.style.display = 'none';
+            });
+            
+            subtopicsModalContent.appendChild(subtopicsContainer);
+            subtopicsModalContent.appendChild(closeButton);
+            subtopicsModal.appendChild(subtopicsModalContent);
+            document.body.appendChild(subtopicsModal);
+            
+            // Mostrar o modal
+            subtopicsModal.style.display = 'flex';
+        } else {
+            showModal(false, response.data.message);
+        }
+    } catch (error) {
+        console.error('Erro ao gerar detalhes do tema:', error);
+        showModal(false, 'Ocorreu um erro ao gerar detalhes do tema. Por favor, tente novamente.');
+    } finally {
+        overlay.classList.add('hidden');
+        stopTimer();
+        setTimeout(hideModal, 3000);
+    }
+}
+	
 	const showAdvancedOptionsBtn = document.getElementById('showAdvancedOptions');
 	const advancedOptionsSection = document.getElementById('advancedOptions');
 	const suggestKeywordsBtn = document.getElementById('suggestKeywords');

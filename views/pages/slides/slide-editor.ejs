@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editor de Slides - Monogenius</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto p-4">
+        <h1 class="text-2xl font-bold mb-4">Editor de Slides</h1>
+        
+        <div class="flex">
+            <!-- Sidebar com miniaturas dos slides -->
+            <div id="slideThumbnails" class="w-1/4 pr-4 space-y-2">
+                <!-- As miniaturas dos slides serão adicionadas aqui dinamicamente -->
+            </div>
+            
+            <!-- Área principal de edição do slide -->
+            <div id="slideEditor" class="w-3/4 bg-white p-4 rounded shadow">
+                <div id="currentSlide" class="aspect-w-16 aspect-h-9 bg-gray-200 mb-4">
+                    <!-- Conteúdo do slide atual será inserido aqui -->
+                </div>
+                <div class="flex justify-between">
+                    <button id="prevSlide" class="bg-blue-500 text-white px-4 py-2 rounded">Anterior</button>
+                    <button id="nextSlide" class="bg-blue-500 text-white px-4 py-2 rounded">Próximo</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let slides = [];
+        let currentSlideIndex = 0;
+
+        // Função para carregar os slides do backend
+        async function loadSlides() {
+            try {
+                const response = await axios.get('/api/get-slides');
+                slides = response.data.slides;
+                renderSlideThumbnails();
+                renderCurrentSlide();
+            } catch (error) {
+                console.error('Erro ao carregar os slides:', error);
+            }
+        }
+
+        // Função para renderizar as miniaturas dos slides
+        function renderSlideThumbnails() {
+            const thumbnailsContainer = document.getElementById('slideThumbnails');
+            thumbnailsContainer.innerHTML = '';
+            slides.forEach((slide, index) => {
+                const thumbnail = document.createElement('div');
+                thumbnail.className = 'bg-white p-2 rounded shadow cursor-pointer';
+                thumbnail.innerHTML = `Slide ${index + 1}`;
+                thumbnail.onclick = () => {
+                    currentSlideIndex = index;
+                    renderCurrentSlide();
+                };
+                thumbnailsContainer.appendChild(thumbnail);
+            });
+        }
+
+        // Função para renderizar o slide atual
+        function renderCurrentSlide() {
+            const currentSlideContainer = document.getElementById('currentSlide');
+            const slide = slides[currentSlideIndex];
+            currentSlideContainer.innerHTML = `
+                <h2 class="text-xl font-bold">${slide.title}</h2>
+                <div>${slide.content}</div>
+            `;
+        }
+
+        // Event listeners para os botões de navegação
+        document.getElementById('prevSlide').addEventListener('click', () => {
+            if (currentSlideIndex > 0) {
+                currentSlideIndex--;
+                renderCurrentSlide();
+            }
+        });
+
+        document.getElementById('nextSlide').addEventListener('click', () => {
+            if (currentSlideIndex < slides.length - 1) {
+                currentSlideIndex++;
+                renderCurrentSlide();
+            }
+        });
+
+        // Carregar os slides ao iniciar a página
+        loadSlides();
+    </script>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<div id="reminders-container" class="mt-8 bg-white shadow overflow-hidden sm:rounded-lg">
+  <div class="px-4 py-5 sm:px-6">
+    <h3 class="text-lg leading-6 font-medium text-gray-900">Lembretes</h3>
+    <p class="mt-1 max-w-2xl text-sm text-gray-500">Seus próximos passos e deadlines</p>
+  </div>
+  <div class="border-t border-gray-200">
+    <ul id="reminders-list" class="divide-y divide-gray-200"></ul>
+  </div>
+</div>
+
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold text-gray-800 mb-6">Meu Progresso Acadêmico</h1>
+
+    <div class="bg-white shadow-md rounded-lg p-6 mb-8">
+        <h2 class="text-2xl font-semibold mb-4">Progresso Geral</h2>
+        <div class="bg-gray-200 rounded-full h-4 mb-4">
+            <div id="overall-progress-bar" class="bg-blue-600 h-4 rounded-full text-xs leading-none text-center text-white"></div>
+        </div>
+        <p id="overall-progress-text" class="text-center text-gray-600"></p>
+    </div>
+
+    <div class="bg-white shadow-md rounded-lg p-6">
+        <h2 class="text-2xl font-semibold mb-4">Timeline do Projeto</h2>
+        <div id="timeline-container" class="flex justify-between items-start mt-4"></div>
+    </div>
+	<div class="mt-8 bg-white shadow-md rounded-lg p-6">
+	  <div id="suggested-features"></div>
+	</div>
+    <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-white shadow-md rounded-lg p-6">
+            <h2 class="text-2xl font-semibold mb-4">Próximas Etapas</h2>
+            <ul id="next-steps" class="list-disc list-inside text-gray-600"></ul>
+        </div>
+
+        <div class="bg-white shadow-md rounded-lg p-6">
+            <h2 class="text-2xl font-semibold mb-4">Estatísticas</h2>
+            <div id="stats-container"></div>
+        </div>
+    </div>
+</div>

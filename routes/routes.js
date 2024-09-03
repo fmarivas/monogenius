@@ -18,7 +18,10 @@ const notificationController = require('../controllers/function/notificationCont
 const MonoCreator = require('../controllers/function/MonoCreatorComponent')
 const Plagiarism = require('../controllers/function/Plagiarism')
 const additionalFeatures = require('../controllers/function/additionalFeatures')
+
 const UserDetails = require('../controllers/function/userDetails')
+const { generateTimeline, calculateProgress } = require('../controllers/function/timelineGenerator')
+
 const DailyTips = require('../controllers/function/tips')
 
 const FavoritesHandler = require('../controllers/function/userFavorites')
@@ -39,6 +42,7 @@ const checkUserSource = require('../controllers/function/middleware/checkUserSou
 const checkRequestAvailability = require('../controllers/function/middleware/checkRequestAvailability')
 
 const pageResources = require('../controllers/config/pageResources')
+const generateTippyDescriptions = require('../controllers/config/tippyDescriptions')
 const preTextualElements = require('../controllers/config/preTextualElements')
 
 //Filas
@@ -208,6 +212,8 @@ router.get('/c/:id', isAuth, async (req, res, next) => {
 		updateUserTokens = await User.usersTokens(req.session.user.id)
 		
 		userFavorites = await FavoritesHandler.getUserFavorites(req.session.user.id)
+		
+		
     } catch(err) {
         console.error(err);
         let error = new Error("Erro de processamento. Tente mais tarde");
@@ -224,7 +230,7 @@ router.get('/c/:id', isAuth, async (req, res, next) => {
         }
         return null;
     };
-	
+	const tippyDescriptions = generateTippyDescriptions();
     const pageDetail = findPage(pageDetails, id);
 	
     if (pageDetail) {
@@ -243,6 +249,7 @@ router.get('/c/:id', isAuth, async (req, res, next) => {
 			userFavorites: userFavorites,
 			userSelectedMonoTheme: userSelectedMonoTheme,
 			tokens: updateUserTokens,
+			tippyDescriptions: tippyDescriptions,
         });
     } else {
         let error = new Error("Page not found");
@@ -250,6 +257,15 @@ router.get('/c/:id', isAuth, async (req, res, next) => {
         next(error);
     }
 });
+
+router.get('/api/slides-upload', isAuth, (req,res)=>{
+	res.render('pages/slides/document-upload')
+})
+
+
+router.get('/api/slide-editor', isAuth, (req,res)=>{
+	res.render('pages/slides/slide-editor')
+})
 
 router.get('/api/daily-tip', async (req, res) => {
     try {
@@ -311,6 +327,40 @@ router.post('/onboarding', isAuth, async (req, res) => {
   }
 });
 
+router.post('/api/update-user-details', isAuth, async (req, res) => {
+  const { expectedGraduation, academicPhase } = req.body;
+ 
+  if(!expectedGraduation || !academicPhase){
+    return res.status(400).json({success: false, error: 'Preencha todos os campos!'});
+  }
+  
+  try {
+    const result = await UserDetails.updateDetails(req.session.user.id, { expectedGraduation, academicPhase });
+    if (result.success) {
+      res.json({ success: true });
+    } else {
+      res.json({ success: false, error: 'Falha ao atualizar detalhes do usuário' });
+    }
+  } catch (err) {
+    console.error('Erro ao atualizar detalhes do usuário:', err);
+    res.status(500).json({ success: false, error: 'Erro interno do servidor' });
+  }
+});
+
+router.get('/api/check-user-confirmation', isAuth, async (req, res) => {
+  try {
+    const result = await UserDetails.checkUserDetailsConfirmation(req.session.user.id);
+    
+    if (result.success) {
+      res.json({ needsConfirmation: result.needsConfirmation });
+    } else {
+      res.status(500).json({ needsConfirmation: true, error: 'Erro ao verificar confirmação do usuário' });
+    }
+  } catch (err) {
+    console.error('Erro ao verificar confirmação do usuário:', err);
+    res.status(500).json({ needsConfirmation: true, error: 'Erro interno do servidor' });
+  }
+});
 
 router.post('/survey/user-source', isAuth, async (req, res) => {
     const { sourceOfKnowledge, otherSource, whatsappNumber } = req.body;
@@ -416,9 +466,9 @@ router.post('/api/plagiarism', isAuth, checkFeatureAccess('plagiarism'), async (
   try {
     const wordCount = countWords(textField);
     
-    // if (wordCount > 500) {
-      // return res.json({success: false, message: 'O texto excede o limite de 500 palavras'});
-    // }
+    if (wordCount > 1000) {
+      return res.json({success: false, message: 'O texto excede o limite de 1000 palavras'});
+    }
     
     const hasEnoughTokens = await checkAndConsumeTokens(req.session.user.id, 'plagiarism', wordCount);
     
@@ -431,8 +481,6 @@ router.post('/api/plagiarism', isAuth, checkFeatureAccess('plagiarism'), async (
     if (canMakeRequest.success) {
       const plagiarismChecker = await Plagiarism.verifyPlagiarism(textField);
       if (plagiarismChecker.success) {
-		  console.log(plagiarismChecker.result)
-		  console.log(plagiarismChecker.result.sources[0].matches)
         res.json({success: true, result: plagiarismChecker.result});
       } else {
         res.json({success: false, message: plagiarismChecker.message});
@@ -468,6 +516,7 @@ router.post('/api/paraphrase', isAuth, async (req, res) => {
     res.status(500).json({ success: false, message: 'Erro interno do servidor' });
   }
 });
+
 router.post('/template/download', isAuth, checkFeatureAccess('template'), upload.single('logo'), (req, res) => {
     const { instituicao, tema, autor, supervisor, local, mes, ano } = req.body;
     const logoBuffer = req.file ? req.file.buffer : null;
@@ -1016,12 +1065,12 @@ router.post('/api/subtopics', isAuth, checkFeatureAccess('themes'), upload.none(
     }
     
     try {
-        const subTopicResult = await additionalFeatures.subTopicGen(theme);
+        const subTopicResult = await additionalFeatures.generateEnhancedThemeDetails(theme);
         
         if (subTopicResult.success) {
             res.json({
                 success: true,
-                subtopics: subTopicResult.subtopics
+                subtopics: subTopicResult.details  // Mudança aqui
             });
         } else {
             res.status(500).json({
@@ -1160,4 +1209,37 @@ router.post('/support/:id', async (req, res) => {
     }
 });
 
+router.get('/api/user-progress', isAuth, async (req, res) => {
+  try {
+    const userId = req.session.user.id;
+    const userProgressResponse = await UserDetails.getUserProgress(userId);
+    
+    if (!userProgressResponse.success) {
+      return res.status(404).json({ error: userProgressResponse.error });
+    }
+
+    res.json(userProgressResponse);
+  } catch (error) {
+    console.error('Erro ao gerar progresso do usuário:', error);
+    res.status(500).json({ error: 'Erro interno do servidor' });
+  }
+});
+
+router.get('/api/reminders', isAuth, async (req, res) => {
+  try {
+    const userId = req.session.user.id;
+    await UserDetails.generateReminders(userId);
+    
+    const reminder = await UserDetails.getReminders(userId);
+    
+    if (reminder.success) {
+      res.json({ success: true, reminders: reminder.reminders });
+    } else {
+      res.json({ success: false, error: reminder.error });
+    }
+  } catch (error) {
+    console.error('Erro ao gerar ou buscar lembretes:', error);
+    res.status(500).json({ error: 'Erro interno do servidor' });
+  }
+});
 module.exports = router

@@ -122,7 +122,7 @@ class additionalFeatures {
         }
     }
 	
-	static async themesCreator(studyArea, specificInterest, academicLevel, themeCount, tier, keywords, areaFocal) {
+	static async themesCreator(studyArea, specificInterest, academicLevel, themeCount, tier, keywords, areaFocal='Chimoio') {
 		const tools = [
 			{
 				type: "function",
@@ -149,61 +149,81 @@ class additionalFeatures {
 			keywordsPrompt = `Considere as seguintes palavras-chave em sua criação de temas: ${keywords}.`;
 		}
 
+		// Lista de exemplos reais de temas acadêmicos
+		const realExamples = [
+			"Avaliação da Cinética de Desidratação da Manga (Mangifera indica L.) no Secador Convectivo",
+			"Análise microbiológica de bolos de rua comercializados e consumidos ao redor da cidade de Chimoio",
+			"Elaboração e caracterização da composição centesimal e análise sensorial de farinha de milho enriquecida com farinha de soja para papa",
+			"Evaluation of Physicochemical, nutritional profile and sensory acceptability of bio-fortified Rice (Oryza sativa) protein of chicken meat flour in Mozambique",
+			"Caracterização físico-química, nutricional e aceitabilidade sensorial de flocos maduros descontínuos de mandioca e rodelas de frutas de banana e maçã desidratada",
+			"Análise e incorporação de popop para a redução parcial da areia no fabrico de blocos vazados de cimento e areia",
+			"Avaliação da viabilidade técnica e económica Ambiental da implementação de secagem fotovoltaica em áreas rurais remotas",
+			"Análise de perspectiva da demanda de energia na Cidade de Tete no período de 2024-2026",
+			"Estufa agrícola inteligente alimentada por sistema Fotovoltaico, para melhorar as condições agro-climáticas de cultivo de hortícolas",
+			"Uso de condutores no roubo de energia",
+			"Automação do sistema de fornecimento de energia eléctrica para eficiência energética na empresa Abilio Antunes",
+			"Análise dos Desafios e barreiras à adopção de tecnologias e práticas sustentáveis na produção agrícola no distrito de Vanduzi",
+			"Análise da viabilidade do uso de sistemas agro-florestais como forma de reduzir os impactos climáticos na província de Manica",
+			"Avaliação da cobertura de vacinação do controle contra Newcastle nos subúrbios da cidade de Chimoio",
+			"Insegurança Alimentar e Nutricional no povoado de Belas- Distrito de Vanduzi Avaliação das fontes catalisadores nos agricultores de subsistência",
+			"Análise da viabilidade da propagação vegetativa por meio da estaquía na cultura de tomate (Solanum lycopersicum)",
+			"A avaliação e efeito de diferentes formas de adubação orgânica na produção de alface a variedade Great Lakes nas condições do túnel, Faculdade de Engenharia",
+			"Mapeamento e análise do regime de queimadas nas florestas de miombo no norte de Moçambique: caso de estudo província de Niassa",
+			"Estudo da poluição Marinha Provocada pela Empresa kenmare na Costa Marítima do Distrito de Moma, Província de Nampula",
+			"Propagação de Estrutura das Correntes ao Norte do Canal de Moçambique, Cabo - Delgado",
+			"Georeferenciamento Remoto e geoprocessing aplicados no monitoramento do deslocamento no norte de Moçambique por meio de dados satélites no período cronológico de 2012 a 2017 na Província da Nassa",
+			"Análise de aspectos socioeconómicos da aquacultura de pequena escala na família no distrito de Gorongosa, Província de Sofala",
+			"Utilização de casuarinos cálcicos para reposição de ar e controle de temperatura na empresa Euro-posto Luís Beira",
+			"Importância da eficiência energética e mitigação das mudanças climáticas em Moçambique",
+			"Assistente Virtual de Atendimento para Estudantes da UNENG",
+			"A importância da Inteligência artificial e o desenvolvimento do pensamento crítico na comunidade académica",
+			"A aplicação da tecnologia BIM na apresentação de projectos arquitectónicos e estruturais utilizando realidade aumentada",
+			"Monogenius: Plataforma Inteligente para Criação e Verificação de Monografias Académicas",
+			"Álcool na adolescência. Factores que influenciam o consumo e a percepção dos estudantes das escolas secundárias sobre as suas consequências",
+			"Avaliação do Grau de Satisfação dos Utentes do HPC",
+			"Perfil socioeconómico e grau de satisfação dos estudantes da FENG",
+			"Impacto da exploração infantil na cidade de Chimoio",
+			"Impacto do uso de seguros na província da Manica (estudo comparado da EMOSE e Indico Seguros)",
+			"Factores psicológicos que influenciam a reincidência criminal dos prisioneiros no estabelecimento penitenciário regional centro de Manica (2023 - 2024)",
+			"Impacto da formarção de preços de transporte publicos na arrecadação de receitas fiscais no município de Chimoio, no período de 2004 a 2022",
+			"Gestão do Recurso Humano: Numa óptica de Marketing interno uma abordagem prática em busca de boas práticas na Gestão de Recursos Humanos",
+			"O Empreendedorismo Universitário e a Quarta Revolução Industrial",
+			"Análise da eficácia do ensino bilingue no desenvolvimento de competências de leitura e escrita caso da Escola Primaria e 1° Congresso, Cidade de Chimoio",
+			"Política da gratuidade do ensino básico, acessibilidade e impacto na Escola Primária Quatro das Laranjeitas - Vanduzi",
+			"Educação Inclusiva Solidária e as Práticas de Vida Humana: O lugar do(a) Educador(a) na Vida",
+			"Avaliação da Produtividade de Variedades Peixinzinho da Cultura de Alface (Lactuca sativa L.) no Sistema Hidropónico face às mudanças climáticas na Cidade de Tete, Bairro Matundo-Vhanla",
+			"Influência dos Modelos Climáticos Tropicais e Subtropicais na Precipitação Total da Estação Seca na Província de Manica",
+			"Sustentabilidade da Agricultura Africana: Desafios e Oportunidades",
+			"O papel das correntes oceânicas derivadas por satélite na variabilidade climática no Canal de Moçambique",
+			"A mudança para práticas e tecnologias de agricultura de conservação na baixa do vale do Zambeze, Faculdade de Engenharia da UCM",
+			"Análise das causas de avarias nos contadores de energia eléctrica da Electricidade de Moçambique, ASC - TETE, 2023 - 2024"
+		];
+
 		const message = `
 			Crie ${themeCount} temas para trabalhos acadêmicos na área de ${studyArea}, com foco em ${specificInterest}, adequados para o nível de ${academicLevel}${areaFocal ? ` em ${areaFocal}` : ''}. ${keywordsPrompt}
 
-			Os temas devem ser:
-			1. Relevantes${areaFocal ? ` para o contexto de ${areaFocal}` : ''}, abordando questões contemporâneas importantes e contribuindo significativamente para o desenvolvimento${areaFocal ? ' do país' : ''}.
-			2. Originais, oferecendo novas perspectivas ou explorando áreas ainda não investigadas extensivamente${areaFocal ? ` em ${areaFocal}` : ''}.
-			3. Viáveis, considerando a disponibilidade de fontes e recursos necessários para a pesquisa no contexto${areaFocal ? ' local' : ''}.
-			4. Claros e delimitados, com escopo bem definido para permitir uma investigação aprofundada e específica.
-			5. De interesse pessoal e social, potencialmente motivando o estudante e beneficiando a comunidade.
-			6. Com contribuição prática, sempre que possível, oferecendo soluções ou insights aplicáveis${areaFocal ? ` à realidade de ${areaFocal}` : ''}.
-			7. Interdisciplinares, quando apropriado, integrando conhecimentos de diferentes áreas para uma abordagem mais abrangente.
-			8. Alinhados com os Objectivos de Desenvolvimento Sustentável (ODS) da ONU, quando aplicável.
-			9. Considerando aspectos culturais, históricos ou socioeconómicos${areaFocal ? ` específicos de ${areaFocal}` : ''}.
-			10. Potencialmente inovadores, explorando tecnologias ou metodologias emergentes no contexto${areaFocal ? ' local' : ''}.
+			IMPORTANTE: Os temas gerados DEVEM seguir ESTRITAMENTE a estrutura e o estilo dos exemplos fornecidos abaixo. Utilize a mesma abordagem de nomenclatura, especificidade e formato. Adapte o conteúdo para ${studyArea} e ${specificInterest}, mas mantenha a estrutura similar.
 
-			Baseie-se nos seguintes exemplos de temas reais de trabalhos acadêmicos${areaFocal ? ` em ${areaFocal}` : ''}, adaptando-os para a área de ${studyArea} e foco em ${specificInterest}:
+			Exemplos de referência:
+			${realExamples.join('\n')}
 
-			1. Análise de aspectos socioeconômicos da ${specificInterest} na ${studyArea}${areaFocal ? ` em ${areaFocal}` : ''}: Um estudo de ${academicLevel}
+			Lembre-se:
+			1. Use termos técnicos específicos da área, como nos exemplos.
+			2. Inclua detalhes metodológicos ou de aplicação, quando relevante.
+			3. Especifique o contexto ou população de estudo, se aplicável.
+			4. Mantenha um nível de especificidade similar aos exemplos.
+			5. Adapte a estrutura para ${studyArea} e ${specificInterest}, mas mantenha o estilo geral.
 
-			2. Influência da aplicação de ${specificInterest} no processo de ${studyArea}: Estudo de caso em ${areaFocal}
-
-			3. Incorporação de ${keywords[0]} para a otimização de ${keywords[1]} na ${studyArea}${areaFocal ? ` em ${areaFocal}` : ''}
-
-			4. Avaliação do grau de satisfação dos usuários de ${specificInterest} na ${studyArea}${areaFocal ? ` em ${areaFocal}` : ''}
-
-			5. Perfil sócio-econômico e grau de satisfação dos estudantes de ${academicLevel} em ${studyArea}${areaFocal ? ` em ${areaFocal}` : ''}
-
-			6. Impacto da ${specificInterest} na ${studyArea}${areaFocal ? ` em ${areaFocal}` : ''}: Uma análise de ${academicLevel}
-
-			7. A dependência de ${keywords[0]} e o desenvolvimento de ${keywords[1]} na ${studyArea}: Perspectivas para ${academicLevel}
-
-			8. Avaliação da produtividade de ${specificInterest} na ${studyArea} face às mudanças climáticas${areaFocal ? ` em ${areaFocal}` : ''}
-
-			9. ${keywords[0]}: Plataforma inteligente para ${keywords[1]} em ${studyArea} de ${academicLevel}
-
-			10. Estudo da ${specificInterest} promovido por ${keywords[0]} na ${studyArea}${areaFocal ? ` em ${areaFocal}` : ''}
-
-			11. Elaboração e caracterização de ${specificInterest} na ${studyArea}: Uma abordagem de ${academicLevel}
-
-			12. Análise da viabilidade do uso de ${specificInterest} como forma de otimizar ${keywords[0]} em ${studyArea}
-
-			13. Desafios e barreiras à adoção de ${specificInterest} na ${studyArea}${areaFocal ? ` em ${areaFocal}` : ''}
-
-			14. ${keywords[0]} na ${keywords[1]}: Fatores que influenciam ${specificInterest} na ${studyArea}
-
-			15. Avaliação da cobertura de ${specificInterest} no controle de ${keywords[0]} em ${studyArea}${areaFocal ? ` em ${areaFocal}` : ''}
+			Os temas devem ser relevantes${areaFocal ? ` para o contexto de ${areaFocal}` : ''}, originais, viáveis, claros, de interesse social, e alinhados com os Objetivos de Desenvolvimento Sustentável da ONU, quando aplicável.
 
 			Apresente cada tema em uma linha separada, garantindo que sejam específicos, relevantes${areaFocal ? ` e adaptados ao contexto de ${areaFocal}` : ''}.
 		`;
 		
-		try{
+		try {
 			const completion = await openai.chat.completions.create({
 				model: 'gpt-4o',
 				messages: [
-					{ role: "system", content: "Você é um assistente especializado em pesquisa acadêmica e bibliografia, com profundo conhecimento das normas APA." },
+					{ role: "system", content: "Você é um assistente especializado em pesquisa acadêmica, com profundo conhecimento em geração de temas de pesquisa. Sua tarefa é criar temas que sigam estritamente o estilo e a estrutura dos exemplos fornecidos." },
 					{ role: "user", content: message }
 				],
 				tools: tools,
@@ -223,50 +243,130 @@ class additionalFeatures {
 			} else {
 				throw new Error('Falha ao gerar temas');
 			}
-		}catch(err){
+		} catch(err) {
 			console.error(err)
 			throw err;
 		}
-		
 	}
 	
-	static async subTopicGen(theme) {
+	static async generateEnhancedThemeDetails(theme) {
+		const tools = [
+			{
+				type: "function",
+				function: {
+					name: "generate_enhanced_theme_details",
+					description: "Gera detalhes estruturados e aprimorados para um tema acadêmico",
+					parameters: {
+						type: "object",
+						properties: {
+							description: {
+								type: "string",
+								description: "Breve descrição do tema"
+							},
+							questions: {
+								type: "array",
+								items: { type: "string" },
+								description: "Lista de perguntas de partida",
+								minItems: 3,
+								maxItems: 3
+							},
+							approaches: {
+								type: "array",
+								items: { type: "string" },
+								description: "Lista de abordagens possíveis",
+								minItems: 2,
+								maxItems: 2
+							},
+							subproblems: {
+								type: "array",
+								items: { type: "string" },
+								description: "Lista de subproblemas relacionados",
+								minItems: 3,
+								maxItems: 3
+							},
+							delimitation: {
+								type: "object",
+								properties: {
+									suggestion: { type: "string" },
+									rationale: { type: "string" }
+								},
+								description: "Sugestão de como delimitar o tema e justificativa"
+							},
+							sample: {
+								type: "object",
+								properties: {
+									suggestion: { type: "string" },
+									rationale: { type: "string" }
+								},
+								description: "Sugestão de definição de amostra e justificativa"
+							}
+						},
+						required: ["description", "questions", "approaches", "subproblems", "delimitation", "sample"]
+					}
+				}
+			}
+		];
+
 		const message = `
-			Gerar 4 subtópicos relacionados ao tema '${theme}' que possam ser explorados em uma monografia acadêmica. 
-			Os subtópicos devem abordar diferentes aspectos do tema, como implicações éticas, impactos tecnológicos, questões sociais, oportunidades de pesquisa, e quaisquer desafios emergentes. 
-			As sugestões devem ser claras e relevantes para o contexto acadêmico e direcionadas a estudantes que estão desenvolvendo uma monografia sobre esse tema. 
-			Apresente apenas os subtópicos, sem numeração, explicações ou conteúdo adicional.
-		`;
-		
+		Com base no tema '${theme}', forneça os seguintes detalhes aprimorados:
+		Descrição: [Breve descrição do tema]
+		Perguntas de Partida:
+		1. [Pergunta 1]
+		2. [Pergunta 2]
+		3. [Pergunta 3]
+		Abordagens Possíveis:
+		1. [Abordagem 1]
+		2. [Abordagem 2]
+		Subproblemas Relacionados:
+		1. [Subproblema 1]
+		2. [Subproblema 2]
+		3. [Subproblema 3]
+		Delimitação do Tema:
+		- Sugestão: [Como delimitar o tema]
+		- Justificativa: [Por que esta delimitação é apropriada]
+		Definição da Amostra:
+		- Sugestão: [Como definir a amostra]
+		- Justificativa: [Por que esta amostra é adequada]
+		Assegure-se de que as informações fornecidas sejam relevantes, originais e tenham potencial para contribuição significativa ao campo de estudo.`;
+
 		try {
 			const completion = await openai.chat.completions.create({
 				model: "gpt-4o",
 				messages: [
-					{ role: "system", content: "Você é um assistente especializado em pesquisa acadêmica e geração de tópicos para monografias." },
+					{ role: "system", content: "Você é um assistente especializado em pesquisa acadêmica, capaz de gerar temas detalhados e estruturados para estudos, incluindo orientações sobre delimitação do tema e definição de amostra." },
 					{ role: "user", content: message }
 				],
-				max_tokens: 150
+				tools: tools,
+				tool_choice: "auto"
 			});
 
-			const response = completion.choices[0].message.content;
+			const response = completion.choices[0].message;
 
-			// Dividir a resposta em linhas e remover linhas vazias
-			const subtopics = response.split('\n').filter(line => line.trim() !== '');
-
-			return {
-				success: true,
-				subtopics: subtopics
-			};
-
+			if (response.tool_calls && response.tool_calls.length > 0) {
+				const functionCall = response.tool_calls[0];
+				if (functionCall.function.name === "generate_enhanced_theme_details") {
+					const themeDetails = JSON.parse(functionCall.function.arguments);
+					return {
+						success: true,
+						details: {
+							title: theme,
+							...themeDetails
+						}
+					};
+				} else {
+					throw new Error(`Função inesperada chamada: ${functionCall.function.name}`);
+				}
+			} else {
+				throw new Error('Falha ao gerar detalhes aprimorados do tema');
+			}
 		} catch (err) {
-			console.error("Erro ao gerar subtópicos:", err);
+			console.error("Erro ao gerar temas detalhados aprimorados:", err);
 			return {
 				success: false,
-				message: "Ocorreu um erro ao gerar os subtópicos. Por favor, tente novamente."
+				message: "Ocorreu um erro ao gerar os temas detalhados aprimorados. Por favor, tente novamente."
 			};
 		}
 	}
-	
 	static async referencesCreator(tema, ideiaInicial, tier, language){
 		try{
 			const referencias = await MonoCreator.generateReferences(tema, ideiaInicial, tier, language);

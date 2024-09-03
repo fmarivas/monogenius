@@ -1,6 +1,7 @@
 const pageDetails = {
     main: {
         dashboard: { name: 'Dashboard', icon: 'fas fa-tachometer-alt' },
+		progress: { name: 'Meu Progresso', icon: 'fas fa-chart-line' },
     },
     features: {
         themes: { name: 'Gerador de Temas', icon: 'fas fa-lightbulb', description: 'Obtenha sugestões de temas inovadores para sua pesquisa.' },

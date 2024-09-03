@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload de Documentos - Monogenius</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto p-4">
+        <h1 class="text-2xl font-bold mb-4">Upload de Documentos</h1>
+        
+        <div id="dropzone" class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:bg-gray-50 transition duration-300">
+            <p>Arraste e solte seus arquivos aqui ou clique para selecionar</p>
+            <input type="file" id="fileInput" class="hidden" multiple>
+        </div>
+
+        <ul id="fileList" class="mt-4 space-y-2"></ul>
+    </div>
+
+    <script>
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('fileInput');
+        const fileList = document.getElementById('fileList');
+
+        dropzone.addEventListener('click', () => fileInput.click());
+
+        dropzone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropzone.classList.add('bg-gray-100');
+        });
+
+        dropzone.addEventListener('dragleave', () => {
+            dropzone.classList.remove('bg-gray-100');
+        });
+
+        dropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropzone.classList.remove('bg-gray-100');
+            handleFiles(e.dataTransfer.files);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+        });
+
+        function handleFiles(files) {
+            for (const file of files) {
+                uploadFile(file);
+            }
+        }
+
+        async function uploadFile(file) {
+            const li = document.createElement('li');
+            li.className = 'flex items-center justify-between bg-white p-2 rounded shadow';
+            li.innerHTML = `
+                <span>${file.name}</span>
+                <div>
+                    <button class="text-blue-500 hover:text-blue-700 mr-2">Visualizar</button>
+                    <button class="text-red-500 hover:text-red-700">Remover</button>
+                </div>
+            `;
+            fileList.appendChild(li);
+			
+            const formData = new FormData();
+            formData.append('file', file);
+            axios.post('/api/read-file', formData)
+                 .then(response => console.log(response))
+                 .catch(error => console.error(error));
+        }
+    </script>
+</body>
+</html>

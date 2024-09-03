@@ -20,7 +20,10 @@
     <link rel="manifest" href="/static/assets/img/favicon/site.webmanifest">  	
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shepherd.js@10.0.1/dist/css/shepherd.css"/>
-	
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tippy.js/6.3.1/tippy.min.css">
+
+	<script src="https://unpkg.com/popper.js@1"></script>
+	<script src="https://unpkg.com/tippy.js@5"></script>
 	<script src="https://cdn.jsdelivr.net/npm/shepherd.js@10.0.1/dist/js/shepherd.min.js"></script>	
 	<script src="https://cdn.tailwindcss.com"></script>
     <script src="/static/assets/js/common.js"></script>
@@ -164,57 +167,67 @@
 
     <div class="flex">
         <!-- Sidebar -->
-		<div id="sidebar" class="fixed lg:relative hidden lg:flex w-64 h-screen flex-col p-2 bg-gray-800 text-white z-50 overflow-y-auto">
-			<div class="mb-4 lg:block hidden">
-				<a href="/c/dashboard"><img src="/static/assets/img/logo.png" alt="Logo" class="w-full h-auto" /></a>
+		<div id="sidebar" class="fixed lg:relative hidden lg:flex w-64 h-screen flex-col bg-gray-800 text-white z-50 overflow-y-auto transition-all duration-300 ease-in-out">
+			<div class="flex items-center justify-between p-4">
+				<a href="/c/dashboard" class="lg:block hidden">
+					<img src="/static/assets/img/logo.png" alt="Logo" class="w-full h-auto max-w-[150px]" />
+				</a>
+				<button id="toggle-sidebar" class="lg:flex hidden items-center justify-center w-8 h-8 rounded-full bg-gray-700 hover:bg-gray-600 transition-colors duration-200">
+					<i class="fas fa-chevron-left"></i>
+				</button>
 			</div>
-			<nav class="flex-grow flex flex-col justify-between">
-				<div>
-					<ul class="list-none p-0 mb-4">
-						<% Object.entries(pageDetails.main).forEach(([pageKey, details]) => { %>
-						<% const isActive = page && page === pageKey; %>
-						<% const activeClass = isActive ? 'bg-gray-700' : ''; %>
-						<li class="mb-2 rounded <%= activeClass %> hover:bg-gray-700 transition-colors duration-200">
-							<a href="/c/<%= pageKey %>" class="font-bold text-decoration-none block text-base p-2">
-								<i class="<%= details.icon %> mr-2"></i>
-								<span class=""><%= details.name %></span>
-							</a>
-						</li>
-						<% }); %>
-					</ul>
-					
-					<div class="border w-full h-0 mb-2"></div>
-					
-					<ul class="list-none p-0 mb-4">
-						<% Object.entries(pageDetails.features).forEach(([pageKey, details]) => { %>
-						<% const isActive = page && page === pageKey; %>
-						<% const activeClass = isActive ? 'bg-gray-700' : ''; %>
-						<li class="mb-2 rounded <%= activeClass %> hover:bg-gray-700 transition-colors duration-200">
-							<a href="/c/<%= pageKey %>" class="font-bold text-decoration-none block text-base p-2">
-								<i class="<%= details.icon %> mr-2"></i>
-								<span class=""><%= details.name %></span>
-							</a>
-						</li>
-						<% }); %>
-					</ul>
+			
+				<nav class="flex-grow flex flex-col justify-between p-4">
+					<div>
+						<ul class="list-none p-0 mb-4 space-y-2">
+							<% Object.entries(pageDetails.main).forEach(([pageKey, details]) => { %>
+							<% const isActive = page && page === pageKey; %>
+							<% const activeClass = isActive ? 'bg-indigo-600' : ''; %>
+							<li class="rounded hover:bg-gray-700 transition-colors duration-200 group">
+								<a href="/c/<%= pageKey %>" class="sidebarBtn flex items-center font-medium text-sm p-2 <%= activeClass %> group-hover:bg-opacity-80" data-tippy-content="<%= details.description %>">
+									<i class="<%= details.icon %> mr-3 w-5 text-center"></i>
+									<span class="flex-grow"><%= details.name %></span>
+									<% if (details.new) { %>
+										<span class="bg-red-500 text-white text-xs px-2 py-1 rounded-full">Novo</span>
+									<% } %>
+								</a>
+							</li>
+							<% }); %>
+						</ul>
+						
+						<div class="border-t border-gray-700 my-4"></div>
+						
+						<ul class="list-none p-0 mb-4 space-y-2">
+							<% Object.entries(pageDetails.features).forEach(([pageKey, details]) => { %>
+							<% const isActive = page && page === pageKey; %>
+							<% const activeClass = isActive ? 'bg-gray-700' : ''; %>
+							<li class="mb-2 rounded <%= activeClass %> hover:bg-gray-700 transition-colors duration-200">
+								<a href="/c/<%= pageKey %>" class="sidebarBtn font-bold text-decoration-none block text-base p-2">
+									<i class="<%= details.icon %> mr-2"></i>
+									<span class=""><%= details.name %></span>
+								</a>
+							</li>
+							<% }); %>
+						</ul>
 
-				</div>
+					</div>
 				
-				<ul class="list-none p-0 mt-auto">
-				<div class="border w-full h-0 mt-auto mb-2"></div>
-					<% Object.entries(pageDetails.bottom).forEach(([pageKey, details]) => { %>
-					<% const isActive = page && page === pageKey; %>
-					<% const activeClass = isActive ? 'bg-gray-700' : ''; %>
-					<li class="mb-2 rounded <%= activeClass %> hover:bg-gray-700 transition-colors duration-200">
-						<a href="/c/<%= pageKey %>" class="font-bold text-decoration-none block text-base p-2">
-							<i class="<%= details.icon %> mr-2"></i>
-							<span class=""><%= details.name %></span>
-						</a>
-					</li>
-					<% }); %>
-				</ul>
+					<div class="border-t border-gray-700 my-4"></div>
+					
+					<ul class="list-none p-0 space-y-2">
+						<% Object.entries(pageDetails.bottom).forEach(([pageKey, details]) => { %>
+						<% const isActive = page && page === pageKey; %>
+						<% const activeClass = isActive ? 'bg-gray-700' : ''; %>
+						<li class="mb-2 rounded <%= activeClass %> hover:bg-gray-700 transition-colors duration-200">
+							<a href="/c/<%= pageKey %>" class="sidebarBtn font-bold text-decoration-none block text-base p-2">
+								<i class="<%= details.icon %> mr-2"></i>
+								<span class=""><%= details.name %></span>
+							</a>
+						</li>
+						<% }); %>
+					</ul>
 
-					<div class="border w-full h-0 mb-2"></div>
+					<div class="border-t border-gray-700 my-4"></div>
 
 					<!-- Nova seção para os tokens do usuário -->
 					<div class="px-4 py-2 bg-gray-700 rounded mb-2">
@@ -226,12 +239,13 @@
 							<span class="ml-2 text-2xl font-bold text-white"><%= tokens || 0 %></span>
 						</div>
 					</div>
-
-					<ul class="list-none p-0">
+					
+					<!-- Bottom links and CTA -->
+					<ul class="list-none p-0 space-y-2">
 						<% Object.entries(pageDetails.cta).forEach(([pageKey, details]) => { %>
 						<% const isActive = page && page === pageKey; %>
 						<li class="mb-2 rounded bg-gradient-to-r from-yellow-400 to-red-500 hover:from-yellow-500 hover:to-red-600 transition-colors duration-200">
-							<a href="/c/<%= pageKey %>" class="font-bold text-decoration-none block text-base p-2 text-white">
+							<a href="/c/<%= pageKey %>" class="sidebarBtn font-bold text-decoration-none block text-base p-2 text-white">
 								<i class="<%= details.icon %> mr-2 animate-pulse"></i>
 								<span class=""><%= details.name %></span>
 							</a>
@@ -252,6 +266,9 @@
                 </div>
             </div>	
             <%- include('pages/' + body) %>
+            <div id="tour-button" class="fixed top-4 right-4 bg-blue-500 text-white p-2 rounded-full cursor-pointer">
+                <i class="fas fa-question-circle"></i>
+            </div>
         </div>
     </div>
 	
@@ -285,8 +302,72 @@
 	  <% }); %>
 	<% } %>	
     <script>
+		const sidebar = document.getElementById('sidebar');
+		const toggleSidebar = document.getElementById('toggle-sidebar');
+		const content = document.getElementById('content');
+
+        // Inicializar tooltips
+        tippy('[data-tippy-content]');
+        
+        // Adicionar animações suaves
+        document.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                document.body.style.opacity = 0;
+                setTimeout(() => {
+                    window.location = link.href;
+                }, 300);
+            });
+        });
+        
+        // Tour guiado
+        document.getElementById('tour-button').addEventListener('click', () => {
+            const tour = new Shepherd.Tour({
+                defaultStepOptions: {
+                    cancelIcon: {
+                        enabled: true
+                    },
+                    classes: 'shadow-md bg-purple-dark',
+                    scrollTo: { behavior: 'smooth', block: 'center' }
+                }
+            });
+
+            tour.addStep({
+                title: 'Bem-vindo ao Monogenius!',
+                text: 'Vamos fazer um tour rápido pela interface.',
+                attachTo: {
+                    element: '#sidebar',
+                    on: 'right'
+                },
+                buttons: [
+                    {
+                        text: 'Próximo',
+                        action: tour.next
+                    }
+                ]
+            });
+
+            // Adicione mais passos conforme necessário
+
+            tour.start();
+        });
+		toggleSidebar.addEventListener('click', () => {
+			sidebar.classList.toggle('w-64');
+			sidebar.classList.toggle('w-20');
+			content.classList.toggle('lg:ml-64');
+			content.classList.toggle('lg:ml-20');
+			
+			// Toggle icon
+			const icon = toggleSidebar.querySelector('i');
+			icon.classList.toggle('fa-chevron-left');
+			icon.classList.toggle('fa-chevron-right');
+			
+			// Toggle text visibility
+			const textElements = sidebar.querySelectorAll('span');
+			textElements.forEach(el => el.classList.toggle('hidden'));
+		});
+		
         document.getElementById('mobile-menu-button').addEventListener('click', function() {
-            const sidebar = document.getElementById('sidebar');
             sidebar.classList.toggle('hidden');
             sidebar.classList.toggle('w-full');
             sidebar.classList.toggle('w-64');
