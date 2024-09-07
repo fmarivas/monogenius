@@ -88,7 +88,6 @@ class Monography {
 		 static async generateIntroduction(tema, ideiaInicial, manuais, referencias, tier) {
 			let aiModel = tier === "free" ? 'gpt-4o-mini' : 'gpt-4o';
 
-console.log(ideiaInicial)
 			const citationInstructions = `
 			  Ao citar as referências no texto, use o estilo APA:
 			  - Para citações diretas: (Sobrenome, Ano, p. X)
